@@ -1,0 +1,2319 @@
+[
+  {
+    "Success Criterion": "1.1.1 Non-text Content (A)",
+    "axe-core Rule": "image-alt",
+    "automated checks (axe core rules )": [
+      "Images have alternative text where required (non-decorative images).",
+      "Decorative images are marked with empty alternative text (alt=\"\") or implemented as CSS backgrounds."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Linked images have descriptive and meaningful alternative text.",
+      "Equivalent text alternatives for complex images are provided in context or via a separate linked page.",
+      "Form buttons have descriptive values that convey their purpose.",
+      "Inputs have appropriate accessible names.",
+      "Embedded multimedia is identified using accessible text alternatives.",
+      "Frames and iframes have appropriate and descriptive titles."
+    ],
+    "Total conditions": [
+      "Images have alternative text where required (non-decorative images).",
+      "Decorative images are marked with empty alternative text (alt=\"\") or implemented as CSS backgrounds.",
+      "Linked images have descriptive and meaningful alternative text.",
+      "Equivalent text alternatives for complex images are provided in context or via a separate linked page.",
+      "Form buttons have descriptive values that convey their purpose.",
+      "Inputs have appropriate accessible names.",
+      "Embedded multimedia is identified using accessible text alternatives.",
+      "Frames and iframes have appropriate and descriptive titles."
+    ],
+    "webaim checks": " 1.Images, image buttons, and image map hot spots have appropriate, equivalent alternative text.\r\n 2.Images that do not convey content, are decorative, or contain content that is already conveyed in text are given empty\r\nalternative text (alt=\"\") or implemented as CSS backgrounds. \r\n3.All linked images have descriptive alternative text.\r\n Equivalent alternatives to complex images are provided in context or on a separate linked page.\r\n 4.Form buttons have a descriptive value.\r\n5. Inputs have appropriate accessible names.\r\n6. Embedded multimedia is identified via accessible text.\r\n 7.Frames and iframes are appropriately titled.\r\n"
+  },
+  {
+    "Success Criterion": "1.1.1 Non-text Content (A)",
+    "axe-core Rule": "object-alt",
+    "automated checks (axe core rules )": [
+      "Embedded objects (such as <object> elements) that convey information have accessible text alternatives.",
+      "Embedded objects include fallback text or accessible naming mechanisms when required."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Images have appropriate and equivalent alternative text.",
+      "Decorative images are marked with empty alternative text (alt=\"\") or implemented as CSS backgrounds.",
+      "Linked images have descriptive and meaningful alternative text.",
+      "Equivalent text alternatives for complex images are provided in context or via a separate linked page.",
+      "Form buttons have descriptive values that convey their purpose.",
+      "Inputs have appropriate accessible names.",
+      "Embedded multimedia is identified using accessible text alternatives beyond object fallback.",
+      "Frames and iframes have appropriate and descriptive titles."
+    ],
+    "Total conditions": [
+      "Embedded objects (such as <object> elements) that convey information have accessible text alternatives.",
+      "Embedded objects include fallback text or accessible naming mechanisms when required.",
+      "Images have appropriate and equivalent alternative text.",
+      "Decorative images are marked with empty alternative text (alt=\"\") or implemented as CSS backgrounds.",
+      "Linked images have descriptive and meaningful alternative text.",
+      "Equivalent text alternatives for complex images are provided in context or via a separate linked page.",
+      "Form buttons have descriptive values that convey their purpose.",
+      "Inputs have appropriate accessible names.",
+      "Embedded multimedia is identified using accessible text alternatives beyond object fallback.",
+      "Frames and iframes have appropriate and descriptive titles."
+    ],
+    "webaim checks": "\r\n\r\n1. Images have appropriate and equivalent alternative text.\r\n2. Decorative images are marked with empty alternative text (alt=\"\") or implemented as CSS backgrounds.\r\n3. Linked images have descriptive and meaningful alternative text.\r\n4. Equivalent text alternatives for complex images are provided in context or via a separate linked page.\r\n5. Form buttons have descriptive values that convey their purpose.\r\n6. Inputs have appropriate accessible names.\r\n7. Embedded multimedia is identified using accessible text alternatives beyond object fallback.\r\n8. Frames and iframes have appropriate and descriptive titles.\r\n"
+  },
+  {
+    "Success Criterion": "1.1.1 Non-text Content (A)",
+    "axe-core Rule": "svg-img-alt",
+    "automated checks (axe core rules )": [
+      "SVG elements that convey information and are exposed as images have accessible text alternatives.",
+      "SVG images include appropriate accessible names via <title>, <desc>, or aria-label where required."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Raster images and other non-SVG images have appropriate and equivalent alternative text.",
+      "Decorative images are marked with empty alternative text (alt=\"\") or implemented as CSS backgrounds.",
+      "Linked images have descriptive and meaningful alternative text.",
+      "Equivalent text alternatives for complex images are provided in context or via a separate linked page.",
+      "Form buttons have descriptive values that convey their purpose.",
+      "Inputs have appropriate accessible names.",
+      "Embedded multimedia is identified using accessible text alternatives.",
+      "Frames and iframes have appropriate and descriptive titles."
+    ],
+    "Total conditions": [
+      "SVG elements that convey information and are exposed as images have accessible text alternatives.",
+      "SVG images include appropriate accessible names via <title>, <desc>, or aria-label where required.",
+      "Raster images and other non-SVG images have appropriate and equivalent alternative text.",
+      "Decorative images are marked with empty alternative text (alt=\"\") or implemented as CSS backgrounds.",
+      "Linked images have descriptive and meaningful alternative text.",
+      "Equivalent text alternatives for complex images are provided in context or via a separate linked page.",
+      "Form buttons have descriptive values that convey their purpose.",
+      "Inputs have appropriate accessible names.",
+      "Embedded multimedia is identified using accessible text alternatives.",
+      "Frames and iframes have appropriate and descriptive titles."
+    ],
+    "webaim checks": "\r\n\r\n1. Images have appropriate and equivalent alternative text.\r\n2. Decorative images are marked with empty alternative text (alt=\"\") or implemented as CSS backgrounds.\r\n3. Linked images have descriptive and meaningful alternative text.\r\n4. Equivalent text alternatives for complex images are provided in context or via a separate linked page.\r\n5. Form buttons have descriptive values that convey their purpose.\r\n6. Inputs have appropriate accessible names.\r\n7. Embedded multimedia is identified using accessible text alternatives beyond object fallback.\r\n8. Frames and iframes have appropriate and descriptive titles.\r\n"
+  },
+  {
+    "Success Criterion": "1.1.1 Non-text Content (A)",
+    "axe-core Rule": "role-img-alt",
+    "automated checks (axe core rules )": [
+      "Elements with role=\"img\" that convey information have accessible text alternatives.",
+      "Elements with role=\"img\" include appropriate accessible names via aria-label, aria-labelledby, or equivalent mechanisms."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Raster images and other non-role=\"img\" images have appropriate and equivalent alternative text.",
+      "Decorative images are marked with empty alternative text (alt=\"\") or implemented as CSS backgrounds.",
+      "Linked images have descriptive and meaningful alternative text.",
+      "Equivalent text alternatives for complex images are provided in context or via a separate linked page.",
+      "Form buttons have descriptive values that convey their purpose.",
+      "Inputs have appropriate accessible names.",
+      "Embedded multimedia is identified using accessible text alternatives.",
+      "Frames and iframes have appropriate and descriptive titles."
+    ],
+    "Total conditions": [
+      "Elements with role=\"img\" that convey information have accessible text alternatives.",
+      "Elements with role=\"img\" include appropriate accessible names via aria-label, aria-labelledby, or equivalent mechanisms.",
+      "Raster images and other non-role=\"img\" images have appropriate and equivalent alternative text.",
+      "Decorative images are marked with empty alternative text (alt=\"\") or implemented as CSS backgrounds.",
+      "Linked images have descriptive and meaningful alternative text.",
+      "Equivalent text alternatives for complex images are provided in context or via a separate linked page.",
+      "Form buttons have descriptive values that convey their purpose.",
+      "Inputs have appropriate accessible names.",
+      "Embedded multimedia is identified using accessible text alternatives.",
+      "Frames and iframes have appropriate and descriptive titles."
+    ],
+    "webaim checks": "\r\n\r\n1. Images have appropriate and equivalent alternative text.\r\n2. Decorative images are marked with empty alternative text (alt=\"\") or implemented as CSS backgrounds.\r\n3. Linked images have descriptive and meaningful alternative text.\r\n4. Equivalent text alternatives for complex images are provided in context or via a separate linked page.\r\n5. Form buttons have descriptive values that convey their purpose.\r\n6. Inputs have appropriate accessible names.\r\n7. Embedded multimedia is identified using accessible text alternatives beyond object fallback.\r\n8. Frames and iframes have appropriate and descriptive titles.\r\n"
+  },
+  {
+    "Success Criterion": "1.1.1 Non-text Content (A)",
+    "axe-core Rule": "input-image-alt",
+    "automated checks (axe core rules )": [
+      "Input elements of type=\"image\" that convey information or functionality have accessible text alternatives.",
+      "Image input controls include appropriate accessible names via alt text or equivalent mechanisms."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Non-input images have appropriate and equivalent alternative text.",
+      "Decorative images are marked with empty alternative text (alt=\"\") or implemented as CSS backgrounds.",
+      "Linked images have descriptive and meaningful alternative text.",
+      "Equivalent text alternatives for complex images are provided in context or via a separate linked page.",
+      "Form buttons have descriptive values that convey their purpose beyond image inputs.",
+      "Inputs (other than image inputs) have appropriate accessible names.",
+      "Embedded multimedia is identified using accessible text alternatives.",
+      "Frames and iframes have appropriate and descriptive titles."
+    ],
+    "Total conditions": [
+      "Input elements of type=\"image\" that convey information or functionality have accessible text alternatives.",
+      "Image input controls include appropriate accessible names via alt text or equivalent mechanisms.",
+      "Non-input images have appropriate and equivalent alternative text.",
+      "Decorative images are marked with empty alternative text (alt=\"\") or implemented as CSS backgrounds.",
+      "Linked images have descriptive and meaningful alternative text.",
+      "Equivalent text alternatives for complex images are provided in context or via a separate linked page.",
+      "Form buttons have descriptive values that convey their purpose beyond image inputs.",
+      "Inputs (other than image inputs) have appropriate accessible names.",
+      "Embedded multimedia is identified using accessible text alternatives.",
+      "Frames and iframes have appropriate and descriptive titles."
+    ],
+    "webaim checks": "\r\n\r\n1. Images have appropriate and equivalent alternative text.\r\n2. Decorative images are marked with empty alternative text (alt=\"\") or implemented as CSS backgrounds.\r\n3. Linked images have descriptive and meaningful alternative text.\r\n4. Equivalent text alternatives for complex images are provided in context or via a separate linked page.\r\n5. Form buttons have descriptive values that convey their purpose.\r\n6. Inputs have appropriate accessible names.\r\n7. Embedded multimedia is identified using accessible text alternatives beyond object fallback.\r\n8. Frames and iframes have appropriate and descriptive titles.\r\n"
+  },
+  {
+    "Success Criterion": "1.1.1 Non-text Content (A)",
+    "axe-core Rule": "aria-meter-name",
+    "automated checks (axe core rules )": [
+      "Elements with role=\"meter\" have an accessible name that identifies the non-text content."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Images have appropriate and equivalent alternative text.",
+      "Decorative images are marked with empty alternative text (alt=\"\") or implemented as CSS backgrounds.",
+      "Linked images have descriptive and meaningful alternative text.",
+      "Equivalent text alternatives for complex images are provided in context or via a separate linked page.",
+      "Form buttons have descriptive values that convey their purpose.",
+      "Inputs (other than role=\"meter\") have appropriate accessible names.",
+      "Embedded multimedia is identified using accessible text alternatives.",
+      "Frames and iframes have appropriate and descriptive titles."
+    ],
+    "Total conditions": [
+      "Elements with role=\"meter\" have an accessible name that identifies the non-text content.",
+      "Images have appropriate and equivalent alternative text.",
+      "Decorative images are marked with empty alternative text (alt=\"\") or implemented as CSS backgrounds.",
+      "Linked images have descriptive and meaningful alternative text.",
+      "Equivalent text alternatives for complex images are provided in context or via a separate linked page.",
+      "Form buttons have descriptive values that convey their purpose.",
+      "Inputs (other than role=\"meter\") have appropriate accessible names.",
+      "Embedded multimedia is identified using accessible text alternatives.",
+      "Frames and iframes have appropriate and descriptive titles."
+    ],
+    "webaim checks": "\r\n\r\n1. Images have appropriate and equivalent alternative text.\r\n2. Decorative images are marked with empty alternative text (alt=\"\") or implemented as CSS backgrounds.\r\n3. Linked images have descriptive and meaningful alternative text.\r\n4. Equivalent text alternatives for complex images are provided in context or via a separate linked page.\r\n5. Form buttons have descriptive values that convey their purpose.\r\n6. Inputs have appropriate accessible names.\r\n7. Embedded multimedia is identified using accessible text alternatives beyond object fallback.\r\n8. Frames and iframes have appropriate and descriptive titles.\r\n"
+  },
+  {
+    "Success Criterion": "1.1.1 Non-text Content (A)",
+    "axe-core Rule": "aria-progressbar-name",
+    "automated checks (axe core rules )": [
+      "Elements with role=\"progressbar\" have an accessible name that identifies the non-text content."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Images have appropriate and equivalent alternative text.",
+      "Decorative images are marked with empty alternative text (alt=\"\") or implemented as CSS backgrounds.",
+      "Linked images have descriptive and meaningful alternative text.",
+      "Equivalent text alternatives for complex images are provided in context or via a separate linked page.",
+      "Form buttons have descriptive values that convey their purpose.",
+      "Inputs (other than role=\"progressbar\") have appropriate accessible names.",
+      "Embedded multimedia is identified using accessible text alternatives.",
+      "Frames and iframes have appropriate and descriptive titles."
+    ],
+    "Total conditions": [
+      "Elements with role=\"progressbar\" have an accessible name that identifies the non-text content.",
+      "Images have appropriate and equivalent alternative text.",
+      "Decorative images are marked with empty alternative text (alt=\"\") or implemented as CSS backgrounds.",
+      "Linked images have descriptive and meaningful alternative text.",
+      "Equivalent text alternatives for complex images are provided in context or via a separate linked page.",
+      "Form buttons have descriptive values that convey their purpose.",
+      "Inputs (other than role=\"progressbar\") have appropriate accessible names.",
+      "Embedded multimedia is identified using accessible text alternatives.",
+      "Frames and iframes have appropriate and descriptive titles."
+    ],
+    "webaim checks": "\r\n\r\n1. Images have appropriate and equivalent alternative text.\r\n2. Decorative images are marked with empty alternative text (alt=\"\") or implemented as CSS backgrounds.\r\n3. Linked images have descriptive and meaningful alternative text.\r\n4. Equivalent text alternatives for complex images are provided in context or via a separate linked page.\r\n5. Form buttons have descriptive values that convey their purpose.\r\n6. Inputs have appropriate accessible names.\r\n7. Embedded multimedia is identified using accessible text alternatives beyond object fallback.\r\n8. Frames and iframes have appropriate and descriptive titles.\r\n"
+  },
+  {
+    "Success Criterion": "1.2.1 Audio-only and Video-only (Prerecorded) (A)",
+    "axe-core Rule": "  audio-caption  (Deprecated)",
+    "automated checks (axe core rules )": [
+      "Audio-only media elements include a mechanism (such as a track or accessible reference) indicating the presence of a transcript or caption alternative."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "A complete and accurate transcript is provided for all non-live audio-only content.",
+      "The transcript includes all relevant spoken dialogue and meaningful sounds.",
+      "For non-live video-only content, a descriptive transcript or audio description is provided.",
+      "Decorative video-only content is correctly identified and does not require a transcript.",
+      "Transcripts or audio descriptions are easy to locate and accessible to users.",
+      "The transcript or audio description accurately reflects the timing and meaning of the media content."
+    ],
+    "Total conditions": [
+      "Audio-only media elements include a mechanism (such as a track or accessible reference) indicating the presence of a transcript or caption alternative.",
+      "A complete and accurate transcript is provided for all non-live audio-only content.",
+      "The transcript includes all relevant spoken dialogue and meaningful sounds.",
+      "For non-live video-only content, a descriptive transcript or audio description is provided.",
+      "Decorative video-only content is correctly identified and does not require a transcript.",
+      "Transcripts or audio descriptions are easy to locate and accessible to users.",
+      "The transcript or audio description accurately reflects the timing and meaning of the media content."
+    ],
+    "webaim checks": " 1.A descriptive transcript of relevant content is provided for non-live audio-only (audio podcasts, MP3 files, etc.).\r\n2. A descriptive transcript or audio description of relevant content is provided for non-live video-only, unless the video\r\nis decorative."
+  },
+  {
+    "Success Criterion": "1.2.2 Captions (Prerecorded) (A)",
+    "axe-core Rule": "video-caption",
+    "automated checks (axe core rules )": [
+      "Prerecorded video elements include a captions track (<track kind=\"captions\">) associated with the video."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Captions are synchronized accurately with the audio.",
+      "Captions include all spoken dialogue and relevant non-speech audio (e.g., sound effects).",
+      "Captions are complete for the entire duration of the prerecorded video."
+    ],
+    "Total conditions": [
+      "Prerecorded video elements include a captions track (<track kind=\"captions\">) associated with the video.",
+      "Captions are synchronized accurately with the audio.",
+      "Captions include all spoken dialogue and relevant non-speech audio (e.g., sound effects).",
+      "Captions are complete for the entire duration of the prerecorded video."
+    ],
+    "webaim checks": " Synchronized captions are provided for non-live video (YouTube videos, etc.)."
+  },
+  {
+    "Success Criterion": "1.2.3 Audio Description or Media Alternative (Prerecorded) (A)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "A descriptive transcript or audio description is provided for non-live video.",
+      "NOTE: Only required if there is relevant visual content that is not presented in the audio."
+    ],
+    "webaim checks": " A descriptive transcript or audio description is provided for non-live video.\r\nNOTE: Only required if there is relevant visual content that is not presented in the audio.\r"
+  },
+  {
+    "Success Criterion": "1.2.4 Captions (Live) (AA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Synchronized captions are provided for live media that contains audio (audio-only broadcasts, web casts, video conferences, etc.)"
+    ],
+    "webaim checks": "Synchronized captions are provided for live media that contains audio (audio-only broadcasts, web casts, video conferences, etc.)"
+  },
+  {
+    "Success Criterion": "1.2.5 Audio Description (Prerecorded) (AA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Audio descriptions are provided for non-live video.",
+      "NOTE: Only required if there is relevant visual content that is not presented in the audio.",
+      "While not required at Level AA, for optimal accessibility WebAIM recommends descriptive transcripts in addition to audio descriptions."
+    ],
+    "webaim checks": "Audio descriptions are provided for non-live video.\r\nNOTE: Only required if there is relevant visual content that is not presented in the audio.\r\nWhile not required at Level AA, for optimal accessibility WebAIM recommends descriptive transcripts in addition to\r\naudio descriptions."
+  },
+  {
+    "Success Criterion": "1.2.6 Sign Language (Prerecorded)(AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "A sign language video is provided for media that contains audio"
+    ],
+    "webaim checks": " A sign language video is provided for media that contains audio"
+  },
+  {
+    "Success Criterion": "1.2.7 Extended Audio Description (Prerecorded) (AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "When audio description cannot be added to video due to insufficient pauses in the audio, an alternative version of the",
+      "video with pauses that allow audio descriptions is provided."
+    ],
+    "webaim checks": "When audio description cannot be added to video due to insufficient pauses in the audio, an alternative version of the\r\nvideo with pauses that allow audio descriptions is provided."
+  },
+  {
+    "Success Criterion": "1.2.8 Media Alternative (Prerecorded) (AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "A descriptive transcript is provided for pre-recorded media that has a video track. For optimal accessibility, WebAIM",
+      "strongly recommends transcripts for all multimedia."
+    ],
+    "webaim checks": "A descriptive transcript is provided for pre-recorded media that has a video track. For optimal accessibility, WebAIM\r\nstrongly recommends transcripts for all multimedia. "
+  },
+  {
+    "Success Criterion": "1.2.9 Audio-only (Live) (AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "A descriptive text transcript (e.g., the script of the live audio) is provided for live content that has audio."
+    ],
+    "webaim checks": "A descriptive text transcript (e.g., the script of the live audio) is provided for live content that has audio."
+  },
+  {
+    "Success Criterion": "1.3.1 Info and Relationships (A)",
+    "axe-core Rule": "aria-required-children",
+    "automated checks (axe core rules )": [
+      "ARIA parent roles that require specific child roles contain all required child elements (for example, role=\"list\" contains role=\"listitem\")."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Headings, landmarks, lists, and other structural elements are marked up using correct native HTML semantics.",
+      "Lists are implemented using appropriate HTML elements (ul, ol, dl) or correct ARIA roles where HTML is insufficient.",
+      "Tables are used only for tabular data and not for layout purposes.",
+      "Data table headers are correctly associated with their corresponding data cells.",
+      "Data tables include captions when needed and captions are correctly associated with the tables.",
+      "Form inputs have visible and programmatically associated text labels.",
+      "Related form controls are grouped using fieldset and legend where appropriate.",
+      "ARIA labelling is used correctly only when native HTML semantics are insufficient."
+    ],
+    "Total conditions": [
+      "ARIA parent roles that require specific child roles contain all required",
+      "child elements (for example, role=\"list\" contains role=\"listitem\").",
+      "Headings, landmarks, lists, and other structural elements are marked up using correct native HTML semantics.",
+      "Lists are implemented using appropriate HTML elements (ul, ol, dl) or correct ARIA roles where HTML is insufficient.",
+      "Tables are used only for tabular data and not for layout purposes.",
+      "Data table headers are correctly associated with their corresponding data cells.",
+      "Data tables include captions when needed and captions are correctly associated with the tables.",
+      "Form inputs have visible and programmatically associated text labels.",
+      "Related form controls are grouped using fieldset and legend where appropriate.",
+      "ARIA labelling is used correctly only when native HTML semantics are insufficient."
+    ],
+    "webaim checks": " 1.Semantic markup is appropriately used to designate headings, regions/landmarks, lists, emphasized or special text,\r\netc.\r\n 2.Tables are used for tabular data and data cells are associated with their headers. Data table captions, if present, are\r\nassociated to data tables.\r\n3. Text labels are associated with form inputs. Related form controls are grouped with fieldset/legend. ARIA labelling\r\nmay be used when standard HTML is insufficient."
+  },
+  {
+    "Success Criterion": "1.3.1 Info and Relationships (A)",
+    "axe-core Rule": "aria-hidden-body",
+    "automated checks (axe core rules )": [
+      "The document body (<body>) is not hidden from assistive",
+      "technologies using aria-hidden=\"true\"."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Semantic markup is appropriately used to designate headings, regions/landmarks, lists, and emphasized or special text.",
+      "Tables are used only for tabular data and data cells are correctly associated with their headers.",
+      "Data table captions, when present, are correctly associated with the corresponding data tables.",
+      "Text labels are programmatically associated with form inputs.",
+      "Related form controls are grouped using fieldset and legend where appropriate.",
+      "ARIA labelling is used correctly only when native HTML semantics are insufficient."
+    ],
+    "Total conditions": [
+      "The document body (<body>) is not hidden from assistive",
+      "technologies using aria-hidden=\"true\".",
+      "Semantic markup is appropriately used to designate headings, regions/landmarks, lists, and emphasized or special text.",
+      "Tables are used only for tabular data and data cells are correctly associated with their headers.",
+      "Data table captions, when present, are correctly associated with the corresponding data tables.",
+      "Text labels are programmatically associated with form inputs.",
+      "Related form controls are grouped using fieldset and legend where appropriate.",
+      "ARIA labelling is used correctly only when native HTML semantics are insufficient."
+    ],
+    "webaim checks": " 1.Semantic markup is appropriately used to designate headings, regions/landmarks, lists, emphasized or special text,\r\netc.\r\n 2.Tables are used for tabular data and data cells are associated with their headers. Data table captions, if present, are\r\nassociated to data tables.\r\n3. Text labels are associated with form inputs. Related form controls are grouped with fieldset/legend. ARIA labelling\r\nmay be used when standard HTML is insufficient."
+  },
+  {
+    "Success Criterion": "1.3.1 Info and Relationships (A)",
+    "axe-core Rule": "aria-required-parent",
+    "automated checks (axe core rules )": [
+      "ARIA child roles that require a specific parent role are contained within the correct required parent elements (for example, role=\"listitem\" is contained within role=\"list\")."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Semantic markup is appropriately used to designate headings, regions/landmarks, lists, and emphasized or special text.",
+      "Tables are used only for tabular data and not for layout purposes.",
+      "Data table headers are correctly associated with their corresponding data cells.",
+      "Data table captions, when present, are correctly associated with the data tables.",
+      "Text labels are programmatically associated with form inputs.",
+      "Related form controls are grouped using fieldset and legend where appropriate.",
+      "ARIA labelling is used correctly only when native HTML semantics are insufficient."
+    ],
+    "Total conditions": [
+      "ARIA child roles that require a specific parent role are contained within the correct required parent elements (for example, role=\"listitem\" is contained within role=\"list\").",
+      "Semantic markup is appropriately used to designate headings, regions/landmarks, lists, and emphasized or special text.",
+      "Tables are used only for tabular data and not for layout purposes.",
+      "Data table headers are correctly associated with their corresponding data cells.",
+      "Data table captions, when present, are correctly associated with the data tables.",
+      "Text labels are programmatically associated with form inputs.",
+      "Related form controls are grouped using fieldset and legend where appropriate.",
+      "ARIA labelling is used correctly only when native HTML semantics are insufficient."
+    ],
+    "webaim checks": " 1.Semantic markup is appropriately used to designate headings, regions/landmarks, lists, emphasized or special text,\r\netc.\r\n 2.Tables are used for tabular data and data cells are associated with their headers. Data table captions, if present, are\r\nassociated to data tables.\r\n3. Text labels are associated with form inputs. Related form controls are grouped with fieldset/legend. ARIA labelling\r\nmay be used when standard HTML is insufficient."
+  },
+  {
+    "Success Criterion": "1.3.1 Info and Relationships (A)",
+    "axe-core Rule": "definition-list",
+    "automated checks (axe core rules )": [
+      "Definition lists use correct semantic structure where <dl> elements contain",
+      "only <dt> and <dd> elements as direct children."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Semantic markup is appropriately used to designate headings, regions/landmarks, lists, and emphasized or special text.",
+      "Lists (ordered, unordered, and definition lists) are used appropriately to represent related content.",
+      "Tables are used only for tabular data and not for layout purposes.",
+      "Data table headers are correctly associated with their corresponding data cells.",
+      "Data table captions, when present, are correctly associated with the data tables.",
+      "Text labels are programmatically associated with form inputs.",
+      "Related form controls are grouped using fieldset and legend where appropriate.",
+      "ARIA labelling is used correctly only when native HTML semantics are insufficient."
+    ],
+    "Total conditions": [
+      "Definition lists use correct semantic structure where <dl> elements contain",
+      "only <dt> and <dd> elements as direct children.",
+      "Semantic markup is appropriately used to designate headings, regions/landmarks, lists, and emphasized or special text.",
+      "Lists (ordered, unordered, and definition lists) are used appropriately to represent related content.",
+      "Tables are used only for tabular data and not for layout purposes.",
+      "Data table headers are correctly associated with their corresponding data cells.",
+      "Data table captions, when present, are correctly associated with the data tables.",
+      "Text labels are programmatically associated with form inputs.",
+      "Related form controls are grouped using fieldset and legend where appropriate.",
+      "ARIA labelling is used correctly only when native HTML semantics are insufficient."
+    ],
+    "webaim checks": " 1.Semantic markup is appropriately used to designate headings, regions/landmarks, lists, emphasized or special text,\r\netc.\r\n 2.Tables are used for tabular data and data cells are associated with their headers. Data table captions, if present, are\r\nassociated to data tables.\r\n3. Text labels are associated with form inputs. Related form controls are grouped with fieldset/legend. ARIA labelling\r\nmay be used when standard HTML is insufficient."
+  },
+  {
+    "Success Criterion": "1.3.1 Info and Relationships (A)",
+    "axe-core Rule": "dlitem",
+    "automated checks (axe core rules )": [
+      "Definition list items (<dt> and <dd>) are contained within a",
+      "<dl> element and not used outside of a definition list."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Semantic markup is appropriately used to designate headings, regions/landmarks, lists, and emphasized or special text.",
+      "Lists (ordered, unordered, and definition lists) are used appropriately to represent related content.",
+      "Tables are used only for tabular data and not for layout purposes.",
+      "Data table headers are correctly associated with their corresponding data cells.",
+      "Data table captions, when present, are correctly associated with the data tables.",
+      "Text labels are programmatically associated with form inputs.",
+      "Related form controls are grouped using fieldset and legend where appropriate.",
+      "ARIA labelling is used correctly only when native HTML semantics are insufficient."
+    ],
+    "Total conditions": [
+      "Definition list items (<dt> and <dd>) are contained within a",
+      "<dl> element and not used outside of a definition list.",
+      "Semantic markup is appropriately used to designate headings, regions/landmarks, lists, and emphasized or special text.",
+      "Lists (ordered, unordered, and definition lists) are used appropriately to represent related content.",
+      "Tables are used only for tabular data and not for layout purposes.",
+      "Data table headers are correctly associated with their corresponding data cells.",
+      "Data table captions, when present, are correctly associated with the data tables.",
+      "Text labels are programmatically associated with form inputs.",
+      "Related form controls are grouped using fieldset and legend where appropriate.",
+      "ARIA labelling is used correctly only when native HTML semantics are insufficient."
+    ],
+    "webaim checks": " 1.Semantic markup is appropriately used to designate headings, regions/landmarks, lists, emphasized or special text,\r\netc.\r\n 2.Tables are used for tabular data and data cells are associated with their headers. Data table captions, if present, are\r\nassociated to data tables.\r\n3. Text labels are associated with form inputs. Related form controls are grouped with fieldset/legend. ARIA labelling\r\nmay be used when standard HTML is insufficient."
+  },
+  {
+    "Success Criterion": "1.3.1 Info and Relationships (A)",
+    "axe-core Rule": "list",
+    "automated checks (axe core rules )": [
+      "Content that is visually presented as a list is marked up using correct list semantics (ul, ol, or role=\"list\").",
+      "List items are contained within a valid list structure (li or role=\"listitem\")."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Semantic markup is appropriately used to designate headings, regions/landmarks, and emphasized or special text.",
+      "Lists are used appropriately to represent related content and logical groupings.",
+      "Tables are used only for tabular data and not for layout purposes.",
+      "Data table headers are correctly associated with their corresponding data cells.",
+      "Data table captions, when present, are correctly associated with the data tables.",
+      "Text labels are programmatically associated with form inputs.",
+      "Related form controls are grouped using fieldset and legend where appropriate.",
+      "ARIA labelling is used correctly only when native HTML semantics are insufficient."
+    ],
+    "Total conditions": [
+      "Content that is visually presented as a list is marked up using correct list semantics (ul, ol, or role=\"list\").",
+      "List items are contained within a valid list structure (li or role=\"listitem\").",
+      "Semantic markup is appropriately used to designate headings, regions/landmarks, and emphasized or special text.",
+      "Lists are used appropriately to represent related content and logical groupings.",
+      "Tables are used only for tabular data and not for layout purposes.",
+      "Data table headers are correctly associated with their corresponding data cells.",
+      "Data table captions, when present, are correctly associated with the data tables.",
+      "Text labels are programmatically associated with form inputs.",
+      "Related form controls are grouped using fieldset and legend where appropriate.",
+      "ARIA labelling is used correctly only when native HTML semantics are insufficient."
+    ],
+    "webaim checks": " 1.Semantic markup is appropriately used to designate headings, regions/landmarks, lists, emphasized or special text,\r\netc.\r\n 2.Tables are used for tabular data and data cells are associated with their headers. Data table captions, if present, are\r\nassociated to data tables.\r\n3. Text labels are associated with form inputs. Related form controls are grouped with fieldset/legend. ARIA labelling\r\nmay be used when standard HTML is insufficient."
+  },
+  {
+    "Success Criterion": "1.3.1 Info and Relationships (A)",
+    "axe-core Rule": "listitem",
+    "automated checks (axe core rules )": [
+      "List items are contained within a valid list structure",
+      "(ul, ol, menu, or role=\"list\") and are not used outside of lists."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Semantic markup is appropriately used to designate headings, regions/landmarks, and emphasized or special text.",
+      "Lists are used appropriately to represent related content and logical groupings.",
+      "Tables are used only for tabular data and not for layout purposes.",
+      "Data table headers are correctly associated with their corresponding data cells.",
+      "Data table captions, when present, are correctly associated with the data tables.",
+      "Text labels are programmatically associated with form inputs.",
+      "Related form controls are grouped using fieldset and legend where appropriate.",
+      "ARIA labelling is used correctly only when native HTML semantics are insufficient."
+    ],
+    "Total conditions": [
+      "List items are contained within a valid list structure",
+      "(ul, ol, menu, or role=\"list\") and are not used outside of lists.",
+      "Semantic markup is appropriately used to designate headings, regions/landmarks, and emphasized or special text.",
+      "Lists are used appropriately to represent related content and logical groupings.",
+      "Tables are used only for tabular data and not for layout purposes.",
+      "Data table headers are correctly associated with their corresponding data cells.",
+      "Data table captions, when present, are correctly associated with the data tables.",
+      "Text labels are programmatically associated with form inputs.",
+      "Related form controls are grouped using fieldset and legend where appropriate.",
+      "ARIA labelling is used correctly only when native HTML semantics are insufficient."
+    ],
+    "webaim checks": " 1.Semantic markup is appropriately used to designate headings, regions/landmarks, lists, emphasized or special text,\r\netc.\r\n 2.Tables are used for tabular data and data cells are associated with their headers. Data table captions, if present, are\r\nassociated to data tables.\r\n3. Text labels are associated with form inputs. Related form controls are grouped with fieldset/legend. ARIA labelling\r\nmay be used when standard HTML is insufficient."
+  },
+  {
+    "Success Criterion": "1.3.1 Info and Relationships (A)",
+    "axe-core Rule": "td-headers-attr",
+    "automated checks (axe core rules )": [
+      "Data table cells (<td>) that use the headers attribute reference",
+      "valid and existing table header cells (<th>)."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Semantic markup is appropriately used to designate headings, regions/landmarks, lists, and emphasized or special text.",
+      "Tables are used only for tabular data and not for layout purposes.",
+      "Data table headers are correctly identified using <th> elements.",
+      "Header and data cell relationships are appropriate and meaningful for the table structure.",
+      "Data table captions, when present, are correctly associated with the data tables.",
+      "Text labels are programmatically associated with form inputs.",
+      "Related form controls are grouped using fieldset and legend where appropriate.",
+      "ARIA labelling is used correctly only when native HTML semantics are insufficient."
+    ],
+    "Total conditions": [
+      "Data table cells (<td>) that use the headers attribute reference",
+      "valid and existing table header cells (<th>).",
+      "Semantic markup is appropriately used to designate headings, regions/landmarks, lists, and emphasized or special text.",
+      "Tables are used only for tabular data and not for layout purposes.",
+      "Data table headers are correctly identified using <th> elements.",
+      "Header and data cell relationships are appropriate and meaningful for the table structure.",
+      "Data table captions, when present, are correctly associated with the data tables.",
+      "Text labels are programmatically associated with form inputs.",
+      "Related form controls are grouped using fieldset and legend where appropriate.",
+      "ARIA labelling is used correctly only when native HTML semantics are insufficient."
+    ],
+    "webaim checks": " 1.Semantic markup is appropriately used to designate headings, regions/landmarks, lists, emphasized or special text,\r\netc.\r\n 2.Tables are used for tabular data and data cells are associated with their headers. Data table captions, if present, are\r\nassociated to data tables.\r\n3. Text labels are associated with form inputs. Related form controls are grouped with fieldset/legend. ARIA labelling\r\nmay be used when standard HTML is insufficient."
+  },
+  {
+    "Success Criterion": "1.3.1 Info and Relationships (A)",
+    "axe-core Rule": "th-has-data-cells",
+    "automated checks (axe core rules )": [
+      "Table header cells (<th>) are associated with at least one data cell (<td>) within the same table."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Semantic markup is appropriately used to designate headings, regions/landmarks, lists, and emphasized or special text.",
+      "Tables are used only for tabular data and not for layout purposes.",
+      "Header and data cell relationships are correct and meaningful for the table structure.",
+      "Data table captions, when present, are correctly associated with the data tables.",
+      "Text labels are programmatically associated with form inputs.",
+      "Related form controls are grouped using fieldset and legend where appropriate.",
+      "ARIA labelling is used correctly only when native HTML semantics are insufficient."
+    ],
+    "Total conditions": [
+      "Table header cells (<th>) are associated with at least one data cell (<td>) within the same table.",
+      "Semantic markup is appropriately used to designate headings, regions/landmarks, lists, and emphasized or special text.",
+      "Tables are used only for tabular data and not for layout purposes.",
+      "Header and data cell relationships are correct and meaningful for the table structure.",
+      "Data table captions, when present, are correctly associated with the data tables.",
+      "Text labels are programmatically associated with form inputs.",
+      "Related form controls are grouped using fieldset and legend where appropriate.",
+      "ARIA labelling is used correctly only when native HTML semantics are insufficient."
+    ],
+    "webaim checks": " 1.Semantic markup is appropriately used to designate headings, regions/landmarks, lists, emphasized or special text,\r\netc.\r\n 2.Tables are used for tabular data and data cells are associated with their headers. Data table captions, if present, are\r\nassociated to data tables.\r\n3. Text labels are associated with form inputs. Related form controls are grouped with fieldset/legend. ARIA labelling\r\nmay be used when standard HTML is insufficient."
+  },
+  {
+    "Success Criterion": "1.3.2 Meaningful Sequence (A)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "The reading and navigation order (determined by code order) is logical and intuitive"
+    ],
+    "webaim checks": " The reading and navigation order (determined by code order) is logical and intuitive"
+  },
+  {
+    "Success Criterion": "1.3.3 Sensory Characteristics (A)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Instructions do not rely upon shape, size, or visual location (e.g., \"Click the square icon to continue\" or \"Instructions are in the right-hand column\").",
+      "Instructions do not rely upon sound (e.g., \"A beeping sound indicates you may continue.\")"
+    ],
+    "webaim checks": " Instructions do not rely upon shape, size, or visual location (e.g., \"Click the square icon to continue\" or \"Instructions\r\nare in the right-hand column\").\r\n Instructions do not rely upon sound (e.g., \"A beeping sound indicates you may continue.\")"
+  },
+  {
+    "Success Criterion": "1.3.4 Orientation (AA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Orientation of web content is not restricted to only portrait or landscape, unless a specific orientation is necessary."
+    ],
+    "webaim checks": " Orientation of web content is not restricted to only portrait or landscape, unless a specific orientation is necessary."
+  },
+  {
+    "Success Criterion": "1.3.5 Identify Input Purpose (AA)",
+    "axe-core Rule": "autocomplete-valid",
+    "automated checks (axe core rules )": [
+      "Form input fields that support autocomplete use valid and appropriate",
+      "autocomplete attribute values as defined by the HTML specification."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "The selected autocomplete values accurately reflect the intended purpose of each input field (e.g., name, email, address).",
+      "Autocomplete attributes are applied to all relevant user data fields where applicable.",
+      "Inputs that should not have autocomplete do not include inappropriate autocomplete values."
+    ],
+    "Total conditions": [
+      "Form input fields that support autocomplete use valid and appropriate autocomplete attribute values as defined by the HTML specification.",
+      "The selected autocomplete values accurately reflect the intended purpose of each input field (e.g., name, email, address).",
+      "Autocomplete attributes are applied to all relevant user data fields where applicable.",
+      "Inputs that should not have autocomplete do not include inappropriate autocomplete values."
+    ],
+    "webaim checks": "Input fields that collect certain types of user information have an\r\n appropriate autocomplete attribute defined"
+  },
+  {
+    "Success Criterion": "1.3.6 Identify Purpose (AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Regions/landmarks are used to identify page regions.",
+      "ARIA is used, where appropriate, to enhance HTML semantics to better identify the purpose of interface",
+      "components."
+    ],
+    "webaim checks": " Regions/landmarks are used to identify page regions.\r\nARIA is used, where appropriate, to enhance HTML semantics to better identify the purpose of interface\r\ncomponents."
+  },
+  {
+    "Success Criterion": "1.4.1 Use of Color (A)",
+    "axe-core Rule": "link-in-text-block",
+    "automated checks (axe core rules )": [
+      "Links within blocks of text are visually distinguishable from surrounding text without relying on color alone."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Color is not used as the sole method to convey information, indicate status, prompt action, or distinguish visual elements other than links.",
+      "Non-link visual cues (icons, charts, error messages, required fields, instructions) do not rely on color alone.",
+      "The contrast ratio between link text and surrounding text is at least 3:1 when color is used to distinguish links.",
+      "Links provide an additional visual indicator (such as underline) on hover and keyboard focus.",
+      "Visual distinctions conveyed by color are also available programmatically or through text alternatives."
+    ],
+    "Total conditions": [
+      "Links within blocks of text are visually distinguishable from surrounding text without relying on color alone.",
+      "Color is not used as the sole method to convey information, indicate status, prompt action, or distinguish visual elements other than links.",
+      "Non-link visual cues (icons, charts, error messages, required fields, instructions) do not rely on color alone.",
+      "The contrast ratio between link text and surrounding text is at least 3:1 when color is used to distinguish links.",
+      "Links provide an additional visual indicator (such as underline) on hover and keyboard focus.",
+      "Visual distinctions conveyed by color are also available programmatically or through text alternatives."
+    ],
+    "webaim checks": "1. Color is not used as the sole method of conveying content or distinguishing visual elements.\r\n2. Color alone is not used to distinguish links from surrounding text unless:\r\n   a) The contrast ratio between the link and surrounding text is at least 3:1, AND\r\n   b) An additional visual distinction (e.g., underline) is provided on hover and keyboard focus.\r\n"
+  },
+  {
+    "Success Criterion": "1.4.2 Audio Control (A)",
+    "axe-core Rule": "no-autoplay-audio",
+    "automated checks (axe core rules )": [
+      "Audio does not automatically play for more than 3 seconds without a user-controlled mechanism to stop or pause it."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "A visible and operable control is available to pause, stop, or mute the audio.",
+      "Audio controls are keyboard accessible.",
+      "Users can independently adjust audio volume without affecting system volume.",
+      "Audio control mechanisms are clearly labeled and understandable."
+    ],
+    "Total conditions": [
+      "Audio does not automatically play for more than 3 seconds without a user-controlled mechanism to stop or pause it.",
+      "A visible and operable control is available to pause, stop, or mute the audio.",
+      "Audio controls are keyboard accessible.",
+      "Users can independently adjust audio volume without affecting system volume.",
+      "Audio control mechanisms are clearly labeled and understandable."
+    ],
+    "webaim checks": "A mechanism is provided to stop, pause, mute, or adjust volume for audio that automatically plays on a page for more\r\nthan 3 seconds."
+  },
+  {
+    "Success Criterion": "1.4.3 Contrast (Minimum) (AA)",
+    "axe-core Rule": "color-contrast",
+    "automated checks (axe core rules )": [
+      "Text and images of text meet the minimum contrast ratio of 4.5:1 for normal text.",
+      "Large-scale text meets the minimum contrast ratio of 3:1."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Text that is part of images is essential and cannot be presented using real text.",
+      "Contrast is evaluated correctly for text rendered over gradients, images, patterns, or videos.",
+      "Custom fonts, font weights, and font rendering do not reduce effective contrast below minimum thresholds.",
+      "Text contrast remains sufficient in all interaction states (hover, focus, active, visited).",
+      "Contrast is maintained when user styles, zoom, or high-contrast modes are applied."
+    ],
+    "Total conditions": [
+      "Text and images of text meet the minimum contrast ratio of 4.5:1 for normal text.",
+      "Large-scale text meets the minimum contrast ratio of 3:1.",
+      "Text that is part of images is essential and cannot be presented using real text.",
+      "Contrast is evaluated correctly for text rendered over gradients, images, patterns, or videos.",
+      "Custom fonts, font weights, and font rendering do not reduce effective contrast below minimum thresholds.",
+      "Text contrast remains sufficient in all interaction states (hover, focus, active, visited).",
+      "Contrast is maintained when user styles, zoom, or high-contrast modes are applied."
+    ],
+    "webaim checks": " Text and images of text have a contrast ratio of at least 4.5:1.\r\n Large text - at least 18 point (typically 24px) or 14 point (typically 18.66px) and bold - has a contrast ratio of at least\r\n3:1."
+  },
+  {
+    "Success Criterion": "1.4.4 Resize text (AA)",
+    "axe-core Rule": "meta-viewport",
+    "automated checks (axe core rules )": [
+      "The viewport meta tag does not restrict user scaling (e.g., does not disable zoom or set maximum-scale less than 2)."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Text content remains readable and does not become truncated, overlapped, or clipped when zoomed to 200%.",
+      "All functionality remains available and operable when the page is zoomed to 200%.",
+      "Horizontal scrolling is not required for reading blocks of text at 200% zoom (except where allowed).",
+      "Fixed-position or absolutely positioned content does not obscure text or controls when zoomed.",
+      "Interactive elements remain visible, usable, and discoverable at 200% zoom."
+    ],
+    "Total conditions": [
+      "The viewport meta tag does not restrict user scaling (e.g., does not disable zoom or set maximum-scale less than 2).",
+      "Text content remains readable and does not become truncated, overlapped, or clipped when zoomed to 200%.",
+      "All functionality remains available and operable when the page is zoomed to 200%.",
+      "Horizontal scrolling is not required for reading blocks of text at 200% zoom (except where allowed).",
+      "Fixed-position or absolutely positioned content does not obscure text or controls when zoomed.",
+      "Interactive elements remain visible, usable, and discoverable at 200% zoom."
+    ],
+    "webaim checks": "The page is readable and functional when the page is zoomed to 200%.\r\nNOTE: 1.4.10 (below) introduces additional requirements for zoomed content"
+  },
+  {
+    "Success Criterion": "1.4.5 Images of Text (AA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "If the same visual presentation can be made using text alone, an image is not used to present that text."
+    ],
+    "webaim checks": "If the same visual presentation can be made using text alone, an image is not used to present that text."
+  },
+  {
+    "Success Criterion": "1.4.6 Contrast (Enhanced) (AAA)",
+    "axe-core Rule": " color-contrast-enhanced",
+    "automated checks (axe core rules )": [
+      "Text and images of text meet the enhanced minimum color contrast ratios of 7:1 for normal text and 4.5:1 for large or bold text based on computed foreground and background colors."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Contrast is sufficient in all user states, including hover, focus, active, disabled, and visited states.",
+      "Text displayed over images, gradients, patterns, or video maintains the required enhanced contrast ratios.",
+      "Contrast remains sufficient when custom user styles, zoom, or high-contrast modes are applied.",
+      "Images of text that contain meaningful content meet the enhanced contrast requirements.",
+      "Dynamically updated text content maintains enhanced contrast at all times.",
+      "Essential visual information conveyed through text is not lost due to insufficient contrast in real-world viewing conditions."
+    ],
+    "Total conditions": [
+      "Text and images of text meet the enhanced minimum color contrast ratios of 7:1 for normal text and 4.5:1 for large or bold text based on computed foreground and background colors.",
+      "Contrast is sufficient in all user states, including hover, focus, active, disabled, and visited states.",
+      "Text displayed over images, gradients, patterns, or video maintains the required enhanced contrast ratios.",
+      "Contrast remains sufficient when custom user styles, zoom, or high-contrast modes are applied.",
+      "Images of text that contain meaningful content meet the enhanced contrast requirements.",
+      "Dynamically updated text content maintains enhanced contrast at all times.",
+      "Essential visual information conveyed through text is not lost due to insufficient contrast in real-world viewing conditions."
+    ],
+    "webaim checks": " Text and images of text have a contrast ratio of at least 7:1.\r\n Large text - at least 18 point (typically 24px) or 14 point (typically 18.66px) and bold - has a contrast ratio of at least\r\n4.5:1."
+  },
+  {
+    "Success Criterion": "1.4.7 Low or No Background Audio (AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Audio with speech has no or very low background noise so the speech is easily distinguished."
+    ],
+    "webaim checks": "Audio with speech has no or very low background noise so the speech is easily distinguished."
+  },
+  {
+    "Success Criterion": "1.4.8 Visual Presentation (AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Blocks of text over one sentence in length:",
+      "o Are no more than 80 characters wide.",
+      "o Are NOT fully justified (aligned to both the left and the right margins).",
+      "o Have adequate line spacing (at least 1/2 the height of the text) and paragraph spacing (1.5 times line spacing).",
+      "o Have defined or inherited foreground and background colors.",
+      "o Do NOT require horizontal scrolling when the text size is doubled."
+    ],
+    "webaim checks": "Blocks of text over one sentence in length:\r\no Are no more than 80 characters wide.\r\no Are NOT fully justified (aligned to both the left and the right margins).\r\no Have adequate line spacing (at least 1/2 the height of the text) and paragraph spacing (1.5 times line spacing).\r\no Have defined or inherited foreground and background colors.\r\no Do NOT require horizontal scrolling when the text size is doubled."
+  },
+  {
+    "Success Criterion": "1.4.9 Images of Text (No Exception) (AAA)",
+    "axe-core Rule": " image-text ",
+    "automated checks (axe core rules )": [
+      "Images that appear to contain text are programmatically detected and flagged for review."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Images containing text are used only for decorative purposes and do not convey essential information.",
+      "When images of text convey information, the information cannot be presented using real text alone.",
+      "Decorative images of text are appropriately marked so they are ignored by assistive technologies.",
+      "Logos, branding, and other allowed exceptions are correctly identified and applied."
+    ],
+    "Total conditions": [
+      "Images that appear to contain text are programmatically detected and flagged for review.",
+      "Images containing text are used only for decorative purposes and do not convey essential information.",
+      "When images of text convey information, the information cannot be presented using real text alone.",
+      "Decorative images of text are appropriately marked so they are ignored by assistive technologies.",
+      "Logos, branding, and other allowed exceptions are correctly identified and applied."
+    ],
+    "webaim checks": "Text is used within an image only for decoration (the image does not convey content) OR when the information\r\ncannot be presented with text alone."
+  },
+  {
+    "Success Criterion": "1.4.10 Reflow (AA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "No loss of content or functionality occurs, and horizontal scrolling is avoided when content is presented at a width of 320 pixels.",
+      "This requires responsive design for most web sites. This is best tested by setting the browser window to 1280 pixels wide and then zooming the page content to 400%.",
+      "Content that requires horizontal scrolling, such as data tables, complex images (such as maps and charts), toolbars,etc. are exempted."
+    ],
+    "webaim checks": "No loss of content or functionality occurs, and horizontal scrolling is avoided when content is presented at a width of\r\n320 pixels.\r\no This requires responsive design for most web sites. This is best tested by setting the browser window to 1280\r\npixels wide and then zooming the page content to 400%.\r\n Content that requires horizontal scrolling, such as data tables, complex images (such as maps and charts), toolbars,\r\netc. are exempted."
+  },
+  {
+    "Success Criterion": "1.4.11 Non-text Contrast (AA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "A contrast ratio of at least 3:1 is present for differentiating graphical objects (such as icons and components of charts or graphs) and author-customized interface components (such as buttons, form controls, and focus indicators/outlines).",
+      "At least 3:1 contrast is maintained in the various states (focus, hover, active, etc.) of author-customized interactive components."
+    ],
+    "webaim checks": " A contrast ratio of at least 3:1 is present for differentiating graphical objects (such as icons and components of charts\r\nor graphs) and author-customized interface components (such as buttons, form controls, and focus\r\nindicators/outlines).\r\n At least 3:1 contrast is maintained in the various states (focus, hover, active, etc.) of author-customized interactive\r\ncomponents."
+  },
+  {
+    "Success Criterion": "1.4.12 Text Spacing (AA)",
+    "axe-core Rule": "avoid-inline-spacing",
+    "automated checks (axe core rules )": [
+      "Inline styles do not set fixed line-height, letter-spacing, or word-spacing values that would prevent user text spacing adjustments."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Content remains readable and no text is clipped, overlapped, or truncated when paragraph, line, word, and letter spacing are increased to the specified values.",
+      "All functionality remains available and operable when text spacing is adjusted.",
+      "Fixed heights or containers do not cause loss of content when spacing is increased.",
+      "Text spacing adjustments do not require horizontal scrolling to read blocks of text.",
+      "Spacing adaptations work consistently across different browsers and assistive technologies."
+    ],
+    "Total conditions": [
+      "Inline styles do not set fixed line-height, letter-spacing, or word-spacing values that would prevent user text spacing adjustments.",
+      "Content remains readable and no text is clipped, overlapped, or truncated when paragraph, line, word, and letter spacing are increased to the specified values.",
+      "All functionality remains available and operable when text spacing is adjusted.",
+      "Fixed heights or containers do not cause loss of content when spacing is increased.",
+      "Text spacing adjustments do not require horizontal scrolling to read blocks of text.",
+      "Spacing adaptations work consistently across different browsers and assistive technologies."
+    ],
+    "webaim checks": "No loss of content or functionality occurs when the user adapts paragraph spacing to 2 times the font size, text line\r\nheight/spacing to 1.5 times the font size, word spacing to .16 times the font size, and letter spacing to .12 times the\r\nfont size.\r\n This is best supported by avoiding pixel height definitions for elements that contain text."
+  },
+  {
+    "Success Criterion": "1.4.13 Content on Hover or Focus (AA) ",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "When additional content is presented on hover or keyboard focus: The newly revealed content can be dismissed (generally via the Esc key) without moving the pointer or keyboard focus, unless the content presents an input error or does not obscure or interfere with other page content.",
+      "When additional content is presented on hover or keyboard focus: The pointer can be moved to the new content without the content disappearing.",
+      "When additional content is presented on hover or keyboard focus: The new content must remain visible until the pointer or keyboard focus is moved away from the triggering control, the new content is dismissed, or the new content is no longer relevant."
+    ],
+    "webaim checks": " When additional content is presented on hover or keyboard focus:\r\no The newly revealed content can be dismissed (generally via the Esc key) without moving the pointer or keyboard\r\nfocus, unless the content presents an input error or does not obscure or interfere with other page content.\r\no The pointer can be moved to the new content without the content disappearing.\r\no The new content must remain visible until the pointer or keyboard focus is moved away from the triggering\r\ncontrol, the new content is dismissed, or the new content is no longer relevant. "
+  },
+  {
+    "Success Criterion": "2.1.1 Keyboard (A)",
+    "axe-core Rule": "scrollable-region-focusable\r\n",
+    "automated checks (axe core rules )": [
+      "Scrollable regions that contain keyboard-operable content are focusable using the keyboard."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "All interactive elements and functionality on the page can be operated using the keyboard alone.",
+      "No functionality requires mouse-only, touch-only, or pointer-specific interactions.",
+      "Keyboard focus order allows users to reach and operate all interactive components.",
+      "Page-defined shortcut keys and accesskeys do not conflict with browser or assistive technology shortcuts.",
+      "Keyboard interactions are consistent and do not trap users within components."
+    ],
+    "Total conditions": [
+      "Scrollable regions that contain keyboard-operable content are focusable using the keyboard.",
+      "All interactive elements and functionality on the page can be operated using the keyboard alone.",
+      "No functionality requires mouse-only, touch-only, or pointer-specific interactions.",
+      "Keyboard focus order allows users to reach and operate all interactive components.",
+      "Page-defined shortcut keys and accesskeys do not conflict with browser or assistive technology shortcuts.",
+      "Keyboard interactions are consistent and do not trap users within components."
+    ],
+    "webaim checks": " All page functionality is available using the keyboard, unless the functionality cannot be accomplished in any known\r\nway using a keyboard (e.g., free hand drawing).\r\n Page-specified shortcut keys and accesskeys (accesskey should typically be avoided) do not conflict with existing\r\nbrowser and screen reader shortcuts. "
+  },
+  {
+    "Success Criterion": "2.1.1 Keyboard (A)",
+    "axe-core Rule": "frame-focusable-content",
+    "automated checks (axe core rules )": [
+      "Iframes that contain interactive or focusable elements are focusable using the keyboard."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "All page functionality is available using the keyboard alone without requiring mouse or touch input.",
+      "Keyboard users can reach and operate all interactive elements within frames and iframes.",
+      "Keyboard focus order is logical and predictable across the main page and embedded frames.",
+      "No keyboard traps exist within frames or embedded content.",
+      "Page-defined shortcut keys and accesskeys do not conflict with browser or assistive technology shortcuts."
+    ],
+    "Total conditions": [
+      "Iframes that contain interactive or focusable elements are focusable using the keyboard.",
+      "All page functionality is available using the keyboard alone without requiring mouse or touch input.",
+      "Keyboard users can reach and operate all interactive elements within frames and iframes.",
+      "Keyboard focus order is logical and predictable across the main page and embedded frames.",
+      "No keyboard traps exist within frames or embedded content.",
+      "Page-defined shortcut keys and accesskeys do not conflict with browser or assistive technology shortcuts."
+    ],
+    "webaim checks": " All page functionality is available using the keyboard, unless the functionality cannot be accomplished in any known\r\nway using a keyboard (e.g., free hand drawing).\r\n Page-specified shortcut keys and accesskeys (accesskey should typically be avoided) do not conflict with existing\r\nbrowser and screen reader shortcuts. "
+  },
+  {
+    "Success Criterion": "2.1.1 Keyboard (A)",
+    "axe-core Rule": "server-side-image-map",
+    "automated checks (axe core rules )": [
+      "Server-side image maps are not used, as they are not operable using the keyboard."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "All page functionality is available using the keyboard alone without requiring mouse or pointer input.",
+      "Client-side image maps, if used, are fully keyboard operable and accessible.",
+      "Interactive regions within images can be reached and activated using the keyboard.",
+      "Keyboard focus order allows users to access all interactive elements.",
+      "Page-defined shortcut keys and accesskeys do not conflict with browser or assistive technology shortcuts."
+    ],
+    "Total conditions": [
+      "Server-side image maps are not used, as they are not operable using the keyboard.",
+      "All page functionality is available using the keyboard alone without requiring mouse or pointer input.",
+      "Client-side image maps, if used, are fully keyboard operable and accessible.",
+      "Interactive regions within images can be reached and activated using the keyboard.",
+      "Keyboard focus order allows users to access all interactive elements.",
+      "Page-defined shortcut keys and accesskeys do not conflict with browser or assistive technology shortcuts."
+    ],
+    "webaim checks": " All page functionality is available using the keyboard, unless the functionality cannot be accomplished in any known\r\nway using a keyboard (e.g., free hand drawing).\r\n Page-specified shortcut keys and accesskeys (accesskey should typically be avoided) do not conflict with existing\r\nbrowser and screen reader shortcuts. "
+  },
+  {
+    "Success Criterion": "2.1.2 No Keyboard Trap (A)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Keyboard focus is never locked or trapped at one particular page element. The user can navigate to and from all navigable page elements using only a keyboard."
+    ],
+    "webaim checks": " Keyboard focus is never locked or trapped at one particular page element. The user can navigate to and from all\r\nnavigable page elements using only a keyboard."
+  },
+  {
+    "Success Criterion": "2.1.3 Keyboard (No Exception)(AAA)",
+    "axe-core Rule": "scrollable-region-focusable",
+    "automated checks (axe core rules )": [
+      "Scrollable regions are keyboard focusable so users can scroll and interact with the content using only the keyboard."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "All interactive functionality on the page can be operated using only the keyboard.",
+      "Keyboard users can access and operate custom widgets and components.",
+      "Keyboard focus order is logical and intuitive throughout the page.",
+      "Keyboard traps are not present and users can move focus away from all components.",
+      "All keyboard interactions work consistently across browsers and assistive technologies.",
+      "Time-based or gesture-based interactions have equivalent keyboard alternatives."
+    ],
+    "Total conditions": [
+      "Scrollable regions are keyboard focusable so users can scroll and interact with the content using only the keyboard.",
+      "All interactive functionality on the page can be operated using only the keyboard.",
+      "Keyboard users can access and operate custom widgets and components.",
+      "Keyboard focus order is logical and intuitive throughout the page.",
+      "Keyboard traps are not present and users can move focus away from all components.",
+      "All keyboard interactions work consistently across browsers and assistive technologies.",
+      "Time-based or gesture-based interactions have equivalent keyboard alternatives."
+    ],
+    "webaim checks": " All page functionality is available using the keyboard."
+  },
+  {
+    "Success Criterion": "2.1.4 Character Key Shortcuts (A) ",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "If a keyboard shortcut uses printable character keys, then the user must be able to disable the key command, change",
+      "the defined key to a non-printable key (Ctrl, Alt, etc.), or only activate the shortcut when an associated interface",
+      "component or button is focused."
+    ],
+    "webaim checks": "If a keyboard shortcut uses printable character keys, then the user must be able to disable the key command, change\r\nthe defined key to a non-printable key (Ctrl, Alt, etc.), or only activate the shortcut when an associated interface\r\ncomponent or button is focused."
+  },
+  {
+    "Success Criterion": "2.2.1 Timing Adjustable (A)",
+    "axe-core Rule": "meta-refresh",
+    "automated checks (axe core rules )": [
+      "Pages do not use automatic meta refresh mechanisms that refresh or redirect the page without user control."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Time limits imposed by scripts, sessions, or applications provide a user-controlled mechanism to turn off, adjust, or extend the time limit.",
+      "Users are warned before a time limit expires and given sufficient opportunity to extend it.",
+      "Time limit controls are accessible using the keyboard and assistive technologies.",
+      "Exceptions for real-time events are correctly applied.",
+      "Time limits longer than 20 hours are correctly identified and excluded from this requirement."
+    ],
+    "Total conditions": [
+      "Pages do not use automatic meta refresh mechanisms that refresh or redirect the page without user control.",
+      "Time limits imposed by scripts, sessions, or applications provide a user-controlled mechanism to turn off, adjust, or extend the time limit.",
+      "Users are warned before a time limit expires and given sufficient opportunity to extend it.",
+      "Time limit controls are accessible using the keyboard and assistive technologies.",
+      "Exceptions for real-time events are correctly applied.",
+      "Time limits longer than 20 hours are correctly identified and excluded from this requirement."
+    ],
+    "webaim checks": "If a page or application has a time limit, the user is given options to turn off, adjust, or extend that time limit. This is\r\nnot a requirement for real-time events (e.g., an auction), where the time limit is absolutely required, or if the time\r\nlimit is longer than 20 hours."
+  },
+  {
+    "Success Criterion": "2.2.2 Pause, Stop, Hide (A)",
+    "axe-core Rule": "blink",
+    "automated checks (axe core rules )": [
+      "Blinking content created using deprecated HTML elements (such as <blink>) is not present."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Automatically moving or scrolling content (e.g., carousels, sliders, marquees, animations) provides a user-controlled mechanism to pause, stop, or hide the movement.",
+      "Automatically updating content (e.g., news tickers, live updates, chat feeds) can be paused, stopped, hidden, or controlled by the user.",
+      "Controls to pause, stop, or hide moving or updating content are clearly visible and accessible.",
+      "Pause and control mechanisms are keyboard accessible.",
+      "Moving or updating content does not resume automatically without user initiation."
+    ],
+    "Total conditions": [
+      "Blinking content created using deprecated HTML elements (such as <blink>) is not present.",
+      "Automatically moving or scrolling content (e.g., carousels, sliders, marquees, animations) provides a user-controlled mechanism to pause, stop, or hide the movement.",
+      "Automatically updating content (e.g., news tickers, live updates, chat feeds) can be paused, stopped, hidden, or controlled by the user.",
+      "Controls to pause, stop, or hide moving or updating content are clearly visible and accessible.",
+      "Pause and control mechanisms are keyboard accessible.",
+      "Moving or updating content does not resume automatically without user initiation."
+    ],
+    "webaim checks": "Automatically moving, blinking, or scrolling content (such as carousels, marquees, or animations) that lasts longer\r\nthan 5 seconds can be paused, stopped, or hidden by the user.\r\nAutomatically updating content (e.g., a dynamically-updating news ticker, chat messages, etc.) can be paused,\r\nstopped, or hidden by the user or the user can manually control the timing of the updates."
+  },
+  {
+    "Success Criterion": "2.2.2 Pause, Stop, Hide (A)",
+    "axe-core Rule": "marquee",
+    "automated checks (axe core rules )": [
+      "Marquee elements (<marquee>) that cause automatic scrolling or movement are not present on the page."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Automatically moving content implemented using CSS or JavaScript (such as carousels, sliders, or animations) can be paused, stopped, or hidden by the user.",
+      "Automatically updating content (such as tickers, live feeds, or chat messages) provides user control to pause, stop, hide, or adjust update timing.",
+      "Controls to pause, stop, or hide moving or updating content are clearly visible and understandable.",
+      "Pause and control mechanisms are fully keyboard accessible.",
+      "Automatically moving or updating content does not restart without explicit user action."
+    ],
+    "Total conditions": [
+      "Marquee elements (<marquee>) that cause automatic scrolling or movement are not present on the page.",
+      "Automatically moving content implemented using CSS or JavaScript (such as carousels, sliders, or animations) can be paused, stopped, or hidden by the user.",
+      "Automatically updating content (such as tickers, live feeds, or chat messages) provides user control to pause, stop, hide, or adjust update timing.",
+      "Controls to pause, stop, or hide moving or updating content are clearly visible and understandable.",
+      "Pause and control mechanisms are fully keyboard accessible.",
+      "Automatically moving or updating content does not restart without explicit user action."
+    ],
+    "webaim checks": "Automatically moving, blinking, or scrolling content (such as carousels, marquees, or animations) that lasts longer\r\nthan 5 seconds can be paused, stopped, or hidden by the user.\r\nAutomatically updating content (e.g., a dynamically-updating news ticker, chat messages, etc.) can be paused,\r\nstopped, or hidden by the user or the user can manually control the timing of the updates."
+  },
+  {
+    "Success Criterion": "2.2.3 No Timing(AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "webaim checks": "The content and functionality have no time limits or constraints. "
+  },
+  {
+    "Success Criterion": "2.2.4 Interruptions (AAA)",
+    "axe-core Rule": "meta-refresh-no-exceptions",
+    "automated checks (axe core rules )": [
+      "Pages do not use meta refresh to automatically reload or redirect content without providing a mechanism for users to postpone or control the interruption."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Alerts, notifications, and updates initiated by scripts can be postponed, suppressed, or controlled by the user.",
+      "Users are provided with clear controls to pause, stop, or delay interruptions.",
+      "Interruptions do not occur unexpectedly or without user consent.",
+      "Time-based updates provide sufficient warning and user control.",
+      "User preferences for reducing interruptions are respected."
+    ],
+    "Total conditions": [
+      "Pages do not use meta refresh to automatically reload or redirect content without providing a mechanism for users to postpone or control the interruption.",
+      "Alerts, notifications, and updates initiated by scripts can be postponed, suppressed, or controlled by the user.",
+      "Users are provided with clear controls to pause, stop, or delay interruptions.",
+      "Interruptions do not occur unexpectedly or without user consent.",
+      "Time-based updates provide sufficient warning and user control.",
+      "User preferences for reducing interruptions are respected."
+    ],
+    "webaim checks": "Interruptions (alerts, page updates, etc.) can be postponed or suppressed by the user"
+  },
+  {
+    "Success Criterion": "2.2.5 Re-authenticating(AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "If an authentication session expires, the user can re-authenticate and continue the activity without losing any data",
+      "from the current page."
+    ],
+    "webaim checks": "If an authentication session expires, the user can re-authenticate and continue the activity without losing any data\r\nfrom the current page."
+  },
+  {
+    "Success Criterion": " 2.2.6 Timeouts (AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Users must be warned of any timeout that could result in data loss, unless the data is preserved for longer than 20",
+      "hours of user inactivity."
+    ],
+    "webaim checks": "Users must be warned of any timeout that could result in data loss, unless the data is preserved for longer than 20\r\nhours of user inactivity."
+  },
+  {
+    "Success Criterion": "2.3.1 Three Flashes or Below Threshold (A)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "No page content flashes more than 3 times per second unless that flashing content is sufficiently small and the flashes are of low contrast and do not contain too much red. (See general flash and red flash thresholds)"
+    ],
+    "webaim checks": " No page content flashes more than 3 times per second unless that flashing content is sufficiently small and the\r\nflashes are of low contrast and do not contain too much red. (See general flash and red flash thresholds) \r"
+  },
+  {
+    "Success Criterion": "2.3.2 Three Flashes(AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "No page content flashes more than 3 times per second."
+    ],
+    "webaim checks": "No page content flashes more than 3 times per second."
+  },
+  {
+    "Success Criterion": "2.3.3 Animation from Interactions(AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Users can disable non-essential animation and movement that is triggered by user interaction"
+    ],
+    "webaim checks": "Users can disable non-essential animation and movement that is triggered by user interaction"
+  },
+  {
+    "Success Criterion": "2.4.1 Bypass Blocks (A)",
+    "axe-core Rule": "region ",
+    "automated checks (axe core rules )": [
+      "Page content uses landmark regions (ARIA or HTML5 landmarks) to identify major sections of the page."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "A visible and operable “skip to main content” (or equivalent) link is provided.",
+      "The skip link is keyboard accessible and receives focus when tabbing.",
+      "Activating the skip link moves focus past repeated navigation to the main content.",
+      "The skip mechanism works consistently across pages with repeated content.",
+      "Headings and landmark regions are used logically to support content bypass for assistive technology users."
+    ],
+    "Total conditions": [
+      "Page content uses landmark regions (ARIA or HTML5 landmarks) to identify major sections of the page.",
+      "A visible and operable “skip to main content” (or equivalent) link is provided.",
+      "The skip link is keyboard accessible and receives focus when tabbing.",
+      "Activating the skip link moves focus past repeated navigation to the main content.",
+      "The skip mechanism works consistently across pages with repeated content.",
+      "Headings and landmark regions are used logically to support content bypass for assistive technology users."
+    ],
+    "webaim checks": " A link is provided to skip navigation and other page elements that are repeated across web pages.\r\n While proper use of headings or regions/landmarks is sufficient to meet this success criterion, because keyboard\r\nnavigation by headings or regions is not supported in most browsers, WebAIM recommends a \"skip\" link in addition\r\nto headings and regions."
+  },
+  {
+    "Success Criterion": "2.4.1 Bypass Blocks (A)",
+    "axe-core Rule": "bypass",
+    "automated checks (axe core rules )": [
+      "A mechanism exists to bypass blocks of repeated content, such as a skip link, landmark region, or equivalent bypass method."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "A visible and operable “skip to main content” (or equivalent) link is provided for keyboard users.",
+      "The skip link receives keyboard focus in a logical order and is perceivable when focused.",
+      "Activating the skip link moves keyboard focus past repeated navigation directly to the main content.",
+      "The bypass mechanism works consistently across pages with repeated navigation or content blocks.",
+      "Headings and landmark regions are used logically to support efficient content bypass for assistive technology users."
+    ],
+    "Total conditions": [
+      "A mechanism exists to bypass blocks of repeated content, such as a skip link, landmark region, or equivalent bypass method.",
+      "A visible and operable “skip to main content” (or equivalent) link is provided for keyboard users.",
+      "The skip link receives keyboard focus in a logical order and is perceivable when focused.",
+      "Activating the skip link moves keyboard focus past repeated navigation directly to the main content.",
+      "The bypass mechanism works consistently across pages with repeated navigation or content blocks.",
+      "Headings and landmark regions are used logically to support efficient content bypass for assistive technology users."
+    ],
+    "webaim checks": " A link is provided to skip navigation and other page elements that are repeated across web pages.\r\n While proper use of headings or regions/landmarks is sufficient to meet this success criterion, because keyboard\r\nnavigation by headings or regions is not supported in most browsers, WebAIM recommends a \"skip\" link in addition\r\nto headings and regions."
+  },
+  {
+    "Success Criterion": "2.4.2 Page Titled (A)",
+    "axe-core Rule": "document-title",
+    "automated checks (axe core rules )": [
+      "The document includes a non-empty and present <title> element in the document head."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "The page title is descriptive and accurately reflects the page’s purpose or content.",
+      "The page title is meaningful and informative for users, including screen reader users.",
+      "Page titles are unique and distinguishable across different pages of the website or application.",
+      "The page title updates appropriately when page content or context changes (e.g., single-page applications)."
+    ],
+    "Total conditions": [
+      "The document includes a non-empty and present <title> element in the document head.",
+      "The page title is descriptive and accurately reflects the page’s purpose or content.",
+      "The page title is meaningful and informative for users, including screen reader users.",
+      "Page titles are unique and distinguishable across different pages of the website or application.",
+      "The page title updates appropriately when page content or context changes (e.g., single-page applications)."
+    ],
+    "webaim checks": " The web page has a descriptive and informative page title. "
+  },
+  {
+    "Success Criterion": "2.4.3 Focus Order (A)",
+    "axe-core Rule": "No axe-core rule",
+    "webaim checks": " The navigation order of links, form controls, etc. is logical and intuitive."
+  },
+  {
+    "Success Criterion": "2.4.4 Link Purpose (In Context) (A)",
+    "axe-core Rule": "link-name",
+    "automated checks (axe core rules )": [
+      "Links have accessible names that are not empty and are programmatically determinable."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Link text or accessible name clearly describes the purpose or destination of the link.",
+      "Link purpose can be understood from the link text alone or in combination with surrounding context (such as headings, list items, or table headers).",
+      "Links with identical text that point to different destinations are visually and programmatically distinguishable.",
+      "Image links and image buttons convey their purpose through meaningful alternative text.",
+      "Link purpose remains clear when links are read out of context (e.g., via a screen reader links list)."
+    ],
+    "Total conditions": [
+      "Links have accessible names that are not empty and are programmatically determinable.",
+      "Link text or accessible name clearly describes the purpose or destination of the link.",
+      "Link purpose can be understood from the link text alone or in combination with surrounding context (such as headings, list items, or table headers).",
+      "Links with identical text that point to different destinations are visually and programmatically distinguishable.",
+      "Image links and image buttons convey their purpose through meaningful alternative text.",
+      "Link purpose remains clear when links are read out of context (e.g., via a screen reader links list)."
+    ],
+    "webaim checks": " The purpose of each link (or image button or image map hotspot) can be determined from the link text alone, or from\r\nthe link text and its context (e.g., surrounding text, list item, previous heading, or table headers).\r\n Links with the same text that go to different locations are readily distinguishable."
+  },
+  {
+    "Success Criterion": "2.4.4 Link Purpose (In Context) (A)",
+    "axe-core Rule": "area-alt",
+    "automated checks (axe core rules )": [
+      "Image map area (<area>) elements have non-empty alternative text that provides an accessible name."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "The alternative text for image map hotspots clearly describes the purpose or destination of each link.",
+      "The purpose of each link can be determined from the link text alone or together with its surrounding context.",
+      "Links with the same text that point to different destinations are readily distinguishable.",
+      "Image buttons and image links convey their purpose through meaningful alternative text.",
+      "Link purpose remains clear when links are presented out of context (e.g., screen reader links list)."
+    ],
+    "Total conditions": [
+      "Image map area (<area>) elements have non-empty alternative text that provides an accessible name.",
+      "The alternative text for image map hotspots clearly describes the purpose or destination of each link.",
+      "The purpose of each link can be determined from the link text alone or together with its surrounding context.",
+      "Links with the same text that point to different destinations are readily distinguishable.",
+      "Image buttons and image links convey their purpose through meaningful alternative text.",
+      "Link purpose remains clear when links are presented out of context (e.g., screen reader links list)."
+    ],
+    "webaim checks": " The purpose of each link (or image button or image map hotspot) can be determined from the link text alone, or from\r\nthe link text and its context (e.g., surrounding text, list item, previous heading, or table headers).\r\n Links with the same text that go to different locations are readily distinguishable."
+  },
+  {
+    "Success Criterion": "2.4.5 Multiple Ways (AA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Multiple ways are available to find other web pages on the site - at least two of: a list of related pages, table of contents, site map, site search, or list of all available web pages."
+    ],
+    "webaim checks": " Multiple ways are available to find other web pages on the site - at least two of: a list of related pages, table of\r\ncontents, site map, site search, or list of all available web pages."
+  },
+  {
+    "Success Criterion": "2.4.6 Headings and Labels (AA)",
+    "axe-core Rule": " heading-order ",
+    "automated checks (axe core rules )": [
+      "Heading levels follow a logical and sequential order without skipping levels (e.g., h1 → h2 → h3)."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Headings accurately and informatively describe the content or section they introduce.",
+      "Form labels and labels for interactive controls clearly describe their purpose.",
+      "Duplicate headings or labels are avoided unless context or structure makes their purpose clear.",
+      "Headings provide a clear outline and hierarchy that helps users understand page organization.",
+      "Headings and labels remain meaningful when accessed out of visual context (e.g., via assistive technology lists)."
+    ],
+    "Total conditions": [
+      "Heading levels follow a logical and sequential order without skipping levels (e.g., h1 → h2 → h3).",
+      "Headings accurately and informatively describe the content or section they introduce.",
+      "Form labels and labels for interactive controls clearly describe their purpose.",
+      "Duplicate headings or labels are avoided unless context or structure makes their purpose clear.",
+      "Headings provide a clear outline and hierarchy that helps users understand page organization.",
+      "Headings and labels remain meaningful when accessed out of visual context (e.g., via assistive technology lists)."
+    ],
+    "webaim checks": " Page headings and labels for form and interactive controls are informative. Avoid duplicating heading and label text\r\nunless the structure provides adequate differentiation between them."
+  },
+  {
+    "Success Criterion": "2.4.7 Focus Visible (AA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "There is a visible indicator for page elements when they receive keyboard focus."
+    ],
+    "webaim checks": " There is a visible indicator for page elements when they receive keyboard focus."
+  },
+  {
+    "Success Criterion": "2.4.8 Location (AAA) ",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "If a web page is part of a sequence of pages or within a complex site structure, an indication of the current page",
+      "location is provided, for example, through breadcrumbs or specifying the current step in a sequence (e.g., \"Step 2 of 5",
+      "- Shipping Address\")."
+    ],
+    "webaim checks": "If a web page is part of a sequence of pages or within a complex site structure, an indication of the current page\r\nlocation is provided, for example, through breadcrumbs or specifying the current step in a sequence (e.g., \"Step 2 of 5\r\n- Shipping Address\")."
+  },
+  {
+    "Success Criterion": "2.4.9 Link Purpose (Link Only) (AAA)",
+    "axe-core Rule": "identical-links-same-purpose",
+    "automated checks (axe core rules )": [
+      "Links that have identical accessible names point to the same destination, ensuring that identical link text does not lead to different locations."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Each link’s text alone clearly and accurately describes its purpose without relying on surrounding context.",
+      "Image links, image buttons, and image map hotspots have text alternatives that clearly convey their purpose.",
+      "Link text is meaningful, descriptive, and not vague (for example, avoiding “click here” or “more”).",
+      "Links that appear visually similar but have different purposes are clearly differentiated by their text.",
+      "The purpose of links remains clear when presented out of visual context (for example, in a list of links)."
+    ],
+    "Total conditions": [
+      "Links that have identical accessible names point to the same destination, ensuring that identical link text does not lead to different locations.",
+      "Each link’s text alone clearly and accurately describes its purpose without relying on surrounding context.",
+      "Image links, image buttons, and image map hotspots have text alternatives that clearly convey their purpose.",
+      "Link text is meaningful, descriptive, and not vague (for example, avoiding “click here” or “more”).",
+      "Links that appear visually similar but have different purposes are clearly differentiated by their text.",
+      "The purpose of links remains clear when presented out of visual context (for example, in a list of links)."
+    ],
+    "webaim checks": "\r\n The purpose of each link (or image button or image map hotspot) can be determined from the link text alone.\r\nThere are no links with the same text that go to different locations."
+  },
+  {
+    "Success Criterion": "2.4.10 Section Headings (AAA)",
+    "axe-core Rule": "- heading-order (partial)",
+    "automated checks (axe core rules )": [
+      "Headings follow a logical and hierarchical order without skipping heading levels."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "All meaningful sections of content are identified using headings where appropriate.",
+      "Headings accurately describe the content or purpose of their respective sections.",
+      "Headings are used consistently to organize content and improve navigability.",
+      "Headings are not used solely for visual styling purposes.",
+      "Section headings remain meaningful when accessed via assistive technology (e.g., headings list)."
+    ],
+    "Total conditions": [
+      "Headings follow a logical and hierarchical order without skipping heading levels.",
+      "All meaningful sections of content are identified using headings where appropriate.",
+      "Headings accurately describe the content or purpose of their respective sections.",
+      "Headings are used consistently to organize content and improve navigability.",
+      "Headings are not used solely for visual styling purposes.",
+      "Section headings remain meaningful when accessed via assistive technology (e.g., headings list)."
+    ],
+    "webaim checks": " Beyond providing an overall document structure, individual sections of content are designated using headings, where\r\nappropriate."
+  },
+  {
+    "Success Criterion": "2.5.1 Pointer Gestures (A) ",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "If multipoint or path-based gestures (such as pinching, swiping, or dragging across the screen) are not essential to the functionality, then the functionality can also be performed with a single point activation (such as activating a button)."
+    ],
+    "webaim checks": " If multipoint or path-based gestures (such as pinching, swiping, or dragging across the screen) are not essential to\r\nthe functionality, then the functionality can also be performed with a single point activation (such as activating a\r\nbutton)."
+  },
+  {
+    "Success Criterion": "2.5.2 Pointer cancellation (A)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "To help avoid inadvertent activation of controls, avoid non-essential down-event (e.g., onmousedown) activation when clicking, tapping, or long pressing the screen. Use onclick, onmouseup, or similar instead. If onmouseup (or similar) is used, you must provide a mechanism to abort or undo the action performed."
+    ],
+    "webaim checks": "To help avoid inadvertent activation of controls, avoid non-essential down-event (e.g., onmousedown) activation\r\nwhen clicking, tapping, or long pressing the screen. Use onclick, onmouseup, or similar instead. If onmouseup (or\r\nsimilar) is used, you must provide a mechanism to abort or undo the action performed."
+  },
+  {
+    "Success Criterion": "2.5.3 Label in Name (A)",
+    "axe-core Rule": " label-content-name-mismatch",
+    "automated checks (axe core rules )": [
+      "The accessible name of an interactive component contains the visible text presented to users."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "The accessible name includes the visible text in the same order and without altering its meaning.",
+      "Accessible names derived from aria-label or aria-labelledby accurately reflect the visible label text.",
+      "Image buttons and icons with visible text equivalents include that text in the accessible name.",
+      "Dynamic changes to visible labels are reflected in the accessible name.",
+      "Abbreviations or symbols used visually are appropriately represented in the accessible name."
+    ],
+    "Total conditions": [
+      "The accessible name of an interactive component contains the visible text presented to users.",
+      "The accessible name includes the visible text in the same order and without altering its meaning.",
+      "Accessible names derived from aria-label or aria-labelledby accurately reflect the visible label text.",
+      "Image buttons and icons with visible text equivalents include that text in the accessible name.",
+      "Dynamic changes to visible labels are reflected in the accessible name.",
+      "Abbreviations or symbols used visually are appropriately represented in the accessible name."
+    ],
+    "webaim checks": "If an interface component (link, button, etc.) presents text (or images of text), the accessible name (label, alternative\r\ntext, aria-label, etc.) for that component must include the visible text."
+  },
+  {
+    "Success Criterion": "2.5.4 Motion Actuation (A) ",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Functionality that is triggered by moving the device (such as shaking or panning a mobile device) or by user movement (such as waving to a camera) can be disabled and equivalent functionality is provided via standard controls like buttons."
+    ],
+    "webaim checks": "Functionality that is triggered by moving the device (such as shaking or panning a mobile device) or by user movement (such as waving to a camera) can be disabled and equivalent functionality is provided via standard controls like buttons."
+  },
+  {
+    "Success Criterion": "2.5.5 Target Size (AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Clickable targets are at least 44 by 44 pixels in size unless an alternative target of that size is provided, the target is",
+      "inline (such as a link within a sentence), the target is not author-modified (such as a default checkbox), or the small",
+      "target size is essential to the functionality."
+    ],
+    "webaim checks": "Clickable targets are at least 44 by 44 pixels in size unless an alternative target of that size is provided, the target is\r\ninline (such as a link within a sentence), the target is not author-modified (such as a default checkbox), or the small\r\ntarget size is essential to the functionality."
+  },
+  {
+    "Success Criterion": "2.5.6 Concurrent Input Mechanisms  (AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Content does not require a specific input type, such as touch-only or keyboard-only, but must support alternative",
+      "inputs (such as using a keyboard on a mobile device)."
+    ],
+    "webaim checks": "Content does not require a specific input type, such as touch-only or keyboard-only, but must support alternative\r\ninputs (such as using a keyboard on a mobile device)."
+  },
+  {
+    "Success Criterion": "3.1.1 Language of Page (A)",
+    "axe-core Rule": "html-has-lang",
+    "automated checks (axe core rules )": [
+      "The <html> element includes a valid and non-empty lang attribute."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "The lang attribute value correctly identifies the primary language of the page content.",
+      "The language declared in the lang attribute matches the actual language used throughout the page.",
+      "The language declaration remains accurate when page content or locale changes dynamically."
+    ],
+    "Total conditions": [
+      "The <html> element includes a valid and non-empty lang attribute.",
+      "The lang attribute value correctly identifies the primary language of the page content.",
+      "The language declared in the lang attribute matches the actual language used throughout the page.",
+      "The language declaration remains accurate when page content or locale changes dynamically."
+    ],
+    "webaim checks": "The language of the page is identified using the lang attribute (e.g., <html lang=\"en\">)"
+  },
+  {
+    "Success Criterion": "3.1.1 Language of Page (A)",
+    "axe-core Rule": "html-lang-valid",
+    "automated checks (axe core rules )": [
+      "The lang attribute on the <html> element contains a valid language code according to BCP 47."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "The lang attribute value correctly identifies the primary language of the page content.",
+      "The declared language matches the actual language used throughout the page.",
+      "The language declaration remains accurate when page content or locale changes dynamically."
+    ],
+    "Total conditions": [
+      "The lang attribute on the <html> element contains a valid language code according to BCP 47.",
+      "The lang attribute value correctly identifies the primary language of the page content.",
+      "The declared language matches the actual language used throughout the page.",
+      "The language declaration remains accurate when page content or locale changes dynamically."
+    ],
+    "webaim checks": "The language of the page is identified using the lang attribute (e.g., <html lang=\"en\">)\r\n"
+  },
+  {
+    "Success Criterion": "3.1.1 Language of Page (A)",
+    "axe-core Rule": "html-xml-lang-mismatch",
+    "automated checks (axe core rules )": [
+      "The lang attribute and xml:lang attribute, when both are present on the <html> element, do not conflict with each other."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "The declared language correctly identifies the primary language of the page content.",
+      "The language specified using lang (and xml:lang, if present) matches the actual language used throughout the page.",
+      "Language declarations remain accurate when page content or locale changes dynamically."
+    ],
+    "Total conditions": [
+      "The lang attribute and xml:lang attribute, when both are present on the <html> element, do not conflict with each other.",
+      "The declared language correctly identifies the primary language of the page content.",
+      "The language specified using lang (and xml:lang, if present) matches the actual language used throughout the page.",
+      "Language declarations remain accurate when page content or locale changes dynamically."
+    ],
+    "webaim checks": "The language of the page is identified using the lang attribute (e.g., <html lang=\"en\">)\r\n"
+  },
+  {
+    "Success Criterion": "3.1.2 Language of Parts (AA)",
+    "axe-core Rule": "valid-lang",
+    "automated checks (axe core rules )": [
+      "Elements with a lang attribute use a valid language code according to BCP 47."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "All passages of content written in a different language from the primary page language are correctly identified using the lang attribute.",
+      "The language specified in the lang attribute accurately matches the language of the content.",
+      "Language changes are applied consistently to all relevant text segments (including dynamically generated content).",
+      "Nested language changes are correctly marked when multiple languages appear within the same content block."
+    ],
+    "Total conditions": [
+      "Elements with a lang attribute use a valid language code according to BCP 47.",
+      "All passages of content written in a different language from the primary page language are correctly identified using the lang attribute.",
+      "The language specified in the lang attribute accurately matches the language of the content.",
+      "Language changes are applied consistently to all relevant text segments (including dynamically generated content).",
+      "Nested language changes are correctly marked when multiple languages appear within the same content block."
+    ],
+    "webaim checks": "The language of page content that is in a different language is identified using the lang attribute (e.g., <blockquote\r\nlang=\"es\">)."
+  },
+  {
+    "Success Criterion": "3.1.3 Unusual Words (AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Words that may be ambiguous, unfamiliar, or used in a very specific way are defined through adjacent text, a",
+      "definition list, a glossary, or other suitable method."
+    ],
+    "webaim checks": " Words that may be ambiguous, unfamiliar, or used in a very specific way are defined through adjacent text, a\r\ndefinition list, a glossary, or other suitable method."
+  },
+  {
+    "Success Criterion": "3.1.4 Abbrevations (AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "The meaning of an unfamiliar abbreviation is provided by expanding it the first time it is used, using",
+      "the <abbr> element, or linking to a definition or glossary."
+    ],
+    "webaim checks": "The meaning of an unfamiliar abbreviation is provided by expanding it the first time it is used, using\r\nthe <abbr> element, or linking to a definition or glossary. "
+  },
+  {
+    "Success Criterion": "3.1.5 Reading Level (AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "A more understandable alternative is provided for content that is more advanced than can be reasonably read by a",
+      "person with roughly 9 years of primary education."
+    ],
+    "webaim checks": " A more understandable alternative is provided for content that is more advanced than can be reasonably read by a\r\nperson with roughly 9 years of primary education. "
+  },
+  {
+    "Success Criterion": "3.1.6 Pronounciation (AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "If the pronunciation of a word is vital to understanding that word, its pronunciation is provided immediately following the word or via a link or glossary"
+    ],
+    "webaim checks": "If the pronunciation of a word is vital to understanding that word, its pronunciation is provided immediately following the word or via a link or glossary\r\n"
+  },
+  {
+    "Success Criterion": "3.2.1 On Focus (A)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "When a page element receives focus, it does not result in a substantial change to the page, the spawning of a pop-up window, an additional change of keyboard focus, or any other change that could confuse or disorient the user."
+    ],
+    "webaim checks": "When a page element receives focus, it does not result in a substantial change to the page, the spawning of a pop-up window, an additional change of keyboard focus, or any other change that could confuse or disorient the user."
+  },
+  {
+    "Success Criterion": "3.2.2 On Input (A)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "When a user inputs information or interacts with a control, it does not result in a substantial change to the page, the spawning of a pop-up window, an additional change of keyboard focus, or any other change that could confuse or disorient the user unless the user is informed of the change ahead of time."
+    ],
+    "webaim checks": "When a user inputs information or interacts with a control, it does not result in a substantial change to the page, the spawning of a pop-up window, an additional change of keyboard focus, or any other change that could confuse or disorient the user unless the user is informed of the change ahead of time."
+  },
+  {
+    "Success Criterion": "3.2.3 Consistent Navigation (AA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Navigation links that are repeated on web pages do not change order when navigating through the site"
+    ],
+    "webaim checks": " Navigation links that are repeated on web pages do not change order when navigating through the site"
+  },
+  {
+    "Success Criterion": "3.2.4 Consistent Identification (AA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Elements that have the same functionality across multiple web pages are consistently identified. For example, a search box at the top of the site should always be labeled the same way."
+    ],
+    "webaim checks": "Elements that have the same functionality across multiple web pages are consistently identified. For example, a search box at the top of the site should always be labeled the same way."
+  },
+  {
+    "Success Criterion": "3.2.5 Change on Request (AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Substantial changes to the page, the spawning of pop-up windows, uncontrolled changes of keyboard focus, or any",
+      "other change that could confuse or disorient the user must be initiated by the user. Alternatively, the user is provided",
+      "an option to disable such changes."
+    ],
+    "webaim checks": " Substantial changes to the page, the spawning of pop-up windows, uncontrolled changes of keyboard focus, or any\r\nother change that could confuse or disorient the user must be initiated by the user. Alternatively, the user is provided\r\nan option to disable such changes."
+  },
+  {
+    "Success Criterion": "3.3.1 Error Identification (A)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Required inputs or inputs that require a specific format, value, or length provide this information within the element's label.",
+      "Form validation errors are efficient, intuitive, and accessible. The error is clearly identified, quick access to the problematic element is provided, and the user can easily fix the error and resubmit the form."
+    ],
+    "webaim checks": "Required inputs or inputs that require a specific format, value, or length provide this information within the element's label.\r\n Form validation errors are efficient, intuitive, and accessible. The error is clearly identified, quick access to the\r\nproblematic element is provided, and the user can easily fix the error and resubmit the form."
+  },
+  {
+    "Success Criterion": "3.3.2 Labels or Instructions (A)",
+    "axe-core Rule": "form-field-multiple-labels",
+    "automated checks (axe core rules )": [
+      "Form controls do not have multiple visible or programmatic labels that would cause confusion for assistive technology users."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Labels or instructions clearly describe the expected input in a way users can easily understand.",
+      "Instructions provide sufficient guidance when specific formats, values, or input expectations are required.",
+      "Labels or instructions are meaningful, descriptive, and not ambiguous.",
+      "Instructions are available to users before input is required.",
+      "Visual placement and wording of labels or instructions make the association with the input clear."
+    ],
+    "Total conditions": [
+      "Form controls do not have multiple visible or programmatic labels that would cause confusion for assistive technology users.",
+      "Labels or instructions clearly describe the expected input in a way users can easily understand.",
+      "Instructions provide sufficient guidance when specific formats, values, or input expectations are required.",
+      "Labels or instructions are meaningful, descriptive, and not ambiguous.",
+      "Instructions are available to users before input is required.",
+      "Visual placement and wording of labels or instructions make the association with the input clear."
+    ],
+    "webaim checks": "Inputs are identified by labels or instructions that help users know what information to enter\r\n"
+  },
+  {
+    "Success Criterion": "3.3.3 Error Suggestion (AA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "If an input error is detected (via client-side or server-side validation), suggestions are provided for fixing the input in a timely and accessible manner."
+    ],
+    "webaim checks": "If an input error is detected (via client-side or server-side validation), suggestions are provided for fixing the input in\r\na timely and accessible manner."
+  },
+  {
+    "Success Criterion": "3.3.4 Error Prevention (Legal, Financial, Data) (AA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Submissions, changes, and deletions of legal, financial, or test data can be reversed, verified, or confirmed."
+    ],
+    "webaim checks": "Submissions, changes, and deletions of legal, financial, or test data can be reversed, verified, or confirmed. \r"
+  },
+  {
+    "Success Criterion": "3.3.5 Help (AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "Instructions and cues are provided in context to help in form completion and submission"
+    ],
+    "webaim checks": " Instructions and cues are provided in context to help in form completion and submission"
+  },
+  {
+    "Success Criterion": "3.3.6 Error Prevention (All) (AAA)",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "If the user can submit information, the submission is reversible, verified, or confirmed"
+    ],
+    "webaim checks": " If the user can submit information, the submission is reversible, verified, or confirmed"
+  },
+  {
+    "Success Criterion": "4.1.1 Parsing (A)",
+    "axe-core Rule": "duplicate-id-active (Deprecated)",
+    "automated checks (axe core rules )": [
+      "Active elements (such as focusable or interactive elements) do not have duplicate id attribute values that could interfere with DOM parsing and assistive technology interaction."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Non-active elements are reviewed to ensure they also do not contain duplicate id values.",
+      "Dynamically generated or updated content is checked to confirm duplicate IDs are not introduced after page load.",
+      "Overall HTML parsing and markup validity are reviewed to identify other errors that could impact assistive technologies."
+    ],
+    "Total conditions": [
+      "Active elements (such as focusable or interactive elements) do not have duplicate id attribute values that could interfere with DOM parsing and assistive technology interaction.",
+      "Non-active elements are reviewed to ensure they also do not contain duplicate id values.",
+      "Dynamically generated or updated content is checked to confirm duplicate IDs are not introduced after page load.",
+      "Overall HTML parsing and markup validity are reviewed to identify other errors that could impact assistive technologies."
+    ],
+    "webaim checks": "NOTE: This success criterion is no longer useful and as of 2023 has been removed from WCAG. It previously required\r\nthat significant HTML validation/parsing errors be avoided."
+  },
+  {
+    "Success Criterion": "4.1.1 Parsing (A)",
+    "axe-core Rule": "duplicate-id (Deprecated)",
+    "automated checks (axe core rules )": [
+      "Elements do not have duplicate id attribute values, ensuring unique identifiers in the DOM and preventing parsing and assistive technology conflicts."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "HTML markup is reviewed to ensure no other parsing errors exist that could affect assistive technology behavior.",
+      "Custom components and dynamically generated content are verified to ensure unique IDs are maintained at runtime."
+    ],
+    "Total conditions": [
+      "Elements do not have duplicate id attribute values, ensuring unique identifiers in the DOM and preventing parsing and assistive technology conflicts.",
+      "HTML markup is reviewed to ensure no other parsing errors exist that could affect assistive technology behavior.",
+      "Custom components and dynamically generated content are verified to ensure unique IDs are maintained at runtime."
+    ],
+    "webaim checks": "NOTE: This success criterion is no longer useful and as of 2023 has been removed from WCAG. It previously required\r\nthat significant HTML validation/parsing errors be avoided."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "\r\naria-roles",
+    "automated checks (axe core rules )": [
+      "Elements with ARIA role attributes use valid, defined ARIA roles that are supported according to the ARIA specification."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Native HTML elements are used wherever possible instead of ARIA roles.",
+      "ARIA roles are used only when HTML semantics are insufficient.",
+      "The assigned role correctly matches the element’s purpose and behavior.",
+      "Required ARIA states and properties for the assigned role are provided.",
+      "Accessible names, roles, and values are properly exposed to assistive technologies during interaction.",
+      "Custom widgets correctly manage state changes and user interaction feedback."
+    ],
+    "Total conditions": [
+      "Elements with ARIA role attributes use valid, defined ARIA roles that are supported according to the ARIA specification.",
+      "Native HTML elements are used wherever possible instead of ARIA roles.",
+      "ARIA roles are used only when HTML semantics are insufficient.",
+      "The assigned role correctly matches the element’s purpose and behavior.",
+      "Required ARIA states and properties for the assigned role are provided.",
+      "Accessible names, roles, and values are properly exposed to assistive technologies during interaction.",
+      "Custom widgets correctly manage state changes and user interaction feedback."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "area-alt",
+    "automated checks (axe core rules )": [
+      "Area elements within image maps have a non-empty alt attribute, ensuring an accessible name is programmatically available for each interactive region."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "The alt text for each area accurately reflects the purpose, role, and function of the interactive region.",
+      "Accessible names exposed through alt text are meaningful and correctly announced by assistive technologies.",
+      "Image map areas use appropriate native HTML semantics rather than ARIA where possible.",
+      "The role and value of interactive regions are correctly conveyed during user interaction.",
+      "Dynamic updates to image maps preserve correct accessible names and roles."
+    ],
+    "Total conditions": [
+      "Area elements within image maps have a non-empty alt attribute, ensuring an accessible name is programmatically available for each interactive region.",
+      "The alt text for each area accurately reflects the purpose, role, and function of the interactive region.",
+      "Accessible names exposed through alt text are meaningful and correctly announced by assistive technologies.",
+      "Image map areas use appropriate native HTML semantics rather than ARIA where possible.",
+      "The role and value of interactive regions are correctly conveyed during user interaction.",
+      "Dynamic updates to image maps preserve correct accessible names and roles."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "aria-allowed-attr",
+    "automated checks (axe core rules )": [
+      "ARIA attributes used on elements are permitted for the element’s assigned role, ensuring only allowed ARIA states and properties are applied."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Native HTML elements are used wherever possible instead of ARIA attributes.",
+      "ARIA attributes are used only when HTML semantics are insufficient.",
+      "The combination of role, state, and property correctly represents the element’s purpose.",
+      "Required ARIA states and properties for custom widgets are fully implemented.",
+      "Accessible names, roles, and values are correctly exposed and updated during user interaction.",
+      "Custom components behave consistently across assistive technologies."
+    ],
+    "Total conditions": [
+      "ARIA attributes used on elements are permitted for the element’s assigned role, ensuring only allowed ARIA states and properties are applied.",
+      "Native HTML elements are used wherever possible instead of ARIA attributes.",
+      "ARIA attributes are used only when HTML semantics are insufficient.",
+      "The combination of role, state, and property correctly represents the element’s purpose.",
+      "Required ARIA states and properties for custom widgets are fully implemented.",
+      "Accessible names, roles, and values are correctly exposed and updated during user interaction.",
+      "Custom components behave consistently across assistive technologies."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "aria-braille-equivalent",
+    "automated checks (axe core rules )": [
+      "Elements that use ARIA braille-related properties provide a valid braille equivalent so that information is correctly exposed to braille assistive technologies."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "The braille equivalent accurately conveys the same meaning and purpose as the visual or text content.",
+      "Braille output is meaningful, understandable, and appropriate for the context of use.",
+      "Native HTML semantics are used wherever possible instead of relying on ARIA braille properties.",
+      "ARIA braille properties are used only when necessary and according to specification.",
+      "Updates to content dynamically refresh the corresponding braille output.",
+      "The exposed name, role, and value remain consistent across different assistive technologies."
+    ],
+    "Total conditions": [
+      "Elements that use ARIA braille-related properties provide a valid braille equivalent so that information is correctly exposed to braille assistive technologies.",
+      "The braille equivalent accurately conveys the same meaning and purpose as the visual or text content.",
+      "Braille output is meaningful, understandable, and appropriate for the context of use.",
+      "Native HTML semantics are used wherever possible instead of relying on ARIA braille properties.",
+      "ARIA braille properties are used only when necessary and according to specification.",
+      "Updates to content dynamically refresh the corresponding braille output.",
+      "The exposed name, role, and value remain consistent across different assistive technologies."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "aria-command-name",
+    "automated checks (axe core rules )": [
+      "Elements with ARIA command roles (such as button, menuitem, or link) have an accessible name so assistive technologies can announce the command to users."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "The accessible name clearly and accurately describes the purpose or action of the command.",
+      "The visible label and accessible name are consistent and do not conflict.",
+      "Native HTML controls are used instead of ARIA command roles wherever possible.",
+      "The role assigned to the element correctly matches its behavior and function.",
+      "State and value changes for the command are properly communicated to assistive technologies.",
+      "Custom command widgets are fully operable and understandable across assistive technologies."
+    ],
+    "Total conditions": [
+      "Elements with ARIA command roles (such as button, menuitem, or link) have an accessible name so assistive technologies can announce the command to users.",
+      "The accessible name clearly and accurately describes the purpose or action of the command.",
+      "The visible label and accessible name are consistent and do not conflict.",
+      "Native HTML controls are used instead of ARIA command roles wherever possible.",
+      "The role assigned to the element correctly matches its behavior and function.",
+      "State and value changes for the command are properly communicated to assistive technologies.",
+      "Custom command widgets are fully operable and understandable across assistive technologies."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "aria-conditional-attr",
+    "automated checks (axe core rules )": [
+      "Elements with ARIA roles correctly use conditional ARIA attributes only when the assigned role requires or allows them, ensuring valid role–attribute relationships."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Native HTML elements are used instead of ARIA wherever possible.",
+      "ARIA roles are applied only when HTML semantics are insufficient.",
+      "Conditional ARIA attributes accurately reflect the current state or behavior of the element.",
+      "Required ARIA states and properties for the role are fully implemented.",
+      "State changes are dynamically updated and announced to assistive technologies.",
+      "The exposed name, role, and value remain accurate throughout user interaction."
+    ],
+    "Total conditions": [
+      "Elements with ARIA roles correctly use conditional ARIA attributes only when the assigned role requires or allows them, ensuring valid role–attribute relationships.",
+      "Native HTML elements are used instead of ARIA wherever possible.",
+      "ARIA roles are applied only when HTML semantics are insufficient.",
+      "Conditional ARIA attributes accurately reflect the current state or behavior of the element.",
+      "Required ARIA states and properties for the role are fully implemented.",
+      "State changes are dynamically updated and announced to assistive technologies.",
+      "The exposed name, role, and value remain accurate throughout user interaction."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "aria-deprecated-role",
+    "automated checks (axe core rules )": [
+      "Elements do not use deprecated ARIA roles, ensuring only current and supported roles are exposed to assistive technologies."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Native HTML elements are used instead of ARIA roles wherever possible.",
+      "ARIA roles accurately match the element’s purpose and behavior.",
+      "Required ARIA states and properties for the assigned role are correctly implemented.",
+      "Accessible names, roles, and values are properly exposed and updated during interaction.",
+      "Custom widgets behave consistently across different assistive technologies."
+    ],
+    "Total conditions": [
+      "Elements do not use deprecated ARIA roles, ensuring only current and supported roles are exposed to assistive technologies.",
+      "Native HTML elements are used instead of ARIA roles wherever possible.",
+      "ARIA roles accurately match the element’s purpose and behavior.",
+      "Required ARIA states and properties for the assigned role are correctly implemented.",
+      "Accessible names, roles, and values are properly exposed and updated during interaction.",
+      "Custom widgets behave consistently across different assistive technologies."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "aria-hidden-body",
+    "automated checks (axe core rules )": [
+      "The document body element is not hidden from assistive technologies using aria-hidden, ensuring that page content remains available to users of screen readers."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Content intended to be hidden from assistive technologies is appropriately managed without affecting the overall accessibility of the page.",
+      "aria-hidden is used only on elements that should be excluded from the accessibility tree.",
+      "Interactive and focusable content is never hidden from assistive technologies while remaining visible to sighted users.",
+      "Dynamic changes to visibility correctly update accessibility exposure.",
+      "The accessible name, role, and value of elements remain accurate throughout user interaction."
+    ],
+    "Total conditions": [
+      "The document body element is not hidden from assistive technologies using aria-hidden, ensuring that page content remains available to users of screen readers.",
+      "Content intended to be hidden from assistive technologies is appropriately managed without affecting the overall accessibility of the page.",
+      "aria-hidden is used only on elements that should be excluded from the accessibility tree.",
+      "Interactive and focusable content is never hidden from assistive technologies while remaining visible to sighted users.",
+      "Dynamic changes to visibility correctly update accessibility exposure.",
+      "The accessible name, role, and value of elements remain accurate throughout user interaction."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "aria-hidden-focus",
+    "automated checks (axe core rules )": [
+      "Elements that are hidden from assistive technologies using aria-hidden do not receive keyboard focus, preventing inaccessible focusable content."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Focus management is logically handled when content is shown or hidden.",
+      "aria-hidden is used only on content that should be completely inaccessible to assistive technologies.",
+      "Interactive elements are never hidden from assistive technologies while remaining visible or focusable.",
+      "Dynamic visibility changes correctly update focus order and accessibility exposure.",
+      "The accessible name, role, and value of interactive elements remain accurate during user interaction."
+    ],
+    "Total conditions": [
+      "Elements that are hidden from assistive technologies using aria-hidden do not receive keyboard focus, preventing inaccessible focusable content.",
+      "Focus management is logically handled when content is shown or hidden.",
+      "aria-hidden is used only on content that should be completely inaccessible to assistive technologies.",
+      "Interactive elements are never hidden from assistive technologies while remaining visible or focusable.",
+      "Dynamic visibility changes correctly update focus order and accessibility exposure.",
+      "The accessible name, role, and value of interactive elements remain accurate during user interaction."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "aria-input-field-name",
+    "automated checks (axe core rules )": [
+      "Input elements have an accessible name provided via label, aria-label, or aria-labelledby so assistive technologies can announce the input’s purpose."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "The accessible name clearly and accurately describes the expected input.",
+      "Visible labels and accessible names are consistent and do not conflict.",
+      "Instructions or hints needed to understand the input are clearly provided to users.",
+      "Native HTML labeling mechanisms are used instead of ARIA where possible.",
+      "Changes to input state or context do not break the accessible name exposure."
+    ],
+    "Total conditions": [
+      "Input elements have an accessible name provided via label, aria-label, or aria-labelledby so assistive technologies can announce the input’s purpose.",
+      "The accessible name clearly and accurately describes the expected input.",
+      "Visible labels and accessible names are consistent and do not conflict.",
+      "Instructions or hints needed to understand the input are clearly provided to users.",
+      "Native HTML labeling mechanisms are used instead of ARIA where possible.",
+      "Changes to input state or context do not break the accessible name exposure."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "aria-prohibited-attr",
+    "automated checks (axe core rules )": [
+      "Elements do not use ARIA attributes that are explicitly prohibited for their assigned role, ensuring valid role–attribute usage."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Native HTML elements are used instead of ARIA wherever possible.",
+      "ARIA roles are applied only when HTML semantics are insufficient.",
+      "The combination of role, state, and property accurately represents the element’s purpose and behavior.",
+      "Required ARIA states and properties for custom widgets are correctly implemented.",
+      "Accessible names, roles, and values are properly exposed and updated during user interaction.",
+      "Custom components behave consistently across different assistive technologies."
+    ],
+    "Total conditions": [
+      "Elements do not use ARIA attributes that are explicitly prohibited for their assigned role, ensuring valid role–attribute usage.",
+      "Native HTML elements are used instead of ARIA wherever possible.",
+      "ARIA roles are applied only when HTML semantics are insufficient.",
+      "The combination of role, state, and property accurately represents the element’s purpose and behavior.",
+      "Required ARIA states and properties for custom widgets are correctly implemented.",
+      "Accessible names, roles, and values are properly exposed and updated during user interaction.",
+      "Custom components behave consistently across different assistive technologies."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "aria-required-attr",
+    "automated checks (axe core rules )": [
+      "Elements that use the aria-required attribute apply it only to supported form controls and with valid values, ensuring the required state is correctly exposed to assistive technologies."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Required fields are clearly communicated to users through visible labels or instructions, not only programmatically.",
+      "Native HTML required attributes are used instead of ARIA where possible.",
+      "The required state accurately reflects the actual validation behavior of the form control.",
+      "Accessible names, roles, and values remain correct during user interaction.",
+      "Error handling and feedback related to required fields are clearly communicated to users."
+    ],
+    "Total conditions": [
+      "Elements that use the aria-required attribute apply it only to supported form controls and with valid values, ensuring the required state is correctly exposed to assistive technologies.",
+      "Required fields are clearly communicated to users through visible labels or instructions, not only programmatically.",
+      "Native HTML required attributes are used instead of ARIA where possible.",
+      "The required state accurately reflects the actual validation behavior of the form control.",
+      "Accessible names, roles, and values remain correct during user interaction.",
+      "Error handling and feedback related to required fields are clearly communicated to users."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "aria-toggle-field-name",
+    "automated checks (axe core rules )": [
+      "Toggle form controls (such as switches, checkboxes, or toggle buttons) have an accessible name provided via label, aria-label, or aria-labelledby so assistive technologies can announce the control and its state."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "The accessible name clearly describes the purpose and effect of the toggle control.",
+      "The visible label and accessible name are consistent and do not conflict.",
+      "The current state of the toggle (on/off, checked/unchecked) is clearly conveyed to users.",
+      "Native HTML toggle controls are used instead of ARIA where possible.",
+      "State changes are correctly updated and announced to assistive technologies during interaction.",
+      "Custom toggle components behave consistently across different assistive technologies."
+    ],
+    "Total conditions": [
+      "Toggle form controls (such as switches, checkboxes, or toggle buttons) have an accessible name provided via label, aria-label, or aria-labelledby so assistive technologies can announce the control and its state.",
+      "The accessible name clearly describes the purpose and effect of the toggle control.",
+      "The visible label and accessible name are consistent and do not conflict.",
+      "The current state of the toggle (on/off, checked/unchecked) is clearly conveyed to users.",
+      "Native HTML toggle controls are used instead of ARIA where possible.",
+      "State changes are correctly updated and announced to assistive technologies during interaction.",
+      "Custom toggle components behave consistently across different assistive technologies."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "aria-tooltip-name",
+    "automated checks (axe core rules )": [
+      "Elements with the ARIA tooltip role have an accessible name so assistive technologies can identify and announce the tooltip content."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Tooltip text clearly and accurately describes the information being provided.",
+      "Tooltips are triggered in a way that is accessible to keyboard and assistive technology users.",
+      "Tooltip content remains available long enough for users to read and understand it.",
+      "Native HTML mechanisms are used instead of ARIA tooltips where possible.",
+      "The relationship between the tooltip and its triggering element is clear to users.",
+      "Dynamic tooltip content updates are correctly announced to assistive technologies."
+    ],
+    "Total conditions": [
+      "Elements with the ARIA tooltip role have an accessible name so assistive technologies can identify and announce the tooltip content.",
+      "Tooltip text clearly and accurately describes the information being provided.",
+      "Tooltips are triggered in a way that is accessible to keyboard and assistive technology users.",
+      "Tooltip content remains available long enough for users to read and understand it.",
+      "Native HTML mechanisms are used instead of ARIA tooltips where possible.",
+      "The relationship between the tooltip and its triggering element is clear to users.",
+      "Dynamic tooltip content updates are correctly announced to assistive technologies."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "aria-valid-attr-value",
+    "automated checks (axe core rules )": [
+      "ARIA attributes used on elements have valid values according to the ARIA specification, ensuring states and properties are correctly exposed to assistive technologies."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Native HTML elements are used instead of ARIA wherever possible.",
+      "ARIA attributes accurately reflect the current state, role, and value of the element.",
+      "Required ARIA states and properties for the assigned role are fully implemented.",
+      "Changes to ARIA state and value are dynamically updated and announced to assistive technologies.",
+      "Accessible names, roles, and values remain accurate and meaningful throughout user interaction.",
+      "Custom widgets behave consistently across different assistive technologies."
+    ],
+    "Total conditions": [
+      "ARIA attributes used on elements have valid values according to the ARIA specification, ensuring states and properties are correctly exposed to assistive technologies.",
+      "Native HTML elements are used instead of ARIA wherever possible.",
+      "ARIA attributes accurately reflect the current state, role, and value of the element.",
+      "Required ARIA states and properties for the assigned role are fully implemented.",
+      "Changes to ARIA state and value are dynamically updated and announced to assistive technologies.",
+      "Accessible names, roles, and values remain accurate and meaningful throughout user interaction.",
+      "Custom widgets behave consistently across different assistive technologies."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "aria-valid-attr",
+    "automated checks (axe core rules )": [
+      "Only valid ARIA attributes are used on elements according to the ARIA specification, preventing unsupported or invalid attributes from being exposed to assistive technologies."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Native HTML elements are used instead of ARIA wherever possible.",
+      "ARIA attributes are applied only when HTML semantics are insufficient.",
+      "The combination of role, state, and property accurately represents the element’s purpose.",
+      "Required ARIA states and properties for custom widgets are fully implemented.",
+      "Accessible names, roles, and values are correctly exposed and updated during interaction.",
+      "Custom components behave consistently across different assistive technologies."
+    ],
+    "Total conditions": [
+      "Only valid ARIA attributes are used on elements according to the ARIA specification, preventing unsupported or invalid attributes from being exposed to assistive technologies.",
+      "Native HTML elements are used instead of ARIA wherever possible.",
+      "ARIA attributes are applied only when HTML semantics are insufficient.",
+      "The combination of role, state, and property accurately represents the element’s purpose.",
+      "Required ARIA states and properties for custom widgets are fully implemented.",
+      "Accessible names, roles, and values are correctly exposed and updated during interaction.",
+      "Custom components behave consistently across different assistive technologies."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "button-name",
+    "automated checks (axe core rules )": [
+      "Button elements have an accessible name provided via visible text, aria-label, aria-labelledby, or equivalent mechanisms so assistive technologies can announce the button’s purpose."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "The button’s accessible name clearly and accurately describes the action it performs.",
+      "The visible label and accessible name are consistent and do not conflict.",
+      "Native HTML button elements are used instead of ARIA roles wherever possible.",
+      "State changes (such as pressed or expanded) are correctly conveyed to users.",
+      "Buttons behave consistently across keyboard, screen reader, and other assistive technologies.",
+      "Dynamic updates related to button actions correctly update accessible name, role, or value when applicable."
+    ],
+    "Total conditions": [
+      "Button elements have an accessible name provided via visible text, aria-label, aria-labelledby, or equivalent mechanisms so assistive technologies can announce the button’s purpose.",
+      "The button’s accessible name clearly and accurately describes the action it performs.",
+      "The visible label and accessible name are consistent and do not conflict.",
+      "Native HTML button elements are used instead of ARIA roles wherever possible.",
+      "State changes (such as pressed or expanded) are correctly conveyed to users.",
+      "Buttons behave consistently across keyboard, screen reader, and other assistive technologies.",
+      "Dynamic updates related to button actions correctly update accessible name, role, or value when applicable."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "duplicate-id-aria",
+    "automated checks (axe core rules )": [
+      "ARIA attributes that reference IDs (such as aria-labelledby, aria-describedby, aria-controls) do not reference duplicate id values, ensuring assistive technologies can correctly resolve relationships."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "All referenced IDs accurately point to the correct elements that provide names, descriptions, or relationships.",
+      "Referenced elements contain meaningful and appropriate content for accessibility.",
+      "Native HTML relationships are used instead of ARIA references wherever possible.",
+      "Dynamically generated content does not introduce duplicate IDs after page load.",
+      "The accessible name, role, and value remain accurate during interaction with referenced elements."
+    ],
+    "Total conditions": [
+      "ARIA attributes that reference IDs (such as aria-labelledby, aria-describedby, aria-controls) do not reference duplicate id values, ensuring assistive technologies can correctly resolve relationships.",
+      "All referenced IDs accurately point to the correct elements that provide names, descriptions, or relationships.",
+      "Referenced elements contain meaningful and appropriate content for accessibility.",
+      "Native HTML relationships are used instead of ARIA references wherever possible.",
+      "Dynamically generated content does not introduce duplicate IDs after page load.",
+      "The accessible name, role, and value remain accurate during interaction with referenced elements."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "frame-title-unique",
+    "automated checks (axe core rules )": [
+      "Frames and iframes have unique title attribute values so assistive technologies can distinguish between different frames on the page."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Frame and iframe titles clearly and accurately describe the content or purpose of each frame.",
+      "Titles are meaningful, descriptive, and not generic (for example, not repeated values like “frame” or “iframe”).",
+      "Frames are used only when necessary and are structured appropriately.",
+      "The relationship between frames and surrounding content is clear to users.",
+      "Dynamic updates to frame content preserve correct and meaningful titles."
+    ],
+    "Total conditions": [
+      "Frames and iframes have unique title attribute values so assistive technologies can distinguish between different frames on the page.",
+      "Frame and iframe titles clearly and accurately describe the content or purpose of each frame.",
+      "Titles are meaningful, descriptive, and not generic (for example, not repeated values like “frame” or “iframe”).",
+      "Frames are used only when necessary and are structured appropriately.",
+      "The relationship between frames and surrounding content is clear to users.",
+      "Dynamic updates to frame content preserve correct and meaningful titles."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "frame-title",
+    "automated checks (axe core rules )": [
+      "Frame and iframe elements have a title attribute so assistive technologies can identify and announce the frame."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Frame and iframe titles clearly and accurately describe the content or purpose of each frame.",
+      "Titles are meaningful and descriptive, not generic or ambiguous.",
+      "Frames are used only when necessary and structured appropriately within the page.",
+      "The relationship between frame content and surrounding page content is clear to users.",
+      "Dynamic updates to frame content preserve correct and meaningful titles."
+    ],
+    "Total conditions": [
+      "Frame and iframe elements have a title attribute so assistive technologies can identify and announce the frame.",
+      "Frame and iframe titles clearly and accurately describe the content or purpose of each frame.",
+      "Titles are meaningful and descriptive, not generic or ambiguous.",
+      "Frames are used only when necessary and structured appropriately within the page.",
+      "The relationship between frame content and surrounding page content is clear to users.",
+      "Dynamic updates to frame content preserve correct and meaningful titles."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "input-button-name",
+    "automated checks (axe core rules )": [
+      "Input elements of type button, submit, or reset have an accessible name provided via the value attribute, aria-label, aria-labelledby, or equivalent mechanisms so assistive technologies can announce the button’s purpose."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "The input button’s accessible name clearly and accurately describes the action it performs.",
+      "The visible label and accessible name are consistent and do not conflict.",
+      "Native HTML input button types are used appropriately instead of ARIA where possible.",
+      "State or context changes triggered by the button are clearly communicated to users.",
+      "Input buttons behave consistently across keyboard, screen reader, and other assistive technologies.",
+      "Dynamic updates related to button actions correctly update accessible name, role, or value when applicable."
+    ],
+    "Total conditions": [
+      "Input elements of type button, submit, or reset have an accessible name provided via the value attribute, aria-label, aria-labelledby, or equivalent mechanisms so assistive technologies can announce the button’s purpose.",
+      "The input button’s accessible name clearly and accurately describes the action it performs.",
+      "The visible label and accessible name are consistent and do not conflict.",
+      "Native HTML input button types are used appropriately instead of ARIA where possible.",
+      "State or context changes triggered by the button are clearly communicated to users.",
+      "Input buttons behave consistently across keyboard, screen reader, and other assistive technologies.",
+      "Dynamic updates related to button actions correctly update accessible name, role, or value when applicable."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "input-image-alt",
+    "automated checks (axe core rules )": [
+      "Input elements of type=\"image\" have a non-empty alt attribute so an accessible name is programmatically available to assistive technologies."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "The alt text accurately describes the purpose or action of the image input control.",
+      "The accessible name provided by alt text is meaningful and equivalent to the control’s function.",
+      "Native HTML input image semantics are used appropriately without unnecessary ARIA.",
+      "The role, name, and value exposed by the image input remain accurate during interaction.",
+      "Dynamic updates or state changes related to the image input are correctly conveyed to assistive technologies."
+    ],
+    "Total conditions": [
+      "Input elements of type=\"image\" have a non-empty alt attribute so an accessible name is programmatically available to assistive technologies.",
+      "The alt text accurately describes the purpose or action of the image input control.",
+      "The accessible name provided by alt text is meaningful and equivalent to the control’s function.",
+      "Native HTML input image semantics are used appropriately without unnecessary ARIA.",
+      "The role, name, and value exposed by the image input remain accurate during interaction.",
+      "Dynamic updates or state changes related to the image input are correctly conveyed to assistive technologies."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "label",
+    "automated checks (axe core rules )": [
+      "Form controls have an associated programmatic label using label elements, aria-label, or aria-labelledby so assistive technologies can determine the control’s accessible name."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Labels clearly and accurately describe the purpose of each form control.",
+      "The visible label and accessible name are consistent and do not conflict.",
+      "Instructions or hints needed to understand the input are clearly provided to users.",
+      "Native HTML labeling mechanisms are used instead of ARIA where possible.",
+      "Dynamic changes to labels or form context preserve correct accessible name exposure."
+    ],
+    "Total conditions": [
+      "Form controls have an associated programmatic label using label elements, aria-label, or aria-labelledby so assistive technologies can determine the control’s accessible name.",
+      "Labels clearly and accurately describe the purpose of each form control.",
+      "The visible label and accessible name are consistent and do not conflict.",
+      "Instructions or hints needed to understand the input are clearly provided to users.",
+      "Native HTML labeling mechanisms are used instead of ARIA where possible.",
+      "Dynamic changes to labels or form context preserve correct accessible name exposure."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "nested-interactive",
+    "automated checks (axe core rules )": [
+      "Interactive elements are not nested within other interactive elements, preventing invalid role, focus, and interaction conflicts for assistive technologies."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "Interactive controls have a single, clear role and purpose.",
+      "Focus order and keyboard interaction behave predictably for interactive elements.",
+      "Native HTML controls are used instead of custom nested interactive structures where possible.",
+      "The accessible name, role, and value of interactive elements remain accurate during interaction.",
+      "Custom interaction patterns are consistently exposed across assistive technologies."
+    ],
+    "Total conditions": [
+      "Interactive elements are not nested within other interactive elements, preventing invalid role, focus, and interaction conflicts for assistive technologies.",
+      "Interactive controls have a single, clear role and purpose.",
+      "Focus order and keyboard interaction behave predictably for interactive elements.",
+      "Native HTML controls are used instead of custom nested interactive structures where possible.",
+      "The accessible name, role, and value of interactive elements remain accurate during interaction.",
+      "Custom interaction patterns are consistently exposed across assistive technologies."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "select-name",
+    "automated checks (axe core rules )": [
+      "Select (dropdown) elements have an accessible name provided via label, aria-label, or aria-labelledby so assistive technologies can announce the purpose of the control."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "The accessible name clearly and accurately describes the purpose of the select control.",
+      "The visible label and accessible name are consistent and do not conflict.",
+      "Instructions or context needed to understand available options are clearly provided.",
+      "Native HTML select elements are used instead of ARIA where possible.",
+      "Changes to available options or selected values are correctly conveyed to assistive technologies."
+    ],
+    "Total conditions": [
+      "Select (dropdown) elements have an accessible name provided via label, aria-label, or aria-labelledby so assistive technologies can announce the purpose of the control.",
+      "The accessible name clearly and accurately describes the purpose of the select control.",
+      "The visible label and accessible name are consistent and do not conflict.",
+      "Instructions or context needed to understand available options are clearly provided.",
+      "Native HTML select elements are used instead of ARIA where possible.",
+      "Changes to available options or selected values are correctly conveyed to assistive technologies."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "summary-name",
+    "automated checks (axe core rules )": [
+      "Summary elements (used with details) have an accessible name so assistive technologies can announce the purpose of the expandable control."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "The summary text clearly and accurately describes the content that will be revealed.",
+      "The visible summary text and accessible name are consistent and do not conflict.",
+      "The expanded and collapsed states are clearly conveyed to users.",
+      "Native HTML details/summary elements are used appropriately without unnecessary ARIA.",
+      "State changes (expanded/collapsed) are correctly announced to assistive technologies."
+    ],
+    "Total conditions": [
+      "Summary elements (used with details) have an accessible name so assistive technologies can announce the purpose of the expandable control.",
+      "The summary text clearly and accurately describes the content that will be revealed.",
+      "The visible summary text and accessible name are consistent and do not conflict.",
+      "The expanded and collapsed states are clearly conveyed to users.",
+      "Native HTML details/summary elements are used appropriately without unnecessary ARIA.",
+      "State changes (expanded/collapsed) are correctly announced to assistive technologies."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "link-name",
+    "automated checks (axe core rules )": [
+      "Link elements have an accessible name provided via link text, aria-label, aria-labelledby, or equivalent mechanisms so assistive technologies can announce the link’s purpose."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "The link’s accessible name clearly and accurately describes the destination or action.",
+      "The visible link text and accessible name are consistent and do not conflict.",
+      "Native HTML link elements are used instead of ARIA roles wherever possible.",
+      "Links are distinguishable and understandable when presented out of context.",
+      "Dynamic updates to link text or purpose correctly update the accessible name."
+    ],
+    "Total conditions": [
+      "Link elements have an accessible name provided via link text, aria-label, aria-labelledby, or equivalent mechanisms so assistive technologies can announce the link’s purpose.",
+      "The link’s accessible name clearly and accurately describes the destination or action.",
+      "The visible link text and accessible name are consistent and do not conflict.",
+      "Native HTML link elements are used instead of ARIA roles wherever possible.",
+      "Links are distinguishable and understandable when presented out of context.",
+      "Dynamic updates to link text or purpose correctly update the accessible name."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.2 Name, Role, Value (A)",
+    "axe-core Rule": "aria-roledescription  (Deprecated)",
+    "automated checks (axe core rules )": [
+      "Elements that use aria-roledescription provide a valid, non-empty value so assistive technologies can announce a human-readable description of the element’s role."
+    ],
+    "Remaining conditions required for full SC compliance (manual testing needed)": [
+      "aria-roledescription is used only to enhance understanding and does not replace correct native roles.",
+      "The role description accurately reflects the element’s actual purpose and behavior.",
+      "Native HTML semantics are used instead of ARIA wherever possible.",
+      "The underlying ARIA role remains correct and appropriate for the element.",
+      "Accessible names, roles, and values remain accurate during user interaction.",
+      "Custom components behave consistently across different assistive technologies."
+    ],
+    "Total conditions": [
+      "Elements that use aria-roledescription provide a valid, non-empty value so assistive technologies can announce a human-readable description of the element’s role.",
+      "aria-roledescription is used only to enhance understanding and does not replace correct native roles.",
+      "The role description accurately reflects the element’s actual purpose and behavior.",
+      "Native HTML semantics are used instead of ARIA wherever possible.",
+      "The underlying ARIA role remains correct and appropriate for the element.",
+      "Accessible names, roles, and values remain accurate during user interaction.",
+      "Custom components behave consistently across different assistive technologies."
+    ],
+    "webaim checks": " Markup is used in a way that facilitates accessibility. This includes following the HTML specifications and using\r\nforms, input labels, frame titles, etc. appropriately.\r\n ARIA is used appropriately to enhance accessibility when HTML is not sufficient."
+  },
+  {
+    "Success Criterion": "4.1.3 Status Messages(AA)\r\n",
+    "axe-core Rule": "No axe-core rule",
+    "Total conditions": [
+      "If an important status message is presented and focus is not set to that message, the message must be announced to screen reader users, typically via an ARIA alert or live region."
+    ],
+    "webaim checks": "\r\n If an important status message is presented and focus is not set to that message, the message must be announced to\r\nscreen reader users, typically via an ARIA alert or live region."
+  }
+]

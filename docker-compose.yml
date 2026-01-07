@@ -1,0 +1,70 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: auditor_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ArmourAI@123
+      POSTGRES_DB: auditor_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  db_setup:
+    build: ./backend
+    container_name: auditor_db_setup
+    command: npm run setup
+    volumes:
+      - ./database:/database
+    environment:
+      DB_USER: postgres
+      DB_PASSWORD: ArmourAI@123
+      DB_HOST: postgres
+      DB_NAME: auditor_db
+      DB_PORT: 5432
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - default
+
+  backend:
+    build: ./backend
+    container_name: auditor_backend
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DB_USER: postgres
+      DB_PASSWORD: ArmourAI@123
+      DB_HOST: postgres
+      DB_NAME: auditor_db
+      DB_PORT: 5432
+      FRONTEND_URL: http://localhost:5173
+    depends_on:
+      db_setup:
+        condition: service_completed_successfully
+    networks:
+      - default
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auditor_frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - default
+
+volumes:
+  postgres_data:
