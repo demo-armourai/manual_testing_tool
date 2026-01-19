@@ -1,7 +1,7 @@
 import { wcagChecklist } from '../utils/wcag-loader';
 
 export const calculateComplianceScore = (progress) => {
-    const checks = progress.checks;
+    const checks = progress?.checks || {};
     const scIds = Object.keys(checks);
     const tested = scIds.length;
 
@@ -32,7 +32,7 @@ export const calculateComplianceScore = (progress) => {
 
 export const calculatePrincipleScores = (progress) => {
     const principles = ['Perceivable', 'Operable', 'Understandable', 'Robust'];
-    const checks = progress.checks;
+    const checks = progress?.checks || {};
     const getStatus = (id) => checks[id]?.status || 'untested';
 
     return principles.map(principle => {

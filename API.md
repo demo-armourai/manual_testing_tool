@@ -109,7 +109,7 @@ Fetch all active WCAG success criteria.
     "sc_id": "1.1.1",
     "condition_text": "All non-text content has a text alternative",
     "condition_type": "manual",
-    "axe_rule_id": null,
+    "axe_rule_id": "rule-id-1, rule-id-2",
     "default_checked": false,
     "is_active": true,
     "created_at": "2025-12-29T10:00:00.000Z"

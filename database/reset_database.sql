@@ -1,0 +1,35 @@
+-- Factory Reset Script
+-- Deletes ALL user data, audit results, schedules, and transactions.
+-- KEEPS ONLY static reference data (WCAG Checklist).
+
+BEGIN;
+
+-- 1. Truncate User and Activity Tables
+TRUNCATE TABLE users RESTART IDENTITY CASCADE;
+TRUNCATE TABLE auth_identities RESTART IDENTITY CASCADE;
+TRUNCATE TABLE user_credits RESTART IDENTITY CASCADE;
+TRUNCATE TABLE credit_transactions RESTART IDENTITY CASCADE;
+TRUNCATE TABLE user_activities RESTART IDENTITY CASCADE;
+TRUNCATE TABLE user_sessions RESTART IDENTITY CASCADE;
+TRUNCATE TABLE email_verification_tokens RESTART IDENTITY CASCADE;
+TRUNCATE TABLE admin_requests RESTART IDENTITY CASCADE;
+TRUNCATE TABLE upgrade_requests RESTART IDENTITY CASCADE;
+
+-- 2. Truncate Audit and Reporting Tables
+TRUNCATE TABLE pages RESTART IDENTITY CASCADE;
+TRUNCATE TABLE page_audits RESTART IDENTITY CASCADE;
+TRUNCATE TABLE page_sc_results RESTART IDENTITY CASCADE;
+TRUNCATE TABLE findings RESTART IDENTITY CASCADE;
+TRUNCATE TABLE compliance_scores RESTART IDENTITY CASCADE;
+TRUNCATE TABLE webcomply_report_summary RESTART IDENTITY CASCADE;
+
+-- 3. Truncate Scheduler Tables
+TRUNCATE TABLE scheduled_audits RESTART IDENTITY CASCADE;
+TRUNCATE TABLE scheduled_audit_results RESTART IDENTITY CASCADE;
+
+-- 4. Truncate Logging and License Tables
+TRUNCATE TABLE audit_logs RESTART IDENTITY CASCADE;
+TRUNCATE TABLE master_admin_audit_logs RESTART IDENTITY CASCADE;
+TRUNCATE TABLE license_usage RESTART IDENTITY CASCADE;
+
+COMMIT;

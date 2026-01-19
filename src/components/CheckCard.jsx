@@ -19,10 +19,13 @@ export function CheckCard({ sc, onOpenFindingForm, onNext, onPrevious, onViewRep
     updateCheckJustification,
     updateConditionStatus,
     deleteFinding,
+    syncAutomatedChecks,
     audits,
     currentTarget,
     findings
   } = useAuditStore();
+
+  const [syncing, setSyncing] = useState(false);
 
 
   const status = getCheckStatus(sc.id);
@@ -40,8 +43,12 @@ export function CheckCard({ sc, onOpenFindingForm, onNext, onPrevious, onViewRep
   const handleStatusChange = (newStatus) => {
     updateCheckStatus(sc.id, newStatus);
     if (newStatus === 'fail') {
+      const existingFinding = findings.find(f =>
+        f.auditId === currentTarget?.id &&
+        f.scIds?.includes(sc.id)
+      );
       setTimeout(() => {
-        onOpenFindingForm(sc.id);
+        onOpenFindingForm(sc.id, existingFinding);
       }, 100);
     }
   };
@@ -55,17 +62,47 @@ export function CheckCard({ sc, onOpenFindingForm, onNext, onPrevious, onViewRep
   const checkState = currentAudit?.checks?.[sc.id];
   const storedConditions = checkState?.checkedConditions || {};
 
-  const checkDetails = checksData.find(c => c["Success Criterion"] && c["Success Criterion"].startsWith(sc.id));
-  const conditions = checkDetails?.["Total conditions"] || [];
-  const autoChecks = checkDetails?.["automated checks (axe core rules )"] || [];
+  // Aggregate all entries for this SC from checksData
+  // Strict check: Ensure exact ID match (followed by space) to avoid substring matches (e.g. 1.4.1 matching 1.4.10)
+  const allRelatedChecks = checksData.filter(c =>
+    c["Success Criterion"] && (
+      c["Success Criterion"].startsWith(`${sc.id} `) ||
+      c["Success Criterion"] === sc.id
+    )
+  );
+
+  // Collect all unique conditions
+  const conditions = Array.from(new Set(
+    allRelatedChecks.flatMap(c => c["Total conditions"] || [])
+  ));
+
+  // Collect all unique automated checks
+  const autoChecks = Array.from(new Set(
+    allRelatedChecks.flatMap(c => c["automated checks (axe core rules )"] || [])
+  ));
 
   const getConditionStatus = (condition) => {
-    if (storedConditions[condition] !== undefined && storedConditions[condition] !== null) {
-      return storedConditions[condition];
+    const stored = storedConditions[condition];
+    if (stored !== undefined && stored !== null) {
+      return typeof stored === 'object' ? stored.status : stored;
     }
     // Automated checks default to 'pass'
     if (autoChecks.includes(condition)) {
       return 'pass';
+    }
+    return null;
+  };
+
+  const getConditionTag = (condition) => {
+    const stored = storedConditions[condition];
+    if (stored !== undefined && stored !== null && typeof stored === 'object') {
+      return stored.tag;
+    }
+    if (autoChecks.includes(condition)) {
+      return 'axe-core';
+    }
+    if (conditions.includes(condition)) {
+      return 'manual';
     }
     return null;
   };
@@ -143,13 +180,34 @@ export function CheckCard({ sc, onOpenFindingForm, onNext, onPrevious, onViewRep
             </div>
           </div>
 
-          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border ${sc.automationCoverage === 'full'
-            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-            : sc.automationCoverage === 'partial'
-              ? 'bg-amber-50 text-amber-700 border-amber-200'
-              : 'bg-slate-50 text-slate-600 border-slate-200'}`}>
-            {sc.automationCoverage === 'full' ? 'Automated' : sc.automationCoverage === 'partial' ? 'Partial Auto' : 'Manual Only'}
-          </span>
+          <div className="flex flex-col items-end gap-2">
+            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border ${sc.automationCoverage === 'full'
+              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+              : sc.automationCoverage === 'partial'
+                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                : 'bg-slate-50 text-slate-600 border-slate-200'}`}>
+              {sc.automationCoverage === 'full' ? 'Automated' : sc.automationCoverage === 'partial' ? 'Partial Auto' : 'Manual Only'}
+            </span>
+            <button
+              onClick={async () => {
+                setSyncing(true);
+                try {
+                  await syncAutomatedChecks(currentTarget.id);
+                } catch (e) {
+                  alert("Sync failed: " + e.message);
+                } finally {
+                  setSyncing(false);
+                }
+              }}
+              disabled={syncing}
+              className={`px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border transition-all
+                ${syncing
+                  ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
+                  : 'bg-indigo-50 text-indigo-600 border-indigo-200 hover:bg-indigo-600 hover:text-white'}`}
+            >
+              {syncing ? 'Syncing...' : 'Sync Automated'}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -184,9 +242,15 @@ export function CheckCard({ sc, onOpenFindingForm, onNext, onPrevious, onViewRep
                     <p className={`text-sm leading-relaxed transition-colors ${status ? 'text-slate-900' : 'text-slate-600'}`}>
                       {condition}
                     </p>
-                    {isAuto && (
-                      <span className="mt-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
-                        Automated Check
+                    {getConditionTag(condition) && (
+                      <span className={`mt-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border
+                        ${getConditionTag(condition) === 'manual'
+                          ? 'bg-slate-100 text-slate-600 border-slate-200'
+                          : 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                        }`}>
+                        {getConditionTag(condition) === 'manual' ? 'Manual Verification' :
+                          getConditionTag(condition) === 'axe-core' ? 'Automated (axe-core)' :
+                            'Automated Check'}
                       </span>
                     )}
                   </div>
@@ -275,11 +339,19 @@ export function CheckCard({ sc, onOpenFindingForm, onNext, onPrevious, onViewRep
 
         {status === 'fail' && (
           <button
-            onClick={() => onOpenFindingForm(sc.id)}
+            onClick={() => {
+              const existingFinding = findings.find(f =>
+                f.auditId === currentTarget?.id &&
+                f.scIds?.includes(sc.id)
+              );
+              onOpenFindingForm(sc.id, existingFinding);
+            }}
             className="px-6 py-2.5 bg-rose-600 text-white rounded-lg hover:bg-rose-700 font-medium shadow-sm shadow-rose-200 transition-all flex items-center gap-2"
           >
             <XCircle className="w-4 h-4" />
-            Add Detailed Finding
+            {findings.some(f => f.auditId === currentTarget?.id && f.scIds?.includes(sc.id))
+              ? 'Edit Detailed Finding'
+              : 'Add Detailed Finding'}
           </button>
         )}
 

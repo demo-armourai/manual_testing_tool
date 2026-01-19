@@ -146,7 +146,7 @@ WCAG success criteria reference data (seeded from Excel/SQL).
 | sc_id | VARCHAR(20) | NOT NULL | WCAG SC ID (e.g., "1.1.1") |
 | condition_text | TEXT | NOT NULL | Condition description |
 | condition_type | VARCHAR(20) | NOT NULL, CHECK | Type of check |
-| axe_rule_id | TEXT | - | Axe-core rule ID if automated |
+| axe_rule_id | TEXT | - | Axe-core rule ID(s) if automated (comma-separated for consolidated conditions) |
 | default_checked | BOOLEAN | NOT NULL, DEFAULT FALSE | Pre-checked by default |
 | is_active | BOOLEAN | DEFAULT TRUE | Active in checklist |
 | created_at | TIMESTAMPTZ | DEFAULT now() | Record creation timestamp |

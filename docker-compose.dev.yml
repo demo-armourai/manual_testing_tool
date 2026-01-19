@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  auditor-backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: auditor-backend
+    environment:
+      - PORT=3001
+      - DB_HOST=wcag-postgres-dev
+      - DB_NAME=wcag_compliance_dev
+      - DB_USER=wcag_user
+      - DB_PASSWORD=wcag_password
+      - DB_PORT=5432
+      - FRONTEND_URL=http://localhost:5173
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend:/app:delegated
+      - ./database:/database
+    networks:
+      - shared-network
+    restart: unless-stopped
+
+  auditor-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auditor-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - auditor-backend
+    networks:
+      - shared-network
+    restart: unless-stopped
+
+networks:
+  shared-network:
+    external: true

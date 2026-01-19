@@ -233,11 +233,8 @@ export function TargetSelector({ selectedDomain, onSelectDomain }) {
                                       </span>
                                       {stats && stats.tested > 0 && (
                                         <>
-                                          <span className="text-emerald-600">
-                                            Score: {audit.score || 0}%
-                                          </span>
                                           <span className="text-slate-400">
-                                            {Math.round((stats.tested / stats.total) * 100)}% Checked
+                                            {stats.tested}/{stats.total} Checked
                                           </span>
                                         </>
                                       )}

@@ -1,7 +1,12 @@
--- WCAG Success Criteria Conditions - Aggressively Consolidated & Healed
-TRUNCATE TABLE findings, page_sc_results, webcomply_report_summary, page_audits, compliance_scores, pages, reference_sc_conditions RESTART IDENTITY CASCADE;
+-- Safe seed - Only updates reference conditions without deleting audit data
+-- This preserves your pages, audits, findings, and scan results
+
+-- Only truncate the reference table
+TRUNCATE TABLE reference_sc_conditions RESTART IDENTITY CASCADE;
+
+-- Repopulate with the latest conditions
 INSERT INTO reference_sc_conditions (sc_id, condition_text, condition_type, axe_rule_id) VALUES
-  ('1.1.1', 'Images have alternative text where required (non-decorative images).', 'axe-core', 'image-alt'),
+   ('1.1.1', 'Images have alternative text where required (non-decorative images).', 'axe-core', 'image-alt'),
   ('1.1.1', 'Decorative images are marked with empty alternative text (alt="") or implemented as CSS backgrounds.', 'axe-core', 'image-alt'),
   ('1.1.1', 'Linked images have descriptive and meaningful alternative text.', 'manual', NULL),
   ('1.1.1', 'Equivalent text alternatives for complex images are provided in context or via a separate linked page.', 'manual', NULL),

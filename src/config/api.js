@@ -20,6 +20,7 @@ export const API = {
     // Audit endpoints
     AUDITS: {
         START: `${API_URL}/audits/start`,
+        SYNC_AUTOMATED: (id) => `${API_URL}/audits/${id}/sync-automated`,
         LIST: `${API_URL}/audits`,
         UPDATE: (id) => `${API_URL}/audits/${id}`,
         DELETE: (id) => `${API_URL}/audits/${id}`,
@@ -56,6 +57,19 @@ export const API = {
         BY_AUDIT_JSON: (auditId) => `${API_URL}/reports/audit/${auditId}/json`,
         BY_ID: (reportId) => `${API_URL}/reports/${reportId}`,
         UPDATE: (reportId) => `${API_URL}/reports/${reportId}`,
+    },
+
+    // Compliance Scores endpoints (WCAG automated scans)
+    COMPLIANCE_SCORES: {
+        BY_USER: (userId) => `${API_URL}/compliance-scores/user/${userId}`,
+        BY_PAGE: (pageId) => `${API_URL}/compliance-scores/page/${pageId}`,
+        BY_ID: (id) => `${API_URL}/compliance-scores/${id}`,
+    },
+
+    // New User Selection endpoints
+    USERS: {
+        LIST: `${API_URL}/users`,
+        WEBSITES: (userId) => `${API_URL}/users/${userId}/websites`,
     },
 };
 

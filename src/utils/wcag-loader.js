@@ -67,7 +67,7 @@ export const loadWCAGChecklist = () => {
                 replacementText: '',
                 type: ['Visual', 'Screen Reader'], // Defaulting as not present in JSON
                 automationCoverage: 'none', // Will calculate based on rules presence
-                defaultSeverity: 'Medium', // Default
+                defaultSeverity: 'Moderate', // Default
                 checks: [], // We will accumulate conditions here
                 axeRules: [] // Accumulate axe-core rules here
             };

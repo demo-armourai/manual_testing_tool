@@ -1,13 +1,16 @@
-import { useEffect } from 'react';
-import { FileText, FileJson, Printer, FileSpreadsheet } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { FileText, FileJson, Printer, FileSpreadsheet, Calendar, ArrowLeft } from 'lucide-react';
 import { calculateComplianceScore, calculatePrincipleScores, exportToJSON, exportToCSV } from '../utils/compliance';
 import { useAuditStore } from '../hooks/useAuditStore';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 
 import DownloadReportButton from './Report/DownloadReportButton';
+import PDFReport from './Report/PDFReport';
+import { wcagChecklist } from '../utils/wcag-loader';
 
-export function ComplianceReport({ progress, findings }) {
+export function ComplianceReport({ progress, findings, auditedEntity }) {
   const { generateReport } = useAuditStore();
+  const [showFullReport, setShowFullReport] = useState(false);
 
   useEffect(() => {
     if (progress?.page_audit_id) {
@@ -29,6 +32,9 @@ export function ComplianceReport({ progress, findings }) {
     URL.revokeObjectURL(url);
   };
 
+  console.log('[ComplianceReport] Findings received:', findings.length);
+  console.log('[ComplianceReport] Sample finding:', findings[0]);
+
   const radarData = principleScores.map(ps => ({
     principle: ps.principle.substring(0, 12),
     score: ps.score.score
@@ -46,15 +52,100 @@ export function ComplianceReport({ progress, findings }) {
     return acc;
   }, {});
 
+  // Prepare data for PDFReport (mimicking backend structure for fallback)
+  const reportData = {
+    targetUrl: progress.targetUrl,
+    projectName: progress.targetName,
+    date: progress.startedAt ? new Date(progress.startedAt).toLocaleString() : new Date().toLocaleString(),
+    tests: wcagChecklist.map(sc => {
+      const check = progress.checks && progress.checks[sc.id];
+      const status = check ? check.status : 'untested';
+      let result = 'Untested';
+      if (status === 'pass') result = 'Pass';
+      if (status === 'fail') result = 'Fail';
+      if (status === 'na') result = 'N/A';
+
+      const scFindings = findings.filter(f => f.scIds && f.scIds.includes(sc.id));
+      const impact = (result === 'Fail' && scFindings.length > 0)
+        ? (scFindings[0].severity || 'minor')
+        : 'minor';
+
+      return {
+        id: sc.id,
+        scId: sc.id, // Add scId for PDFReport table
+        description: `${sc.title}: ${sc.description}`,
+        wcagCriteria: sc.id,
+        result: result,
+        impact: impact
+      };
+    }),
+    detailedFindings: findings.map(f => {
+      // Handle both scId (string) and scIds (array) formats
+      let scId;
+      if (f.scIds && Array.isArray(f.scIds) && f.scIds.length > 0) {
+        scId = f.scIds[0];
+      } else if (f.scId) {
+        scId = f.scId;
+      } else if (f.sc_id) {
+        scId = f.sc_id;
+      }
+
+      const sc = wcagChecklist.find(item => item.id === scId);
+      return {
+        ...f,
+        scId: scId,
+        scIds: [scId], // Ensure scIds is always an array
+        scTitles: sc ? [sc.title] : [],
+        htmlSnippet: f.htmlSnippet || f.domSnippet || f.html_snippet || '',
+        notes: f.notes || '',
+        wcagCriteria: scId,
+        url: f.url || progress.targetUrl
+      };
+    }),
+    preparedFor: auditedEntity
+  };
+
+  if (showFullReport) {
+    return (
+      <div className="w-full">
+        <div className="mb-6 flex justify-between items-center print:hidden bg-white p-4 rounded-xl border border-slate-200 sticky top-0 z-10 shadow-sm">
+          <button
+            onClick={() => setShowFullReport(false)}
+            className="flex items-center gap-2 px-4 py-2 text-slate-600 hover:text-slate-900 transition-colors font-medium"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Summary
+          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => window.print()}
+              className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-bold shadow-md shadow-blue-200"
+            >
+              <Printer className="w-4 h-4" />
+              Print / Save PDF
+            </button>
+          </div>
+        </div>
+        <PDFReport data={reportData} />
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6 w-full print:space-y-4">
+    <div className="space-y-6 w-full print:hidden">
       {/* Header */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 print:border-none print:shadow-none print:p-0">
         <div className="flex items-start justify-between mb-4">
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-1">Compliance Report</h2>
-            <p className="text-gray-600 font-medium">Target: {progress.targetName}</p>
-            <p className="text-sm text-gray-500">{progress.targetUrl}</p>
+            <p className="text-gray-600 font-medium">Target: {progress.targetName || 'Loading...'}</p>
+            <p className="text-sm text-gray-500">{progress.targetUrl || 'URL Pending'}</p>
+            {progress.startedAt && (
+              <p className="text-xs text-slate-400 mt-1 font-semibold flex items-center gap-1">
+                <Calendar className="w-3 h-3" />
+                Audit Run: {new Date(progress.startedAt).toLocaleString([], { dateStyle: 'long', timeStyle: 'short' })}
+              </p>
+            )}
           </div>
 
           <div className="flex gap-2 print:hidden items-center">
@@ -63,7 +154,11 @@ export function ComplianceReport({ progress, findings }) {
               JSON
             </button>
 
-            <DownloadReportButton />
+            <DownloadReportButton
+              auditedEntity={auditedEntity}
+              onTogglePreview={setShowFullReport}
+              isPreviewVisible={showFullReport}
+            />
           </div>
         </div>
 

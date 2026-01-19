@@ -33,23 +33,23 @@ export const useAuditStore = create()(persist((set, get) => ({
             const targets = [];
             const audits = {};
 
-            // Track seen items to avoid duplicates if backend returns historical records
-            const seenPageIds = new Set();
-
             auditData.forEach(item => {
                 const targetId = item.page_audit_id; // Use UUID as ID
 
-                if (!seenPageIds.has(item.page_id)) {
-                    targets.push({
-                        id: targetId,
-                        name: item.page_name || getHostname(item.page_url),
-                        url: item.page_url,
-                        domain: item.domain,
-                        type: 'page',
-                        createdAt: item.started_at,
-                    });
-                    seenPageIds.add(item.page_id);
-                }
+                targets.push({
+                    id: targetId,
+                    page_id: item.page_id,
+                    name: item.page_name || getHostname(item.page_url),
+                    url: item.page_url,
+                    domain: item.domain,
+                    type: 'page',
+                    createdAt: item.started_at,
+                    status: item.status,
+                    score: item.score,
+                    compliance_score_id: item.compliance_score_id,
+                    tested_count: parseInt(item.tested_count) || 0,
+                    total_count: parseInt(item.total_count) || 78
+                });
 
                 audits[targetId] = {
                     targetId: targetId,
@@ -60,8 +60,11 @@ export const useAuditStore = create()(persist((set, get) => ({
                     lastUpdatedAt: item.started_at,
                     lastActiveScId: null,
                     page_audit_id: item.page_audit_id,
+                    compliance_score_id: item.compliance_score_id,
                     score: item.score || 0,
-                    status: item.status || 'not_started'
+                    status: item.status || 'not_started',
+                    tested_count: parseInt(item.tested_count) || 0,
+                    total_count: parseInt(item.total_count) || 78
                 };
             });
 
@@ -72,10 +75,10 @@ export const useAuditStore = create()(persist((set, get) => ({
                 severity: f.severity,
                 description: f.description,
                 selector: f.selector,
-                domSnippet: f.html_snippet,
-                notes: f.notes,
-                scIds: [f.sc_id],
-                auditId: f.auditId,
+                domSnippet: f.html_snippet || f.domSnippet || '',
+                notes: f.notes || '',
+                scIds: Array.isArray(f.sc_id) ? f.sc_id : [f.sc_id],
+                auditId: f.auditId || f.auditid || f.page_audit_id,
                 createdAt: f.created_at,
                 updatedAt: f.created_at,
                 status: 'open',
@@ -84,6 +87,16 @@ export const useAuditStore = create()(persist((set, get) => ({
                 domain: f.domain || ''
             }));
 
+            console.log(`[fetchInitialData] Processed ${allFindings.length} findings`);
+            if (allFindings.length > 0) {
+                console.log('[fetchInitialData] Sample finding:', {
+                    id: allFindings[0].id,
+                    auditId: allFindings[0].auditId,
+                    hasSnippet: !!allFindings[0].domSnippet,
+                    hasNotes: !!allFindings[0].notes
+                });
+            }
+
             set({ targets, audits, findings: allFindings, loading: false });
         } catch (error) {
             console.error('Failed to fetch initial data:', error);
@@ -91,41 +104,58 @@ export const useAuditStore = create()(persist((set, get) => ({
         }
     },
 
-    addTarget: async (target) => {
+    addTarget: async (target, explicitAuditId = null) => {
         set({ loading: true, error: null });
         try {
             const hostname = getHostname(target.url);
             const response = await apiClient.post(API.AUDITS.START, {
                 domain: hostname,
                 page_url: target.url,
-                page_name: target.name
+                page_name: target.name,
+                compliance_score_id: target.compliance_score_id,
+                audit_id: explicitAuditId
             });
 
             const targetId = response.page_audit_id;
+
+            // Check if we already have this target in state
+            const existingTarget = get().targets.find(t => t.id === targetId);
+            const existingAudit = get().audits[targetId];
+
             const newTarget = {
+                ...(existingTarget || {}),
                 ...target,
                 id: targetId,
                 domain: hostname,
-                createdAt: new Date(),
+                createdAt: existingAudit?.startedAt || existingTarget?.createdAt || new Date(),
+                score: existingAudit?.score ?? existingTarget?.score ?? 0,
+                tested_count: existingAudit?.tested_count ?? existingTarget?.tested_count ?? 0,
+                total_count: existingAudit?.total_count ?? existingTarget?.total_count ?? 78,
+                status: existingAudit?.status || existingTarget?.status || 'in_progress'
             };
 
             const newAudit = {
                 targetId,
                 targetName: target.name,
                 targetUrl: target.url,
-                checks: {},
-                startedAt: new Date(),
+                checks: existingAudit?.checks || {}, // Preserve existing checks if resuming
+                startedAt: existingAudit?.startedAt || existingTarget?.createdAt || new Date(),
                 lastUpdatedAt: new Date(),
-                lastActiveScId: null,
+                lastActiveScId: existingAudit?.lastActiveScId || null,
                 page_audit_id: response.page_audit_id,
                 page_id: response.page_id,
-                score: 0,
-                status: 'in_progress'
+                score: existingAudit?.score ?? existingTarget?.score ?? 0,
+                tested_count: existingAudit?.tested_count ?? existingTarget?.tested_count ?? 0,
+                total_count: existingAudit?.total_count ?? existingTarget?.total_count ?? 78,
+                status: existingAudit?.status || existingTarget?.status || 'in_progress',
+                compliance_score_id: target.compliance_score_id
             };
 
             set((state) => ({
-                targets: [...state.targets, newTarget],
-                audits: { ...state.audits, [targetId]: newAudit },
+                targets: existingTarget
+                    ? state.targets.map(t => t.id === targetId ? newTarget : t)
+                    : [...state.targets, newTarget],
+                audits: { ...state.audits, [targetId]: { ...(state.audits[targetId] || {}), ...newAudit } },
                 loading: false
             }));
 
@@ -174,7 +204,6 @@ export const useAuditStore = create()(persist((set, get) => ({
             // Fetch all findings for this audit in one request
             const allFindingsData = await apiClient.get(API.FINDINGS.BY_AUDIT(targetId));
 
-            // Get target info to inject into findings (since findings table doesn't have url/page)
             const target = get().targets.find(t => t.id === targetId);
             const allFindings = [];
 
@@ -186,42 +215,90 @@ export const useAuditStore = create()(persist((set, get) => ({
                     severity: f.severity,
                     description: f.description,
                     selector: f.selector,
-                    domSnippet: f.html_snippet,
-                    notes: f.notes,
-                    scIds: [f.sc_id],
-                    auditId: f.auditId,
+                    domSnippet: f.html_snippet || f.domSnippet || '',
+                    notes: f.notes || '',
+                    scIds: Array.isArray(f.sc_id) ? f.sc_id : [f.sc_id],
+                    auditId: targetId, // CRITICAL: Use targetId to ensure correct audit association
                     createdAt: f.created_at,
                     updatedAt: f.created_at,
                     status: 'open',
-                    url: target?.url || '',
-                    page: target?.name || ''
+                    url: f.url || target?.url || '',
+                    page: f.page || target?.name || '',
+                    domain: f.domain || ''
                 });
             });
 
             // Process results
             const checks = results.reduce((acc, res) => {
+                // Ensure checkedConditions is parsed if it's a string, though apiClient usually handles JSON
+                let checkedConditions = res.checked_conditions || {};
+
+                // Normalization: Ensure all conditions are objects { status, tag }
+                // This handles migration from old string-only status format
+                const normalizedConditions = {};
+                Object.entries(checkedConditions).forEach(([key, value]) => {
+                    if (typeof value === 'string') {
+                        normalizedConditions[key] = { status: value, tag: 'manual' };
+                    } else {
+                        normalizedConditions[key] = value;
+                    }
+                });
+
                 acc[res.sc_id] = {
                     status: res.result,
                     justification: res.notes,
-                    checkedConditions: res.checked_conditions,
+                    checkedConditions: normalizedConditions,
                     result_id: res.result_id
                 };
                 return acc;
             }, {});
 
             set((state) => {
-                // Merge findings: Create map of existing, add/update with new
-                const findingsMap = new Map(state.findings.map(f => [f.id, f]));
-                allFindings.forEach(f => findingsMap.set(f.id, f));
+                // Merge findings: Exclude current audit's findings, then add freshly loaded ones
+                // This ensures we always have the latest findings from the backend for this audit
+                console.log(`[loadAuditResults] Filtering out ${state.findings.filter(f => (f.auditId || f.auditid) === targetId).length} existing findings for ${targetId}`);
+
+                const findingsMap = new Map(
+                    state.findings
+                        .filter(f => {
+                            const fId = (f.auditId || f.auditid || '').toString().toLowerCase();
+                            const tId = (targetId || '').toString().toLowerCase();
+                            return fId !== tId;
+                        })
+                        .map(f => [f.id, f])
+                );
+
+                // Add all findings from the current audit (freshly loaded from backend)
+                allFindings.forEach(f => {
+                    findingsMap.set(f.id, f);
+                    console.log(`[loadAuditResults] Loaded finding ${f.id} from backend for ${targetId}`);
+                });
+
+                const updatedAudit = {
+                    ...state.audits[targetId],
+                    checks
+                };
+
+                // Recalculate metrics
+                const compliance = calculateComplianceScore(updatedAudit);
+                updatedAudit.score = compliance.score;
+                updatedAudit.tested_count = compliance.tested;
+                updatedAudit.total_count = compliance.total;
+
+                console.log(`[loadAuditResults] Loaded ${allFindings.length} findings for audit ${targetId}`);
+                console.log(`[loadAuditResults] Total findings in store: ${findingsMap.size}`);
 
                 return {
                     audits: {
                         ...state.audits,
-                        [targetId]: {
-                            ...state.audits[targetId],
-                            checks
-                        }
+                        [targetId]: updatedAudit
                     },
+                    targets: state.targets.map(t => t.id === targetId ? {
+                        ...t,
+                        score: compliance.score,
+                        tested_count: compliance.tested,
+                        total_count: compliance.total
+                    } : t),
                     findings: Array.from(findingsMap.values()),
                     loading: false
                 };
@@ -280,40 +357,47 @@ export const useAuditStore = create()(persist((set, get) => ({
 
     syncResultToBackend: async (targetId, scId) => {
         const audit = get().audits[targetId];
-        if (!audit) return;
-        const check = audit.checks[scId];
-        if (!check) return;
+        if (!audit) return null; // Return result_id if possible
+
+        const check = audit.checks[scId] || { status: 'pending', justification: '', checkedConditions: {} };
 
         set({ loading: true, error: null });
         try {
             const response = await apiClient.post(API.RESULTS.CREATE, {
                 page_audit_id: targetId,
                 sc_id: scId,
-                result: check.status === 'untested' ? 'pending' : check.status,
+                result: check.status === 'untested' ? 'pending' : (check.status || 'pending'),
                 checked_conditions: check.checkedConditions || {},
                 notes: check.justification || ''
             });
 
+            const result_id = response.result_id;
+
             // Store the result_id for future finding associations
-            set((state) => ({
-                audits: {
-                    ...state.audits,
-                    [targetId]: {
-                        ...state.audits[targetId],
-                        checks: {
-                            ...state.audits[targetId].checks,
-                            [scId]: {
-                                ...state.audits[targetId].checks[scId],
-                                result_id: response.result_id
+            set((state) => {
+                const updatedAudit = state.audits[targetId] || audit;
+                return {
+                    audits: {
+                        ...state.audits,
+                        [targetId]: {
+                            ...updatedAudit,
+                            checks: {
+                                ...updatedAudit.checks,
+                                [scId]: {
+                                    ...(updatedAudit.checks[scId] || check),
+                                    result_id: result_id
+                                }
                             }
                         }
-                    }
-                },
-                loading: false
-            }));
+                    },
+                    loading: false
+                };
+            });
+            return result_id;
         } catch (error) {
             console.error('Failed to sync result:', error);
             set({ error: `Sync failed: ${error.message}`, loading: false });
+            return null;
         }
     },
 
@@ -326,18 +410,18 @@ export const useAuditStore = create()(persist((set, get) => ({
 
         const updatedConditions = {
             ...(existingCheck.checkedConditions || {}),
-            [condition]: status
+            [condition]: { status, tag: 'manual' }
         };
 
         // Derive overall status: if any condition is 'fail', the entire SC is 'fail'
         let overallStatus = 'pending';
         const conditionValues = Object.values(updatedConditions);
 
-        if (conditionValues.some(s => s === 'fail')) {
+        if (conditionValues.some(v => (v?.status || v) === 'fail')) {
             overallStatus = 'fail';
-        } else if (conditionValues.every(s => s === 'pass')) {
+        } else if (conditionValues.every(v => (v?.status || v) === 'pass')) {
             overallStatus = 'pass';
-        } else if (conditionValues.some(s => s === 'pass' || s === 'na')) {
+        } else if (conditionValues.some(v => (v?.status || v) === 'pass' || (v?.status || v) === 'na')) {
             overallStatus = 'pending';
         }
 
@@ -435,19 +519,20 @@ export const useAuditStore = create()(persist((set, get) => ({
         set({ loading: true, error: null });
         try {
             // Try to get result_id for the first SC in focus
-            const scId = finding.scIds[0];
+            const scId = finding.scIds && finding.scIds.length > 0 ? finding.scIds[0] : null;
+            if (!scId) throw new Error('No Success Criterion selected for this finding.');
+
             const audit = get().audits[target.id];
             let result_id = audit?.checks[scId]?.result_id;
 
-            // If no result_id, sync the result first
+            // If no result_id, sync the result first and get it back
             if (!result_id) {
-                await get().syncResultToBackend(target.id, scId);
-                const updatedAudit = get().audits[target.id];
-                result_id = updatedAudit?.checks[scId]?.result_id;
+                console.log(`[addFinding] No result_id found for ${scId}, syncing now...`);
+                result_id = await get().syncResultToBackend(target.id, scId);
             }
 
             if (!result_id) {
-                throw new Error('No result record found for this Success Criterion. Please set a status first.');
+                throw new Error('Could not establish a database record for this Success Criterion. Please ensure it is marked as Pass/Fail first.');
             }
 
             const response = await apiClient.post(API.FINDINGS.CREATE, {
@@ -462,14 +547,24 @@ export const useAuditStore = create()(persist((set, get) => ({
             const newFinding = {
                 ...finding,
                 id: response.finding_id,
+                auditId: target.id,
                 createdAt: new Date(),
                 updatedAt: new Date(),
             };
 
-            set((state) => ({
-                findings: [...state.findings, newFinding],
-                loading: false
-            }));
+            console.log('[addFinding] Created new finding:', newFinding);
+            console.log('[addFinding] Finding auditId:', newFinding.auditId);
+            console.log('[addFinding] Current target id:', target.id);
+
+            set((state) => {
+                const updatedFindings = [...state.findings, newFinding];
+                console.log('[addFinding] Total findings after add:', updatedFindings.length);
+                console.log('[addFinding] Findings for this audit:', updatedFindings.filter(f => f.auditId === target.id).length);
+                return {
+                    findings: updatedFindings,
+                    loading: false
+                };
+            });
         } catch (error) {
             console.error('Failed to add finding:', error);
             set({ error: `Failed to save finding: ${error.message}`, loading: false });
@@ -491,7 +586,9 @@ export const useAuditStore = create()(persist((set, get) => ({
                 findings: state.findings.map((f) => f.id === id ? {
                     ...f,
                     ...updates,
-                    id: response.finding_id, // ensure ID is correct from response
+                    selector: updates.selector || updates.cssSelector || f.selector,
+                    domSnippet: updates.html_snippet || updates.domSnippet || f.domSnippet,
+                    id: response.finding_id,
                     updatedAt: new Date()
                 } : f),
                 loading: false
@@ -542,12 +639,37 @@ export const useAuditStore = create()(persist((set, get) => ({
                     [targetId]: {
                         ...state.audits[targetId],
                         score: compliance.score,
+                        tested_count: compliance.tested,
+                        total_count: compliance.total,
                         status: compliance.score === 100 ? 'completed' : 'in_progress'
                     }
-                }
+                },
+                targets: state.targets.map(t => t.id === targetId ? {
+                    ...t,
+                    score: compliance.score,
+                    tested_count: compliance.tested,
+                    total_count: compliance.total
+                } : t)
             }));
         } catch (error) {
             console.error('Failed to sync audit metadata:', error);
+        }
+    },
+
+    syncAutomatedChecks: async (targetId) => {
+        set({ loading: true, error: null });
+        try {
+            const response = await apiClient.post(API.AUDITS.SYNC_AUTOMATED(targetId));
+
+            // Reload results to reflect the sync
+            await get().loadAuditResults(targetId);
+
+            set({ loading: false });
+            return response;
+        } catch (error) {
+            console.error('Failed to sync automated checks:', error);
+            set({ error: `Automation sync failed: ${error.message}`, loading: false });
+            throw error;
         }
     },
 

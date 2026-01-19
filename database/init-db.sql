@@ -10,8 +10,65 @@ CREATE TABLE IF NOT EXISTS compliance_scores (
   incomplete INTEGER NOT NULL,
   inapplicable INTEGER NOT NULL,
   audit_results JSONB,
+  audit_source TEXT DEFAULT 'manual',
+  scheduled_audit_id INTEGER,
   created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-  -- FOREIGN KEY (user_id) REFERENCES users (id) -- Commented out as users table is not defined in this schema block
+  -- FOREIGN KEY (user_id) REFERENCES users (id) -- Users table might be in another schema/migration
+);
+
+-- ... (rest of the tables as in updated WCAG-Compliance-Check) ...
+
+-- 6. scheduled_audits
+CREATE TABLE IF NOT EXISTS scheduled_audits (
+    id SERIAL PRIMARY KEY,
+    user_id TEXT NOT NULL, -- References users(id) in shared db
+    schedule_name TEXT NOT NULL,
+    target_url TEXT NOT NULL,
+    schedule_type TEXT NOT NULL,
+    execution_time TEXT NOT NULL,
+    days_of_week JSONB,
+    timezone TEXT DEFAULT 'Asia/Kolkata',
+    max_runs INTEGER,
+    current_run_count INTEGER DEFAULT 0,
+    cron_expression TEXT NOT NULL,
+    next_run_at TIMESTAMPTZ,
+    last_run_at TIMESTAMPTZ,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 7. scheduled_audit_results
+CREATE TABLE IF NOT EXISTS scheduled_audit_results (
+    id SERIAL PRIMARY KEY,
+    scheduled_audit_id INTEGER NOT NULL REFERENCES scheduled_audits(id) ON DELETE CASCADE,
+    execution_status TEXT NOT NULL CHECK (execution_status IN ('running', 'success', 'failed')),
+    executed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    compliance_score_id INTEGER REFERENCES compliance_scores(id) ON DELETE SET NULL,
+    violations_count INTEGER,
+    passes_count INTEGER,
+    compliance_score NUMERIC(5,2),
+    execution_time_ms INTEGER,
+    error_message TEXT
+);
+
+-- 8. credit_transactions
+CREATE TABLE IF NOT EXISTS credit_transactions (
+    id SERIAL PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    transaction_type TEXT NOT NULL CHECK (transaction_type IN ('credit', 'debit')),
+    amount INTEGER NOT NULL,
+    description TEXT,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 9. user_activities
+CREATE TABLE IF NOT EXISTS user_activities (
+    id SERIAL PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    activity_type TEXT NOT NULL,
+    details TEXT,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 2. pages 
@@ -40,10 +97,10 @@ CREATE TABLE IF NOT EXISTS page_audits (
   audited_by    TEXT,
   score         INTEGER DEFAULT 0 CHECK (score BETWEEN 0 AND 100),
   started_at    TIMESTAMPTZ DEFAULT now(),
-  completed_at  TIMESTAMPTZ,
+  last_saved_at TIMESTAMPTZ,
   -- Optional linkage to a compliance snapshot
-  compliance_score_id INTEGER NULL REFERENCES compliance_scores(id) ON DELETE SET NULL,
-  CONSTRAINT uq_page_audit UNIQUE (page_id)
+  compliance_score_id INTEGER NULL REFERENCES compliance_scores(id) ON DELETE SET NULL
+  -- CONSTRAINT uq_page_audit UNIQUE (page_id) -- Removed to allow multiple audits per page
 );
 
 CREATE INDEX IF NOT EXISTS idx_page_audits_page_id ON page_audits(page_id);
@@ -61,7 +118,6 @@ CREATE TABLE IF NOT EXISTS reference_sc_conditions (
   condition_type VARCHAR(20) NOT NULL
                  CHECK (condition_type IN ('manual','automated','axe-core')),
   axe_rule_id TEXT,
-  default_checked BOOLEAN NOT NULL DEFAULT FALSE,
   is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMPTZ DEFAULT now()
 );

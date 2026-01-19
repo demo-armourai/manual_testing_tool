@@ -20,6 +20,45 @@ const asyncHandler = fn => (req, res, next) =>
     });
 
 /**
+ * Recalculate and update the compliance score for an audit.
+ * @param {string} page_audit_id - The ID of the audit to update
+ */
+async function updateAuditScore(page_audit_id) {
+    // Aggregate results
+    const resultsAgg = await db.query(
+        `SELECT 
+            result,
+            COUNT(*) as count
+         FROM page_sc_results
+         WHERE page_audit_id = $1
+         GROUP BY result`,
+        [page_audit_id]
+    );
+
+    let pass_count = 0;
+    let na_count = 0;
+
+    resultsAgg.rows.forEach(row => {
+        switch (row.result) {
+            case 'pass': pass_count = parseInt(row.count); break;
+            case 'na': na_count = parseInt(row.count); break;
+        }
+    });
+
+    // We use 78 total SCs for WCAG 2.1 AA
+    const TOTAL_SCS = 78;
+    const applicable = TOTAL_SCS - na_count;
+    const score = applicable > 0 ? Math.round((pass_count / applicable) * 100) : 0;
+
+    await db.query(
+        `UPDATE page_audits SET score = $1, last_saved_at = now() WHERE page_audit_id = $2`,
+        [score, page_audit_id]
+    );
+
+    return score;
+}
+
+/**
  * ============================================================================
  * AUDIT MANAGEMENT ROUTES
  * ============================================================================
@@ -36,7 +75,7 @@ const asyncHandler = fn => (req, res, next) =>
  * @access  Public
  */
 router.post('/audits/start', asyncHandler(async (req, res) => {
-    const { domain, page_url, page_name } = req.body;
+    const { domain, page_url, page_name, audited_by, compliance_score_id } = req.body;
 
     // Validate required fields
     if (!domain || !page_url) {
@@ -53,34 +92,201 @@ router.post('/audits/start', asyncHandler(async (req, res) => {
     );
     const page_id = pageResult.rows[0].page_id;
 
-    // Insert Audit (or get existing active one)
-    try {
-        let auditResult = await db.query(
-            `INSERT INTO page_audits (page_id, status) 
-             VALUES ($1, 'in_progress') 
-             RETURNING page_audit_id`,
+    // Insert or Retrieve Audit specifically for this compliance_score_id
+    let auditResult;
+    if (compliance_score_id) {
+        auditResult = await db.query(
+            `SELECT page_audit_id FROM page_audits WHERE page_id = $1 AND compliance_score_id = $2 LIMIT 1`,
+            [page_id, compliance_score_id]
+        );
+    } else {
+        // Fallback for legacy audits without score association
+        auditResult = await db.query(
+            `SELECT page_audit_id FROM page_audits WHERE page_id = $1 AND compliance_score_id IS NULL LIMIT 1`,
             [page_id]
         );
-        res.json({
-            page_audit_id: auditResult.rows[0].page_audit_id,
-            page_id
-        });
-    } catch (err) {
-        // If unique constraint violation, get the existing one
-        if (err.code === '23505') { // unique_violation
-            const existing = await db.query(
-                `SELECT page_audit_id FROM page_audits WHERE page_id = $1`,
-                [page_id]
-            );
-            res.json({
-                page_audit_id: existing.rows[0].page_audit_id,
-                page_id,
-                message: "Resumed existing audit"
-            });
-        } else {
-            throw err;
-        }
     }
+
+    let page_audit_id;
+
+    if (auditResult.rows.length > 0) {
+        page_audit_id = auditResult.rows[0].page_audit_id;
+    } else {
+        let newAudit = await db.query(
+            `INSERT INTO page_audits (page_id, status, audited_by, started_at, compliance_score_id) 
+             VALUES ($1, 'in_progress', $2, now(), $3) 
+             RETURNING page_audit_id`,
+            [page_id, audited_by, compliance_score_id]
+        );
+        page_audit_id = newAudit.rows[0].page_audit_id;
+    }
+
+    res.json({
+        page_audit_id,
+        page_id
+    });
+}));
+
+/**
+ * @route   POST /api/audits/:page_audit_id/sync-automated
+ * @desc    Synchronize automated checks from the latest WCAG scan results.
+ *          Fetches results from compliance_scores and updates page_sc_results.
+ */
+router.post('/audits/:page_audit_id/sync-automated', asyncHandler(async (req, res) => {
+    const { page_audit_id } = req.params;
+
+    // 1. Get audit and page details
+    const auditResult = await db.query(
+        `SELECT pa.*, p.page_url, p.page_id 
+         FROM page_audits pa 
+         JOIN pages p ON pa.page_id = p.page_id 
+         WHERE pa.page_audit_id = $1`,
+        [page_audit_id]
+    );
+
+    if (auditResult.rows.length === 0) {
+        return res.status(404).json({ error: 'Audit not found' });
+    }
+
+    const { page_id, compliance_score_id } = auditResult.rows[0];
+
+    // 2. Fetch the specific compliance scan linked to this audit
+    let complianceResult;
+    if (compliance_score_id) {
+        complianceResult = await db.query(
+            `SELECT * FROM compliance_scores WHERE id = $1`,
+            [compliance_score_id]
+        );
+    } else {
+        // Fallback to latest for legacy audits or those without a linked scan
+        complianceResult = await db.query(
+            `SELECT * FROM compliance_scores 
+             WHERE page_id = $1 
+             ORDER BY created_at DESC LIMIT 1`,
+            [page_id]
+        );
+    }
+
+    if (complianceResult.rows.length === 0) {
+        return res.status(404).json({ error: 'No automated scan results found' });
+    }
+
+    const scanData = complianceResult.rows[0].audit_results;
+    const summaryTables = scanData.summaryTables || {};
+
+    const violationRuleIds = new Set((summaryTables.violations?.rows || []).map(r => r.ruleId));
+    const passRuleIds = new Set((summaryTables.passes?.rows || []).map(r => r.ruleId));
+    const inapplicableRuleIds = new Set((summaryTables.inapplicable?.rows || []).map(r => r.ruleId));
+
+    // 3. Fetch all reference conditions
+    const conditionsResult = await db.query(
+        `SELECT * FROM reference_sc_conditions WHERE is_active = TRUE`
+    );
+    const allConditions = conditionsResult.rows;
+
+    // 4. Group conditions by sc_id
+    const scGroups = {};
+    allConditions.forEach(cond => {
+        if (!scGroups[cond.sc_id]) scGroups[cond.sc_id] = [];
+        scGroups[cond.sc_id].push(cond);
+    });
+
+    const syncResults = [];
+
+    // 5. For each SC, determine the automated results
+    for (const sc_id in scGroups) {
+        const conditions = scGroups[sc_id];
+        const checked_conditions = {};
+        let sc_status = 'pending';
+        let hasFail = false;
+        let allPassOrNA = true;
+        let hasManual = false;
+
+        conditions.forEach(cond => {
+            let status = 'pending';
+            const tag = cond.condition_type; // 'manual', 'automated', or 'axe-core'
+
+            if (tag === 'axe-core' && cond.axe_rule_id) {
+                const rules = cond.axe_rule_id.split(',').map(r => r.trim());
+
+                let ruleFail = false;
+                let rulePass = false;
+                let ruleInapplicable = false;
+
+                rules.forEach(rule => {
+                    if (violationRuleIds.has(rule)) ruleFail = true;
+                    else if (passRuleIds.has(rule)) rulePass = true;
+                    else if (inapplicableRuleIds.has(rule)) ruleInapplicable = true;
+                });
+
+                if (ruleFail) {
+                    status = 'fail';
+                    hasFail = true;
+                } else if (rulePass) {
+                    status = 'pass';
+                } else if (ruleInapplicable) {
+                    status = 'na';
+                }
+            } else if (tag === 'manual') {
+                hasManual = true;
+            }
+
+            if (status === 'pending') allPassOrNA = false;
+
+            checked_conditions[cond.condition_text] = { status, tag };
+        });
+
+        // Overall SC Result Logic:
+        if (hasFail) {
+            sc_status = 'fail';
+        } else if (allPassOrNA && !hasManual) {
+            // Check if there's at least one 'pass' vs all 'na'
+            const statuses = Object.values(checked_conditions).map(c => c.status);
+            if (statuses.includes('pass')) {
+                sc_status = 'pass';
+            } else if (statuses.every(s => s === 'na')) {
+                sc_status = 'na';
+            } else {
+                sc_status = 'pass'; // Default to pass if mixed or no conditions but not failed
+            }
+        } else {
+            sc_status = 'pending';
+        }
+
+        // 6. Upsert results, but ONLY if they don't exist OR are currently 'pending'
+        // This prevents overwriting manual auditor work.
+        await db.query(
+            `INSERT INTO page_sc_results (page_audit_id, sc_id, result, checked_conditions, reviewed_at)
+             VALUES ($1, $2, $3, $4, now())
+             ON CONFLICT (page_audit_id, sc_id) 
+             DO UPDATE SET 
+                result = CASE 
+                            WHEN page_sc_results.result = 'pending' THEN EXCLUDED.result 
+                            ELSE page_sc_results.result 
+                         END,
+                checked_conditions = CASE 
+                                        WHEN page_sc_results.result = 'pending' THEN EXCLUDED.checked_conditions 
+                                        ELSE page_sc_results.checked_conditions 
+                                     END,
+                reviewed_at = CASE 
+                                WHEN page_sc_results.result = 'pending' THEN now() 
+                                ELSE page_sc_results.reviewed_at 
+                              END
+             WHERE page_sc_results.result = 'pending' OR NOT EXISTS (SELECT 1 FROM page_sc_results WHERE page_audit_id = $1 AND sc_id = $2)`,
+            [page_audit_id, sc_id, sc_status, JSON.stringify(checked_conditions)]
+        );
+
+        syncResults.push({ sc_id, status: sc_status });
+    }
+
+    // 7. Update audit score
+    await updateAuditScore(page_audit_id);
+
+    res.json({
+        success: true,
+        message: 'Automated checks synchronized successfully',
+        syncedCount: syncResults.length
+    });
 }));
 
 /**
@@ -92,21 +298,27 @@ router.post('/audits/start', asyncHandler(async (req, res) => {
  */
 router.get('/audits', asyncHandler(async (req, res) => {
     const result = await db.query(`
-        SELECT 
+        SELECT DISTINCT ON (pa.page_id)
             pa.page_audit_id,
             pa.page_id,
             pa.status,
-            pa.score,
+            COALESCE(
+                (SELECT ROUND((COUNT(CASE WHEN r.result = 'pass' THEN 1 END)::float / NULLIF(78 - COUNT(CASE WHEN r.result = 'na' THEN 1 END), 0)) * 100) 
+                 FROM page_sc_results r WHERE r.page_audit_id = pa.page_audit_id), 
+                0
+            ) as score,
             pa.wcag_version,
             pa.audited_by,
             pa.started_at,
-            pa.completed_at,
+            pa.last_saved_at,
             p.domain,
             p.page_url,
-            p.page_name
+            p.page_name,
+            (SELECT count(*) FROM page_sc_results r WHERE r.page_audit_id = pa.page_audit_id AND r.result IN ('pass', 'fail', 'na')) as tested_count,
+            78 as total_count
         FROM page_audits pa
         JOIN pages p ON pa.page_id = p.page_id
-        ORDER BY pa.started_at DESC
+        ORDER BY pa.page_id, pa.started_at DESC
     `);
     res.json(result.rows);
 }));
@@ -127,7 +339,7 @@ router.put('/audits/:page_audit_id', asyncHandler(async (req, res) => {
         updates.push(`status = $${paramCount++}`);
         values.push(status);
         if (status === 'completed') {
-            updates.push(`completed_at = now()`);
+            updates.push(`last_saved_at = now()`);
         }
     }
 
@@ -139,6 +351,11 @@ router.put('/audits/:page_audit_id', asyncHandler(async (req, res) => {
     if (audited_by !== undefined) {
         updates.push(`audited_by = $${paramCount++}`);
         values.push(audited_by);
+    }
+
+    if (req.body.compliance_score_id !== undefined) {
+        updates.push(`compliance_score_id = $${paramCount++}`);
+        values.push(req.body.compliance_score_id);
     }
 
     if (updates.length === 0) {
@@ -242,6 +459,9 @@ router.post('/results', asyncHandler(async (req, res) => {
          RETURNING result_id`,
         [page_audit_id, sc_id, result, checked_conditions || {}, notes]
     );
+
+    // 2. Update audit score
+    await updateAuditScore(page_audit_id);
 
     res.json({
         success: true,
@@ -425,9 +645,12 @@ router.get('/findings', asyncHandler(async (req, res) => {
 
 router.post('/findings', asyncHandler(async (req, res) => {
     const { result_id, severity, description, selector, html_snippet, notes } = req.body;
+    console.log('--- POST /findings ---');
+    console.log('Body:', JSON.stringify(req.body, null, 2));
 
     // Validate required fields
     if (!result_id || !severity || !description) {
+        console.warn('Validation failed: Missing fields', { result_id, severity, description });
         return res.status(400).json({
             error: 'result_id, severity, and description are required'
         });
@@ -436,6 +659,7 @@ router.post('/findings', asyncHandler(async (req, res) => {
     // Validate severity value
     const validSeverities = ['Critical', 'Serious', 'Moderate', 'Minor'];
     if (!validSeverities.includes(severity)) {
+        console.warn('Validation failed: Invalid severity', severity);
         return res.status(400).json({
             error: `Invalid severity. Must be one of: ${validSeverities.join(', ')}`
         });
@@ -484,19 +708,20 @@ router.get('/findings/audit/:page_audit_id', asyncHandler(async (req, res) => {
             f.created_at,
             f.notes,
             r.sc_id,
-            pa.page_audit_id as auditId,
+            r.page_audit_id as auditId,
             p.domain,
             p.page_url as url,
             p.page_name as page
          FROM findings f
          JOIN page_sc_results r ON f.result_id = r.result_id
-         JOIN page_audits pa ON r.page_audit_id = pa.page_audit_id
-         JOIN pages p ON pa.page_id = p.page_id
+         LEFT JOIN page_audits pa ON r.page_audit_id = pa.page_audit_id
+         LEFT JOIN pages p ON pa.page_id = p.page_id
          WHERE r.page_audit_id = $1
          ORDER BY f.created_at DESC`,
         [page_audit_id]
     );
 
+    console.log(`[GET /findings/audit/${page_audit_id}] Found ${result.rows.length} findings`);
     res.json(result.rows);
 }));
 
@@ -688,7 +913,7 @@ router.post('/reports/generate', asyncHandler(async (req, res) => {
             pa.page_audit_id,
             pa.status,
             pa.score,
-            pa.completed_at,
+            pa.last_saved_at,
             p.domain,
             p.page_name,
             p.page_url
@@ -746,7 +971,7 @@ router.post('/reports/generate', asyncHandler(async (req, res) => {
             page_url,
             audit_status,
             audit_score,
-            completed_at,
+            last_saved_at,
             pass_count,
             fail_count,
             na_count,
@@ -756,9 +981,12 @@ router.post('/reports/generate', asyncHandler(async (req, res) => {
          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, now())
          ON CONFLICT (page_audit_id)
          DO UPDATE SET
+            domain = EXCLUDED.domain,
+            page_name = EXCLUDED.page_name,
+            page_url = EXCLUDED.page_url,
             audit_status = EXCLUDED.audit_status,
             audit_score = EXCLUDED.audit_score,
-            completed_at = EXCLUDED.completed_at,
+            last_saved_at = EXCLUDED.last_saved_at,
             pass_count = EXCLUDED.pass_count,
             fail_count = EXCLUDED.fail_count,
             na_count = EXCLUDED.na_count,
@@ -772,8 +1000,8 @@ router.post('/reports/generate', asyncHandler(async (req, res) => {
             audit.page_name,
             audit.page_url,
             audit.status,
-            Math.round(compliance_percentage), // Update score based on compliance %
-            audit.completed_at,
+            audit.score,
+            audit.last_saved_at,
             pass_count,
             fail_count,
             na_count,
@@ -788,7 +1016,15 @@ router.post('/reports/generate', asyncHandler(async (req, res) => {
         [Math.round(compliance_percentage), page_audit_id]
     );
 
-    res.json(report.rows[0]);
+    // Merge report data with audit/page details for the response
+    res.json({
+        ...report.rows[0],
+        domain: audit.domain,
+        page_name: audit.page_name,
+        page_url: audit.page_url,
+        audit_status: audit.status,
+        audit_score: audit.score
+    });
 }));
 
 /**
@@ -802,7 +1038,17 @@ router.get('/reports/audit/:page_audit_id', asyncHandler(async (req, res) => {
     const { page_audit_id } = req.params;
 
     const result = await db.query(
-        `SELECT * FROM webcomply_report_summary WHERE page_audit_id = $1`,
+        `SELECT 
+            r.*,
+            p.domain,
+            p.page_name,
+            p.page_url,
+            pa.status as audit_status,
+            pa.score as audit_score
+         FROM webcomply_report_summary r
+         JOIN page_audits pa ON r.page_audit_id = pa.page_audit_id
+         JOIN pages p ON pa.page_id = p.page_id
+         WHERE r.page_audit_id = $1`,
         [page_audit_id]
     );
 
@@ -833,10 +1079,19 @@ router.get('/reports', asyncHandler(async (req, res) => {
     );
     const total = parseInt(countResult.rows[0].total);
 
-    // Get paginated reports
+    // Get paginated reports with joined details
     const result = await db.query(
-        `SELECT * FROM webcomply_report_summary 
-         ORDER BY generated_at DESC 
+        `SELECT 
+            r.*,
+            p.domain,
+            p.page_name,
+            p.page_url,
+            pa.status as audit_status,
+            pa.score as audit_score
+         FROM webcomply_report_summary r
+         JOIN page_audits pa ON r.page_audit_id = pa.page_audit_id
+         JOIN pages p ON pa.page_id = p.page_id
+         ORDER BY r.generated_at DESC 
          LIMIT $1 OFFSET $2`,
         [limit, offset]
     );
@@ -860,7 +1115,17 @@ router.get('/reports/:report_id', asyncHandler(async (req, res) => {
     const { report_id } = req.params;
 
     const result = await db.query(
-        `SELECT * FROM webcomply_report_summary WHERE report_id = $1`,
+        `SELECT 
+            r.*,
+            p.domain,
+            p.page_name,
+            p.page_url,
+            pa.status as audit_status,
+            pa.score as audit_score
+         FROM webcomply_report_summary r
+         JOIN page_audits pa ON r.page_audit_id = pa.page_audit_id
+         JOIN pages p ON pa.page_id = p.page_id
+         WHERE r.report_id = $1`,
         [report_id]
     );
 
@@ -883,7 +1148,7 @@ router.get('/reports/:report_id', asyncHandler(async (req, res) => {
  */
 router.put('/reports/:report_id', asyncHandler(async (req, res) => {
     const { report_id } = req.params;
-    const { compliance_percentage, audit_score } = req.body;
+    const { compliance_percentage } = req.body;
 
     // Build dynamic update query
     const updates = [];
@@ -893,10 +1158,6 @@ router.put('/reports/:report_id', asyncHandler(async (req, res) => {
     if (compliance_percentage !== undefined) {
         updates.push(`compliance_percentage = $${paramCount++}`);
         values.push(compliance_percentage);
-    }
-    if (audit_score !== undefined) {
-        updates.push(`audit_score = $${paramCount++}`);
-        values.push(audit_score);
     }
 
     if (updates.length === 0) {
@@ -917,7 +1178,23 @@ router.put('/reports/:report_id', asyncHandler(async (req, res) => {
         return res.status(404).json({ error: 'Report not found' });
     }
 
-    res.json(result.rows[0]);
+    // Fetch full report with joined data
+    const fullReport = await db.query(
+        `SELECT 
+            r.*,
+            p.domain,
+            p.page_name,
+            p.page_url,
+            pa.status as audit_status,
+            pa.score as audit_score
+         FROM webcomply_report_summary r
+         JOIN page_audits pa ON r.page_audit_id = pa.page_audit_id
+         JOIN pages p ON pa.page_id = p.page_id
+         WHERE r.report_id = $1`,
+        [report_id]
+    );
+
+    res.json(fullReport.rows[0]);
 }));
 
 /**
@@ -937,7 +1214,7 @@ router.get('/reports/audit/:page_audit_id/json', asyncHandler(async (req, res) =
             pa.page_audit_id,
             pa.status,
             pa.score,
-            pa.completed_at,
+            pa.last_saved_at,
             pa.started_at,
             pa.wcag_version,
             p.domain,
@@ -970,7 +1247,7 @@ router.get('/reports/audit/:page_audit_id/json', asyncHandler(async (req, res) =
         [page_audit_id]
     );
 
-    // Get all findings
+    // Get all findings with page URL
     const findingsData = await db.query(
         `SELECT 
             f.finding_id,
@@ -981,13 +1258,20 @@ router.get('/reports/audit/:page_audit_id/json', asyncHandler(async (req, res) =
             f.html_snippet,
             f.notes,
             f.created_at,
-            r.sc_id
+            r.sc_id,
+            p.page_url as url,
+            p.domain,
+            p.page_name as page
          FROM findings f
          JOIN page_sc_results r ON f.result_id = r.result_id
+         LEFT JOIN page_audits pa ON r.page_audit_id = pa.page_audit_id
+         LEFT JOIN pages p ON pa.page_id = p.page_id
          WHERE r.page_audit_id = $1
          ORDER BY f.created_at DESC`,
         [page_audit_id]
     );
+
+    console.log(`[GET report/json] Found ${findingsData.rows.length} findings for audit ${page_audit_id}`);
 
     // Get reference conditions to map axe rules
     const conditionsData = await db.query(
@@ -1122,21 +1406,22 @@ router.get('/reports/audit/:page_audit_id/json', asyncHandler(async (req, res) =
                 .map(c => c.sc_id);
             const ruleResults = resultsData.rows.filter(r => ruleSCs.includes(r.sc_id));
 
-            if (ruleResults.length > 0) {
-                const anyFailed = ruleResults.some(r => r.result === 'fail');
-                const failedResult = ruleResults.find(r => r.result === 'fail');
-                const impact = failedResult ?
-                    (findingsData.rows.find(f => f.sc_id === failedResult.sc_id)?.severity || 'minor') :
-                    'minor';
-
-                processedRuleIds.add(cond.axe_rule_id);
-                tests.push({
-                    id: cond.axe_rule_id,
-                    description: axeRuleDescriptions[cond.axe_rule_id] || `Axe-core rule: ${cond.axe_rule_id}`,
-                    result: anyFailed ? 'Fail' : 'Pass',
-                    impact: impact
-                });
+            if (ruleResults.length === 0) {
+                // No results for this rule yet, skip it
+                return;
             }
+
+            processedRuleIds.add(cond.axe_rule_id);
+
+            const anyFailed = ruleResults.some(r => r.result === 'fail');
+            const ruleResult = anyFailed ? 'Fail' : 'Pass';
+
+            tests.push({
+                id: cond.axe_rule_id,
+                description: axeRuleDescriptions[cond.axe_rule_id] || `Axe-core rule: ${cond.axe_rule_id}`,
+                result: ruleResult,
+                impact: anyFailed ? 'serious' : 'minor'
+            });
         }
     });
 
@@ -1164,7 +1449,7 @@ router.get('/reports/audit/:page_audit_id/json', asyncHandler(async (req, res) =
         });
     }
 
-    // Build findings array
+    // Build findings array with all required fields
     const findings = findingsData.rows.map(f => ({
         id: f.finding_id,
         scId: f.sc_id,
@@ -1173,7 +1458,10 @@ router.get('/reports/audit/:page_audit_id/json', asyncHandler(async (req, res) =
         selector: f.selector,
         htmlSnippet: f.html_snippet,
         notes: f.notes,
-        createdAt: f.created_at
+        createdAt: f.created_at,
+        url: f.url,
+        domain: f.domain,
+        page: f.page
     }));
 
     // Calculate compliance metrics
@@ -1186,7 +1474,7 @@ router.get('/reports/audit/:page_audit_id/json', asyncHandler(async (req, res) =
         assessment: {
             targetWebsite: audit.page_url,
             projectName: audit.page_name || 'ArmourWebComply',
-            assessmentDate: audit.completed_at || audit.started_at || new Date().toISOString(),
+            assessmentDate: audit.last_saved_at || audit.started_at || new Date().toISOString(),
             reportVersion: '1.0',
             testingTechnology: 'axe-core v4.10.3',
             complianceStandard: `WCAG ${audit.wcag_version || '2.2'} Level A`,
@@ -1218,6 +1506,142 @@ router.get('/reports/audit/:page_audit_id/json', asyncHandler(async (req, res) =
     };
 
     res.json(reportJson);
+}));
+
+/**
+ * ============================================================================
+ * COMPLIANCE SCORES ROUTES (WCAG Scan Results)
+ * ============================================================================
+ */
+
+/**
+ * @route   GET /api/compliance-scores/user/:user_id
+ * @desc    Fetch all WCAG compliance scores for a specific user.
+ *          Returns automated scan results from the WCAG WebComply tool.
+ * @param   {string} user_id - UUID of the user
+ * @returns {array} Array of compliance score objects with page details
+ * @access  Public
+ */
+router.get('/compliance-scores/user/:user_id', asyncHandler(async (req, res) => {
+    const { user_id } = req.params;
+
+    const result = await db.query(
+        `SELECT 
+            cs.*,
+            p.domain,
+            p.page_url,
+            p.page_name
+         FROM compliance_scores cs
+         JOIN pages p ON cs.page_id = p.page_id
+         WHERE cs.user_id = $1
+         ORDER BY cs.created_at DESC`,
+        [user_id]
+    );
+
+    res.json(result.rows);
+}));
+
+/**
+ * @route   GET /api/compliance-scores/page/:page_id
+ * @desc    Fetch all WCAG compliance scores for a specific page.
+ *          Shows scan history for a single page.
+ * @param   {string} page_id - UUID of the page
+ * @returns {array} Array of compliance score objects
+ * @access  Public
+ */
+router.get('/compliance-scores/page/:page_id', asyncHandler(async (req, res) => {
+    const { page_id } = req.params;
+
+    const result = await db.query(
+        `SELECT 
+            cs.*,
+            p.domain,
+            p.page_url,
+            p.page_name
+         FROM compliance_scores cs
+         JOIN pages p ON cs.page_id = p.page_id
+         WHERE cs.page_id = $1
+         ORDER BY cs.created_at DESC`,
+        [page_id]
+    );
+
+    res.json(result.rows);
+}));
+
+/**
+ * @route   GET /api/compliance-scores/:id
+ * @desc    Fetch a single compliance score by its ID.
+ *          Includes full audit_results JSONB data.
+ * @param   {string} id - ID of the compliance score
+ * @returns {object} Compliance score object with page details
+ * @access  Public
+ */
+router.get('/compliance-scores/:id', asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    const result = await db.query(
+        `SELECT 
+            cs.*,
+            p.domain,
+            p.page_url,
+            p.page_name
+         FROM compliance_scores cs
+         JOIN pages p ON cs.page_id = p.page_id
+         WHERE cs.id = $1`,
+        [id]
+    );
+
+    if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'Compliance score not found' });
+    }
+
+    res.json(result.rows[0]);
+}));
+
+/**
+ * ============================================================================
+ * USER & WEBSITE MANAGEMENT ROUTES (FROM WCAG DATABASE)
+ * ============================================================================
+ */
+
+/**
+ * @route   GET /api/users
+ * @desc    Fetch all users from the shared WCAG database.
+ */
+router.get('/users', asyncHandler(async (req, res) => {
+    const result = await db.query("SELECT id, username, email, role, display_name FROM users WHERE role = 'user' ORDER BY username ASC");
+    res.json(result.rows);
+}));
+
+/**
+ * @route   GET /api/users/:userId/websites
+ * @desc    Fetch unique websites audited by a specific user in WCAG-Compliance-Check.
+ */
+router.get('/users/:userId/websites', asyncHandler(async (req, res) => {
+    const { userId } = req.params;
+    const result = await db.query(`
+        SELECT 
+            p.domain, 
+            p.page_url, 
+            p.page_name,
+            cs.id as compliance_score_id,
+            cs.score as last_score,
+            cs.created_at as last_scanned_at,
+            (SELECT ROUND((COUNT(CASE WHEN r.result = 'pass' THEN 1 END)::float / NULLIF(78 - COUNT(CASE WHEN r.result = 'na' THEN 1 END), 0)) * 100) 
+             FROM page_sc_results r 
+             JOIN page_audits pa_inner ON r.page_audit_id = pa_inner.page_audit_id
+             WHERE pa_inner.compliance_score_id = cs.id
+             LIMIT 1) as manual_score,
+            (SELECT page_audit_id 
+             FROM page_audits 
+             WHERE compliance_score_id = cs.id 
+             LIMIT 1) as manual_audit_id
+        FROM compliance_scores cs
+        JOIN pages p ON cs.page_id = p.page_id
+        WHERE cs.user_id = $1::text OR cs.user_id::text = $1::text
+        ORDER BY cs.created_at DESC
+    `, [userId]);
+    res.json(result.rows);
 }));
 
 module.exports = router;

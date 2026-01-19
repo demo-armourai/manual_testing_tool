@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { FileBarChart, CheckSquare, AlertCircle, Menu, X } from 'lucide-react';
+import { FileBarChart, CheckSquare, AlertCircle, Menu, X, BarChart } from 'lucide-react';
 import { wcagChecklist, getChecklistByLevel } from './utils/wcag-loader';
 import { useAuditStore } from './hooks/useAuditStore';
 import { calculateComplianceScore } from './utils/compliance';
+import { apiClient, API } from './config/api';
 
 import { TargetSelector } from './components/TargetSelector';
 import { CheckCard } from './components/CheckCard';
@@ -11,9 +12,20 @@ import { FilterPanel } from './components/FilterPanel';
 import { FindingForm } from './components/FindingForm';
 import { FindingsList } from './components/FindingsList';
 import { ComplianceReport } from './components/ComplianceReport';
+import { ComplianceScoresView } from './components/ComplianceScoresView';
+import { UserSelection } from './components/UserSelection';
+import { UserWebsiteList } from './components/UserWebsiteList';
+
+const getHostname = (url) => {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return url;
+  }
+};
 
 export default function App() {
-  const { currentTarget, audits, findings, getFindingsForTarget, setCurrentTarget, setLastActiveScId, fetchInitialData, loadAuditResults } = useAuditStore();
+  const { currentTarget, audits, findings, getFindingsForTarget, setCurrentTarget, setLastActiveScId, fetchInitialData, loadAuditResults, addTarget } = useAuditStore();
 
   useEffect(() => {
     fetchInitialData();
@@ -33,6 +45,7 @@ export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [editingFinding, setEditingFinding] = useState();
 
+  const [selectedUser, setSelectedUser] = useState(null);
   const [selectedDomain, setSelectedDomain] = useState(null);
 
   // Resume progress when target changes
@@ -111,12 +124,33 @@ export default function App() {
 
   const SEVERITY_ORDER = { 'Critical': 4, 'Serious': 3, 'Moderate': 2, 'Minor': 1 };
 
-  // Determine findings to show in sidebar
+  // Determine findings to show in sidebar - only when a specific audit is selected
   let targetFindings = currentTarget
-    ? findings.filter(f => f.auditId === currentTarget.id || f.url === currentTarget.url)
-    : selectedDomain
-      ? findings.filter(f => (f.domain === selectedDomain) || (getHostname(f.url) === selectedDomain))
-      : findings;
+    ? findings.filter(f => {
+      const fAuditId = (f.auditId || f.auditid || '').toString().toLowerCase();
+      const tId = (currentTarget.id || '').toString().toLowerCase();
+      return fAuditId === tId;
+    })
+    : [];
+
+  // Debug logging
+  console.log('[App] Current target:', currentTarget?.id);
+  console.log('[App] Total findings in store:', findings.length);
+  console.log('[App] Findings for current target:', targetFindings.length);
+  if (findings.length > 0) {
+    console.log('[App] Sample finding auditId:', findings[0]?.auditId);
+    console.log('[App] All finding auditIds:', findings.map(f => f.auditId));
+  }
+
+  // Log when findings or currentTarget changes
+  useEffect(() => {
+    console.log('[App useEffect] Findings changed. Total:', findings.length);
+    console.log('[App useEffect] Current target:', currentTarget?.id);
+    if (currentTarget) {
+      const targetSpecificFindings = findings.filter(f => f.auditId === currentTarget.id);
+      console.log('[App useEffect] Findings for current target:', targetSpecificFindings.length);
+    }
+  }, [findings, currentTarget]);
 
   targetFindings = targetFindings.sort((a, b) => {
     return (SEVERITY_ORDER[b.severity] || 0) - (SEVERITY_ORDER[a.severity] || 0);
@@ -124,9 +158,7 @@ export default function App() {
 
   const sidebarTitle = currentTarget
     ? "Findings on this page"
-    : selectedDomain
-      ? `Findings on ${selectedDomain}`
-      : "All Findings";
+    : "Findings";
 
   const progress = currentTarget ? audits[currentTarget.id] : null;
 
@@ -230,23 +262,32 @@ export default function App() {
             {viewMode === 'audit' && (
               <>
                 {!currentTarget && (
-                  <>
-                    <TargetSelector
-                      selectedDomain={selectedDomain}
-                      onSelectDomain={handleSelectDomain}
-                    />
-                    <div className="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
-                      <h2 className="text-lg font-semibold text-blue-900 mb-2">
-                        Welcome to WCAG Accessibility Auditing Tool
-                      </h2>
-                      <ul className="list-disc list-inside text-sm text-slate-700 space-y-1">
-                        <li>Create an audit target</li>
-                        <li>Review each WCAG success criterion</li>
-                        <li>Record findings with evidence</li>
-                        <li>Generate compliance reports</li>
-                      </ul>
-                    </div>
-                  </>
+                  <div className="max-w-6xl mx-auto px-4">
+                    {!selectedUser ? (
+                      <UserSelection onSelectUser={setSelectedUser} />
+                    ) : (
+                      <UserWebsiteList
+                        selectedUser={selectedUser}
+                        onBack={() => setSelectedUser(null)}
+                        onSelectWebsite={async (site, auditId) => {
+                          const target = {
+                            name: site.page_name || getHostname(site.page_url),
+                            url: site.page_url,
+                            compliance_score_id: site.compliance_score_id
+                          };
+
+                          const targetId = await addTarget(target, auditId);
+                          if (targetId) {
+                            setCurrentTarget({
+                              id: targetId,
+                              name: target.name,
+                              url: target.url
+                            });
+                          }
+                        }}
+                      />
+                    )}
+                  </div>
                 )}
 
                 {currentTarget && !currentSC && (
@@ -309,23 +350,46 @@ export default function App() {
               />
             )}
 
+
             {viewMode === 'report' && (
               <div className="pb-12">
                 {!currentTarget ? (
-                  <>
-                    <TargetSelector
-                      selectedDomain={selectedDomain}
-                      onSelectDomain={handleSelectDomain}
-                    />
-                    <div className="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-lg text-center">
-                      <h2 className="text-lg font-semibold text-blue-900 mb-2">
-                        View Compliance Reports
-                      </h2>
-                      <p className="text-slate-700">
-                        Select a target above to view its detailed compliance report and charts.
-                      </p>
-                    </div>
-                  </>
+                  <div className="max-w-6xl mx-auto px-4">
+                    {!selectedUser ? (
+                      <UserSelection onSelectUser={setSelectedUser} />
+                    ) : (
+                      <UserWebsiteList
+                        selectedUser={selectedUser}
+                        onBack={() => setSelectedUser(null)}
+                        onSelectWebsite={(site, auditId) => {
+                          if (auditId && auditId !== 'new') {
+                            const selectedAudit = audits[auditId];
+                            if (selectedAudit) {
+                              // Calculate if audit is complete
+                              const auditProgress = audits[selectedAudit.targetId];
+                              const score = calculateComplianceScore(auditProgress);
+
+                              // Relaxed: Allow report generation even if not all SCs are tested
+                              // We can show a warning instead of a hard block
+                              if (score.untested > 0) {
+                                if (!confirm(`This audit is incomplete (${score.untested} criteria pending). Do you want to view the partial report anyway?`)) {
+                                  return;
+                                }
+                              }
+
+                              setCurrentTarget({
+                                id: selectedAudit.targetId,
+                                name: selectedAudit.targetName || site.page_name || site.domain,
+                                url: selectedAudit.targetUrl || site.page_url
+                              });
+                            }
+                          } else {
+                            alert("Please select an existing completed audit from the history list to generate a report.");
+                          }
+                        }}
+                      />
+                    )}
+                  </div>
                 ) : (
                   <>
                     <div className="mb-6 flex justify-end print:hidden">
@@ -338,15 +402,11 @@ export default function App() {
                       </button>
                     </div>
 
-                    {progress ? (
-                      <ComplianceReport progress={progress} findings={targetFindings} />
-                    ) : (
-                      <div className="p-12 text-center bg-slate-50 rounded-xl border border-dashed border-slate-300">
-                        <p className="text-slate-500">
-                          Initializing report data...
-                        </p>
-                      </div>
-                    )}
+                    <ComplianceReport
+                      progress={progress || {}}
+                      findings={targetFindings}
+                      auditedEntity={selectedUser?.display_name || selectedUser?.username || 'Client'}
+                    />
                   </>
                 )}
               </div>
@@ -389,17 +449,17 @@ export default function App() {
                       {finding.description}
                     </p>
                     {finding.domSnippet && (
-                      <div className="mt-2 p-1.5 bg-slate-900 text-slate-100 rounded text-[9px] font-mono truncate">
+                      <div className="mt-2 p-1.5 bg-slate-900 text-slate-100 rounded text-[9px] font-mono whitespace-pre-wrap overflow-x-auto max-h-32">
                         {finding.domSnippet}
                       </div>
                     )}
                     {finding.selector && (
-                      <div className="mt-1 text-[9px] text-indigo-600 font-mono truncate">
+                      <div className="mt-1 text-[9px] text-indigo-600 font-mono break-all">
                         SEL: {finding.selector}
                       </div>
                     )}
                     {finding.notes && (
-                      <p className="mt-1 text-[10px] text-slate-500 italic line-clamp-1">
+                      <p className="mt-1 text-[10px] text-slate-500 italic">
                         Note: {finding.notes}
                       </p>
                     )}
