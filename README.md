@@ -14,59 +14,10 @@ A professional, comprehensive web accessibility auditing tool designed to evalua
 
 ---
 
-## 🛠️ Quick Start (Unified Setup)
 
-The easiest way to run the entire application is using the unified start script.
 
-### 1. Prerequisites
-- **Node.js** (v20+ recommended for Vite 7)
-- **PostgreSQL** (v12+)
 
-### 2. One-Step Execution
-From the project root, run:
-```bash
-./run.sh
-```
-*This script will check your node version, create the database if missing, initialize tables, and start both frontend and backend.*
 
----
-
-## 📂 Project Structure
-
-```text
-Auditor/
-├── backend/            # Express API & Database Logic
-│   ├── routes.js       # Core API logic
-│   └── db.js           # PostgreSQL connection
-├── src/               # React Frontend
-│   ├── hooks/          # useAuditStore (Zustand)
-│   └── components/     # UI Components
-├── database/          # SQL Schema & Seed scripts
-├── run.sh             # Unified startup script
-└── README.md          # You are here
-```
-
----
-
-## 🗄️ Database Setup (Manual)
-
-If you prefer to set up the database manually:
-
-1. **Create Database**:
-   ```sql
-   CREATE DATABASE auditor_db;
-   ```
-2. **Set Password**: (Default in `.env` is `ArmourAI@123`)
-   ```sql
-   ALTER USER postgres WITH PASSWORD 'ArmourAI@123';
-   ```
-3. **Initialize & Seed**:
-   ```bash
-   cd backend
-   npm run setup
-   ```
-
----
 
 ## 🔌 API Endpoints
 
@@ -85,25 +36,6 @@ The backend runs on `http://localhost:3001/api`.
 
 ---
 
-## 🔍 Troubleshooting
-
-### PostgreSQL "Peer authentication failed"
-If you cannot connect, update your `pg_hba.conf` or set the password for the `postgres` user:
-```bash
-sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'ArmourAI@123';"
-```
-
-### Port 3001 or 5173 busy
-```bash
-lsof -ti:3001 | xargs kill -9
-lsof -ti:5173 | xargs kill -9
-```
-
-### Node Version issues
-If Vite fails to start, ensure you are on Node 20+:
-```bash
-source ~/.nvm/nvm.sh && nvm use 20
-```
 
 ---
 
@@ -112,5 +44,3 @@ source ~/.nvm/nvm.sh && nvm use 20
 - [WAI Quick Reference](https://www.w3.org/WAI/WCAG21/quickref/)
 
 ---
-
-**Built with ❤️ for a more accessible web.**
