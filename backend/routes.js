@@ -24,35 +24,74 @@ const asyncHandler = fn => (req, res, next) =>
  * @param {string} page_audit_id - The ID of the audit to update
  */
 async function updateAuditScore(page_audit_id) {
-    // Aggregate results
+    // List of 50 WCAG 2.1 Level A and AA Success Criteria
+    const WCAG_2_1_A_AA = [
+        // Level A (30 SCs)
+        '1.1.1', '1.2.1', '1.2.2', '1.2.3', '1.3.1', '1.3.2', '1.3.3', '1.4.1', '1.4.2',
+        '2.1.1', '2.1.2', '2.1.4', '2.2.1', '2.2.2', '2.3.1', '2.4.1', '2.4.2', '2.4.3', '2.4.4',
+        '2.5.1', '2.5.2', '2.5.3', '2.5.4',
+        '3.1.1', '3.2.1', '3.2.2', '3.3.1', '3.3.2',
+        '4.1.1', '4.1.2',
+        // Level AA (20 SCs)
+        '1.2.4', '1.2.5', '1.3.4', '1.3.5', '1.4.3', '1.4.4', '1.4.5', '1.4.10', '1.4.11', '1.4.12', '1.4.13',
+        '2.4.5', '2.4.6', '2.4.7',
+        '3.1.2', '3.2.3', '3.2.4', '3.3.3', '3.3.4',
+        '4.1.3'
+    ];
+
+    // Aggregate results ONLY for applicable A/AA criteria
     const resultsAgg = await db.query(
         `SELECT 
             result,
             COUNT(*) as count
          FROM page_sc_results
          WHERE page_audit_id = $1
+         AND sc_id = ANY($2::text[])
          GROUP BY result`,
-        [page_audit_id]
+        [page_audit_id, WCAG_2_1_A_AA]
     );
 
     let pass_count = 0;
+    let fail_count = 0;
     let na_count = 0;
+    let pending_count = 0;
 
     resultsAgg.rows.forEach(row => {
         switch (row.result) {
             case 'pass': pass_count = parseInt(row.count); break;
+            case 'fail': fail_count = parseInt(row.count); break;
             case 'na': na_count = parseInt(row.count); break;
+            case 'pending': pending_count = parseInt(row.count); break;
         }
     });
 
-    // We use 78 total SCs for WCAG 2.1 AA
-    const TOTAL_SCS = 78;
+    const TOTAL_SCS = 50;
     const applicable = TOTAL_SCS - na_count;
     const score = applicable > 0 ? Math.round((pass_count / applicable) * 100) : 0;
 
+    // Determine audit status:
+    // 'completed' if all A/AA success criteria are either pass, fail, or na (no pending)
+    // AND we have reviewed 50 items (or more, though with filter it should be max 50)
+    // 'in_progress' otherwise
+    const total_reviewed = pass_count + fail_count + na_count;
+
+    // Logic: If we have accounted for all 50 items and none are pending
+    const audit_status = (total_reviewed >= TOTAL_SCS && pending_count === 0) ? 'completed' : 'in_progress';
+
+    console.log(`[updateAuditScore] Audit ${page_audit_id}:`, {
+        pass: pass_count,
+        fail: fail_count,
+        na: na_count,
+        pending: pending_count,
+        total_reviewed,
+        TOTAL_SCS,
+        score,
+        audit_status
+    });
+
     await db.query(
-        `UPDATE page_audits SET score = $1, last_saved_at = now() WHERE page_audit_id = $2`,
-        [score, page_audit_id]
+        `UPDATE page_audits SET score = $1, status = $2, last_saved_at = now() WHERE page_audit_id = $3`,
+        [score, audit_status, page_audit_id]
     );
 
     return score;
@@ -286,6 +325,122 @@ router.post('/audits/:page_audit_id/sync-automated', asyncHandler(async (req, re
         success: true,
         message: 'Automated checks synchronized successfully',
         syncedCount: syncResults.length
+    });
+}));
+
+/**
+ * @route   POST /api/audits/:page_audit_id/sync-automated/:scId
+ * @desc    Synchronize automated checks for a SPECIFIC Success Criterion.
+ *          Clears existing manual results and findings for this SC first.
+ */
+router.post('/audits/:page_audit_id/sync-automated/:scId', asyncHandler(async (req, res) => {
+    const { page_audit_id, scId } = req.params;
+
+    console.log(`[DEBUG] Targeted sync for Audit: ${page_audit_id}, SC: ${scId}`);
+
+    // 1. Get audit and page details
+    const auditResult = await db.query(
+        `SELECT pa.*, p.page_id FROM page_audits pa JOIN pages p ON pa.page_id = p.page_id WHERE pa.page_audit_id = $1`,
+        [page_audit_id]
+    );
+
+    if (auditResult.rows.length === 0) return res.status(404).json({ error: 'Audit not found' });
+    const { page_id, compliance_score_id } = auditResult.rows[0];
+
+    // 2. Clear manual data for this SC
+    // a) Delete findings associated with this SC result
+    await db.query(
+        `DELETE FROM findings WHERE result_id IN (
+            SELECT result_id FROM page_sc_results WHERE page_audit_id = $1 AND sc_id = $2
+        )`,
+        [page_audit_id, scId]
+    );
+
+    // b) Delete the SC result record itself to force a fresh sync
+    await db.query(
+        `DELETE FROM page_sc_results WHERE page_audit_id = $1 AND sc_id = $2`,
+        [page_audit_id, scId]
+    );
+
+    // 3. Fetch compliance data
+    let complianceResult;
+    if (compliance_score_id) {
+        complianceResult = await db.query(`SELECT * FROM compliance_scores WHERE id = $1`, [compliance_score_id]);
+    } else {
+        complianceResult = await db.query(
+            `SELECT * FROM compliance_scores WHERE page_id = $1 ORDER BY created_at DESC LIMIT 1`,
+            [page_id]
+        );
+    }
+
+    if (complianceResult.rows.length === 0) return res.status(404).json({ error: 'No automated scan results found' });
+
+    const scanData = complianceResult.rows[0].audit_results;
+    const summaryTables = scanData.summaryTables || {};
+    const violationRuleIds = new Set((summaryTables.violations?.rows || []).map(r => r.ruleId));
+    const passRuleIds = new Set((summaryTables.passes?.rows || []).map(r => r.ruleId));
+    const inapplicableRuleIds = new Set((summaryTables.inapplicable?.rows || []).map(r => r.ruleId));
+
+    // 4. Determine automated results for this SC
+    const conditionsResult = await db.query(
+        `SELECT * FROM reference_sc_conditions WHERE sc_id = $1 AND is_active = TRUE`,
+        [scId]
+    );
+    const conditions = conditionsResult.rows;
+
+    const checked_conditions = {};
+    let sc_status = 'pending';
+    let hasFail = false;
+    let allPassOrNA = true;
+    let hasManual = false;
+
+    conditions.forEach(cond => {
+        let status = 'pending';
+        const tag = cond.condition_type;
+
+        if (tag === 'axe-core' && cond.axe_rule_id) {
+            const rules = cond.axe_rule_id.split(',').map(r => r.trim());
+            let ruleFail = false, rulePass = false, ruleInapplicable = false;
+
+            rules.forEach(rule => {
+                if (violationRuleIds.has(rule)) ruleFail = true;
+                else if (passRuleIds.has(rule)) rulePass = true;
+                else if (inapplicableRuleIds.has(rule)) ruleInapplicable = true;
+            });
+
+            if (ruleFail) { status = 'fail'; hasFail = true; }
+            else if (rulePass) { status = 'pass'; }
+            else if (ruleInapplicable) { status = 'na'; }
+        } else if (tag === 'manual') {
+            hasManual = true;
+        }
+
+        if (status === 'pending') allPassOrNA = false;
+        checked_conditions[cond.condition_text] = { status, tag };
+    });
+
+    if (hasFail) sc_status = 'fail';
+    else if (allPassOrNA && !hasManual) {
+        const statuses = Object.values(checked_conditions).map(c => c.status);
+        if (statuses.includes('pass')) sc_status = 'pass';
+        else if (statuses.every(s => s === 'na')) sc_status = 'na';
+        else sc_status = 'pass';
+    }
+
+    // 5. Insert new automated result
+    await db.query(
+        `INSERT INTO page_sc_results (page_audit_id, sc_id, result, checked_conditions, reviewed_at)
+         VALUES ($1, $2, $3, $4, now())`,
+        [page_audit_id, scId, sc_status, JSON.stringify(checked_conditions)]
+    );
+
+    // 6. Update audit score
+    await updateAuditScore(page_audit_id);
+
+    res.json({
+        success: true,
+        message: `Automated checks for ${scId} synchronized successfully`,
+        status: sc_status
     });
 }));
 
@@ -1569,6 +1724,33 @@ router.get('/compliance-scores/page/:page_id', asyncHandler(async (req, res) => 
 }));
 
 /**
+ * @route   GET /api/compliance-scores/recent
+ * @desc    Fetch the most recent compliance scores with page details.
+ * @returns {array} Array of recent compliance score objects
+ * @access  Public
+ */
+router.get('/compliance-scores/recent', asyncHandler(async (req, res) => {
+    console.log('[DEBUG] HIT /compliance-scores/recent');
+    const result = await db.query(
+        `SELECT 
+            cs.*,
+            cs.user_id,
+            p.domain,
+            p.page_url,
+            p.page_name,
+            u.username as auditor_name,
+            u.display_name as auditor_display_name
+         FROM compliance_scores cs
+         JOIN pages p ON cs.page_id = p.page_id
+         LEFT JOIN users u ON cs.user_id::text = u.id::text
+         ORDER BY cs.created_at DESC
+         LIMIT 6`
+    );
+
+    res.json(result.rows);
+}));
+
+/**
  * @route   GET /api/compliance-scores/:id
  * @desc    Fetch a single compliance score by its ID.
  *          Includes full audit_results JSONB data.
@@ -1578,6 +1760,13 @@ router.get('/compliance-scores/page/:page_id', asyncHandler(async (req, res) => 
  */
 router.get('/compliance-scores/:id', asyncHandler(async (req, res) => {
     const { id } = req.params;
+
+    // Explicitly check if ID is numeric to avoid 500 error when other routes might hit this
+    if (isNaN(parseInt(id))) {
+        return res.status(400).json({ error: 'Invalid compliance score ID' });
+    }
+
+    console.log('[DEBUG] HIT /compliance-scores/:id with ID:', id);
 
     const result = await db.query(
         `SELECT 
@@ -1609,7 +1798,31 @@ router.get('/compliance-scores/:id', asyncHandler(async (req, res) => {
  * @desc    Fetch all users from the shared WCAG database.
  */
 router.get('/users', asyncHandler(async (req, res) => {
-    const result = await db.query("SELECT id, username, email, role, display_name FROM users WHERE role = 'user' ORDER BY username ASC");
+    const result = await db.query("SELECT id, username, email, role, display_name FROM users ORDER BY username ASC");
+    res.json(result.rows);
+}));
+
+/**
+ * @route   GET /api/users/stats
+ * @desc    Fetch audit statistics for each user.
+ */
+router.get('/users/stats', asyncHandler(async (req, res) => {
+    const result = await db.query(`
+        SELECT 
+            u.id, 
+            u.username, 
+            u.email, 
+            u.display_name,
+            COUNT(DISTINCT cs.id) as total_tests,
+            COUNT(DISTINCT CASE WHEN pa.page_audit_id IS NULL AND cs.id IS NOT NULL THEN cs.id END) as not_started,
+            COUNT(DISTINCT CASE WHEN pa.status = 'in_progress' THEN pa.page_audit_id END) as in_progress,
+            COUNT(DISTINCT CASE WHEN pa.status = 'completed' THEN pa.page_audit_id END) as finished
+        FROM users u
+        LEFT JOIN compliance_scores cs ON u.id::text = cs.user_id::text
+        LEFT JOIN page_audits pa ON cs.id = pa.compliance_score_id
+        GROUP BY u.id, u.username, u.email, u.display_name
+        ORDER BY u.username ASC
+    `);
     res.json(result.rows);
 }));
 
@@ -1635,7 +1848,11 @@ router.get('/users/:userId/websites', asyncHandler(async (req, res) => {
             (SELECT page_audit_id 
              FROM page_audits 
              WHERE compliance_score_id = cs.id 
-             LIMIT 1) as manual_audit_id
+             LIMIT 1) as manual_audit_id,
+            (SELECT status 
+             FROM page_audits 
+             WHERE compliance_score_id = cs.id 
+             LIMIT 1) as manual_audit_status
         FROM compliance_scores cs
         JOIN pages p ON cs.page_id = p.page_id
         WHERE cs.user_id = $1::text OR cs.user_id::text = $1::text

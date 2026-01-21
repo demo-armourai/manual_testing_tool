@@ -21,6 +21,8 @@ export const API = {
     AUDITS: {
         START: `${API_URL}/audits/start`,
         SYNC_AUTOMATED: (id) => `${API_URL}/audits/${id}/sync-automated`,
+        SYNC_AUTOMATED_SC: (id, scId) => `${API_URL}/audits/${id}/sync-automated/${scId}`,
+        SYNC_AUTOMATED_PAGE: (id) => `${API_URL}/audits/${id}/sync-automated-page`,
         LIST: `${API_URL}/audits`,
         UPDATE: (id) => `${API_URL}/audits/${id}`,
         DELETE: (id) => `${API_URL}/audits/${id}`,
@@ -64,11 +66,13 @@ export const API = {
         BY_USER: (userId) => `${API_URL}/compliance-scores/user/${userId}`,
         BY_PAGE: (pageId) => `${API_URL}/compliance-scores/page/${pageId}`,
         BY_ID: (id) => `${API_URL}/compliance-scores/${id}`,
+        RECENT: `${API_URL}/compliance-scores/recent`,
     },
 
     // New User Selection endpoints
     USERS: {
         LIST: `${API_URL}/users`,
+        STATS: `${API_URL}/users/stats`,
         WEBSITES: (userId) => `${API_URL}/users/${userId}/websites`,
     },
 };

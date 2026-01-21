@@ -20,6 +20,7 @@ export function CheckCard({ sc, onOpenFindingForm, onNext, onPrevious, onViewRep
     updateConditionStatus,
     deleteFinding,
     syncAutomatedChecks,
+    syncAutomatedBySC,
     audits,
     currentTarget,
     findings
@@ -192,7 +193,9 @@ export function CheckCard({ sc, onOpenFindingForm, onNext, onPrevious, onViewRep
               onClick={async () => {
                 setSyncing(true);
                 try {
-                  await syncAutomatedChecks(currentTarget.id);
+                  await syncAutomatedBySC(currentTarget.id, sc.id);
+                  // Optional: You might want to reload the specific audit results here
+                  // although the store action already does a reload.
                 } catch (e) {
                   alert("Sync failed: " + e.message);
                 } finally {
@@ -355,24 +358,48 @@ export function CheckCard({ sc, onOpenFindingForm, onNext, onPrevious, onViewRep
           </button>
         )}
 
-        <button
-          onClick={hasNext ? onNext : onViewReport}
-          className={`px-6 py-2.5 rounded-lg font-medium shadow-sm transition-all flex items-center gap-2 ${hasNext
-            ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200'
-            : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-200'
-            }`}
-        >
-          {hasNext ? (
-            'Next Criterion'
-          ) : (
-            <>
-              <FileBarChart className="w-4 h-4" />
-              View Report
-            </>
-          )}
-        </button>
+        {/* Check if all conditions have been verified */}
+        {(() => {
+          const allConditionsVerified = conditions.every(c => {
+            const s = getConditionStatus(c);
+            return s !== null && s !== undefined;
+          });
+          const canProceed = allConditionsVerified && status && status !== 'pending';
+
+          return (
+            <button
+              onClick={() => {
+                if (!canProceed) return;
+                hasNext ? onNext() : onViewReport();
+              }}
+              disabled={!canProceed}
+              title={
+                !allConditionsVerified
+                  ? "Verify all conditions first"
+                  : (!status || status === 'pending')
+                    ? "Select a final status (Pass/Fail/N/A) before proceeding"
+                    : hasNext ? "Next Criterion" : "View Report"
+              }
+              className={`px-6 py-2.5 rounded-lg font-medium shadow-sm transition-all flex items-center gap-2
+                ${!canProceed
+                  ? 'bg-slate-200 text-slate-400 cursor-not-allowed opacity-60'
+                  : hasNext
+                    ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200'
+                    : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-200'
+                }`}
+            >
+              {hasNext ? (
+                'Next Criterion'
+              ) : (
+                <>
+                  <FileBarChart className="w-4 h-4" />
+                  View Report
+                </>
+              )}
+            </button>
+          );
+        })()}
       </div>
     </div>
   );
 }
-
