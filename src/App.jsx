@@ -390,21 +390,13 @@ export default function App() {
                       compliance_score_id: site.compliance_score_id
                     };
 
-                    if (auditId && auditId !== 'new') {
+                    const targetId = await addTarget(target, auditId === 'new' ? null : auditId);
+                    if (targetId) {
                       setCurrentTarget({
-                        id: auditId,
+                        id: targetId,
                         name: target.name,
                         url: target.url
                       });
-                    } else {
-                      const targetId = await addTarget(target, auditId);
-                      if (targetId) {
-                        setCurrentTarget({
-                          id: targetId,
-                          name: target.name,
-                          url: target.url
-                        });
-                      }
                     }
                   }
                 }}

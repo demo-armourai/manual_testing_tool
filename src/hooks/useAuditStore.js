@@ -238,7 +238,25 @@ export const useAuditStore = create()(persist((set, get) => ({
     loadAuditResults: async (targetId) => {
         set({ loading: true });
         try {
-            const results = await apiClient.get(API.RESULTS.BY_AUDIT(targetId));
+            let results = await apiClient.get(API.RESULTS.BY_AUDIT(targetId));
+
+            // NEW: Auto-sync if results are empty and there is a scan to sync from
+            if (results.length === 0) {
+                const target = get().targets.find(t => t.id === targetId);
+                const scoreId = target?.compliance_score_id || get().audits[targetId]?.compliance_score_id;
+
+                if (scoreId) {
+                    console.log(`[loadAuditResults] Results empty but scan exists (${scoreId}), auto-syncing...`);
+                    try {
+                        await apiClient.post(API.AUDITS.SYNC_AUTOMATED(targetId));
+                        // Re-fetch results after sync
+                        results = await apiClient.get(API.RESULTS.BY_AUDIT(targetId));
+                    } catch (syncErr) {
+                        console.error('[loadAuditResults] Auto-sync failed:', syncErr);
+                    }
+                }
+            }
+
             // Fetch all findings for this audit in one request
             const allFindingsData = await apiClient.get(API.FINDINGS.BY_AUDIT(targetId));
 
@@ -473,8 +491,8 @@ export const useAuditStore = create()(persist((set, get) => ({
                 ...audit?.checks,
                 [scId]: {
                     ...existingCheck,
-                    // Preserve existing status - don't auto-infer
-                    status: existingCheck.status || 'pending',
+                    // Reset status to pending whenever conditions change to force re-verification
+                    status: 'pending',
                     checkedConditions: updatedConditions
                 }
             },

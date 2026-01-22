@@ -98,82 +98,11 @@ async function updateAuditScore(page_audit_id) {
 }
 
 /**
- * ============================================================================
- * AUDIT MANAGEMENT ROUTES
- * ============================================================================
+ * Synchronize automated checks from a compliance scan into the audit results.
+ * @param {string} page_audit_id - The ID of the audit to sync
+ * @returns {Promise<object>} Results summary
  */
-
-/**
- * @route   POST /api/audits/start
- * @desc    Start a new audit for a page or resume an existing incomplete one.
- *          Upserts the page into the 'pages' table and inserts/retrieves the audit in 'page_audits'.
- * @body    {string} domain - The domain of the page being audited
- * @body    {string} page_url - The full URL of the page
- * @body    {string} page_name - Human-readable name for the page
- * @returns {object} { page_audit_id, page_id, message? }
- * @access  Public
- */
-router.post('/audits/start', asyncHandler(async (req, res) => {
-    const { domain, page_url, page_name, audited_by, compliance_score_id } = req.body;
-
-    // Validate required fields
-    if (!domain || !page_url) {
-        return res.status(400).json({ error: 'Domain and page_url are required' });
-    }
-
-    // Upsert Page - Insert new or update timestamp if exists
-    let pageResult = await db.query(
-        `INSERT INTO pages (domain, page_url, page_name) 
-         VALUES ($1, $2, $3) 
-         ON CONFLICT (domain, page_url) DO UPDATE SET updated_at = now() 
-         RETURNING page_id`,
-        [domain, page_url, page_name]
-    );
-    const page_id = pageResult.rows[0].page_id;
-
-    // Insert or Retrieve Audit specifically for this compliance_score_id
-    let auditResult;
-    if (compliance_score_id) {
-        auditResult = await db.query(
-            `SELECT page_audit_id FROM page_audits WHERE page_id = $1 AND compliance_score_id = $2 LIMIT 1`,
-            [page_id, compliance_score_id]
-        );
-    } else {
-        // Fallback for legacy audits without score association
-        auditResult = await db.query(
-            `SELECT page_audit_id FROM page_audits WHERE page_id = $1 AND compliance_score_id IS NULL LIMIT 1`,
-            [page_id]
-        );
-    }
-
-    let page_audit_id;
-
-    if (auditResult.rows.length > 0) {
-        page_audit_id = auditResult.rows[0].page_audit_id;
-    } else {
-        let newAudit = await db.query(
-            `INSERT INTO page_audits (page_id, status, audited_by, started_at, compliance_score_id) 
-             VALUES ($1, 'in_progress', $2, now(), $3) 
-             RETURNING page_audit_id`,
-            [page_id, audited_by, compliance_score_id]
-        );
-        page_audit_id = newAudit.rows[0].page_audit_id;
-    }
-
-    res.json({
-        page_audit_id,
-        page_id
-    });
-}));
-
-/**
- * @route   POST /api/audits/:page_audit_id/sync-automated
- * @desc    Synchronize automated checks from the latest WCAG scan results.
- *          Fetches results from compliance_scores and updates page_sc_results.
- */
-router.post('/audits/:page_audit_id/sync-automated', asyncHandler(async (req, res) => {
-    const { page_audit_id } = req.params;
-
+async function syncAuditAutomatedResults(page_audit_id) {
     // 1. Get audit and page details
     const auditResult = await db.query(
         `SELECT pa.*, p.page_url, p.page_id 
@@ -184,7 +113,7 @@ router.post('/audits/:page_audit_id/sync-automated', asyncHandler(async (req, re
     );
 
     if (auditResult.rows.length === 0) {
-        return res.status(404).json({ error: 'Audit not found' });
+        throw new Error('Audit not found');
     }
 
     const { page_id, compliance_score_id } = auditResult.rows[0];
@@ -207,7 +136,7 @@ router.post('/audits/:page_audit_id/sync-automated', asyncHandler(async (req, re
     }
 
     if (complianceResult.rows.length === 0) {
-        return res.status(404).json({ error: 'No automated scan results found' });
+        return { success: false, message: 'No automated scan results found' };
     }
 
     const scanData = complianceResult.rows[0].audit_results;
@@ -321,12 +250,118 @@ router.post('/audits/:page_audit_id/sync-automated', asyncHandler(async (req, re
     // 7. Update audit score
     await updateAuditScore(page_audit_id);
 
-    res.json({
+    return {
         success: true,
         message: 'Automated checks synchronized successfully',
         syncedCount: syncResults.length
+    };
+}
+
+/**
+ * ============================================================================
+ * AUDIT MANAGEMENT ROUTES
+ * ============================================================================
+ */
+
+/**
+ * @route   POST /api/audits/start
+ * @desc    Start a new audit for a page or resume an existing incomplete one.
+ *          Upserts the page into the 'pages' table and inserts/retrieves the audit in 'page_audits'.
+ * @body    {string} domain - The domain of the page being audited
+ * @body    {string} page_url - The full URL of the page
+ * @body    {string} page_name - Human-readable name for the page
+ * @returns {object} { page_audit_id, page_id, message? }
+ * @access  Public
+ */
+router.post('/audits/start', asyncHandler(async (req, res) => {
+    const { domain, page_url, page_name, audited_by, compliance_score_id } = req.body;
+
+    // Validate required fields
+    if (!domain || !page_url) {
+        return res.status(400).json({ error: 'Domain and page_url are required' });
+    }
+
+    // Upsert Page - Insert new or update timestamp if exists
+    let pageResult = await db.query(
+        `INSERT INTO pages (domain, page_url, page_name) 
+         VALUES ($1, $2, $3) 
+         ON CONFLICT (domain, page_url) DO UPDATE SET updated_at = now() 
+         RETURNING page_id`,
+        [domain, page_url, page_name]
+    );
+    const page_id = pageResult.rows[0].page_id;
+
+    // Insert or Retrieve Audit specifically for this compliance_score_id
+    let auditResult;
+    if (compliance_score_id) {
+        auditResult = await db.query(
+            `SELECT page_audit_id FROM page_audits WHERE page_id = $1 AND compliance_score_id = $2 LIMIT 1`,
+            [page_id, compliance_score_id]
+        );
+    } else {
+        // Fallback for legacy audits without score association
+        auditResult = await db.query(
+            `SELECT page_audit_id FROM page_audits WHERE page_id = $1 AND compliance_score_id IS NULL LIMIT 1`,
+            [page_id]
+        );
+    }
+
+    let page_audit_id;
+
+    if (auditResult.rows.length > 0) {
+        page_audit_id = auditResult.rows[0].page_audit_id;
+
+        // NEW: Even if audit exists, if it has no results yet, try to auto-sync
+        if (compliance_score_id) {
+            try {
+                const resultsCheck = await db.query(
+                    'SELECT 1 FROM page_sc_results WHERE page_audit_id = $1 LIMIT 1',
+                    [page_audit_id]
+                );
+                if (resultsCheck.rows.length === 0) {
+                    console.log(`[POST /audits/start] Auto-syncing existing audit with no results: ${page_audit_id}`);
+                    await syncAuditAutomatedResults(page_audit_id);
+                }
+            } catch (syncErr) {
+                console.error('[POST /audits/start] Auto-sync (resume) failed:', syncErr);
+            }
+        }
+    } else {
+        let newAudit = await db.query(
+            `INSERT INTO page_audits (page_id, status, audited_by, started_at, compliance_score_id) 
+             VALUES ($1, 'in_progress', $2, now(), $3) 
+             RETURNING page_audit_id`,
+            [page_id, audited_by, compliance_score_id]
+        );
+        page_audit_id = newAudit.rows[0].page_audit_id;
+
+        // Automatically sync automated results if starting a new audit linked to a scan
+        if (compliance_score_id) {
+            try {
+                await syncAuditAutomatedResults(page_audit_id);
+            } catch (err) {
+                console.error('[POST /audits/start] Auto-sync (new) failed:', err);
+            }
+        }
+    }
+
+    res.json({
+        page_audit_id,
+        page_id
     });
 }));
+
+/**
+ * @route   POST /api/audits/:page_audit_id/sync-automated
+ * @desc    Synchronize automated checks from the latest WCAG scan results.
+ *          Fetches results from compliance_scores and updates page_sc_results.
+ */
+router.post('/audits/:page_audit_id/sync-automated', asyncHandler(async (req, res) => {
+    const { page_audit_id } = req.params;
+    const result = await syncAuditAutomatedResults(page_audit_id);
+    res.json(result);
+}));
+
 
 /**
  * @route   POST /api/audits/:page_audit_id/sync-automated/:scId
@@ -1739,7 +1774,15 @@ router.get('/compliance-scores/recent', asyncHandler(async (req, res) => {
             p.page_url,
             p.page_name,
             u.username as auditor_name,
-            u.display_name as auditor_display_name
+            u.display_name as auditor_display_name,
+            (SELECT page_audit_id 
+             FROM page_audits 
+             WHERE compliance_score_id = cs.id 
+             LIMIT 1) as audit_id,
+            (SELECT status 
+             FROM page_audits 
+             WHERE compliance_score_id = cs.id 
+             LIMIT 1) as status
          FROM compliance_scores cs
          JOIN pages p ON cs.page_id = p.page_id
          LEFT JOIN users u ON cs.user_id::text = u.id::text

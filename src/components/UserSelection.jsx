@@ -59,7 +59,7 @@ export const UserSelection = ({ onSelectUser }) => {
                     Select a User
                 </h2>
                 <p className="text-slate-500 text-sm sm:text-lg">
-                    Choose a user to view their audited websites and start a manual audit.
+                    Choose a user to view report
                 </p>
             </div>
 

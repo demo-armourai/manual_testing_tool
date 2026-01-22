@@ -87,10 +87,6 @@ export function CheckCard({ sc, onOpenFindingForm, onNext, onPrevious, onViewRep
     if (stored !== undefined && stored !== null) {
       return typeof stored === 'object' ? stored.status : stored;
     }
-    // Automated checks default to 'pass'
-    if (autoChecks.includes(condition)) {
-      return 'pass';
-    }
     return null;
   };
 
