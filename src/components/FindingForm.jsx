@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, ChevronDown } from 'lucide-react';
 import { wcagChecklist, getSCById } from '../utils/wcag-loader';
 import { useAuditStore } from '../hooks/useAuditStore';
-export function FindingForm({ prefillScId, editingFinding, onClose }) {
+export function FindingForm({ prefillScId, prefillCondition, editingFinding, onClose }) {
   const { addFinding, updateFinding, progress, audits, currentTarget, error, loading } = useAuditStore();
   const [selectedSCs, setSelectedSCs] = useState(editingFinding?.scIds || (prefillScId ? [prefillScId] : []));
   const [severity, setSeverity] = useState(editingFinding?.severity ||
@@ -17,8 +17,10 @@ export function FindingForm({ prefillScId, editingFinding, onClose }) {
   const [role, setRole] = useState(editingFinding?.role || '');
   const [domSnippet, setDomSnippet] = useState(editingFinding?.domSnippet || editingFinding?.htmlSnippet || editingFinding?.html_snippet || '');
   const [notes, setNotes] = useState(editingFinding?.notes || '');
+  const [condition, setCondition] = useState(editingFinding?.condition || prefillCondition || '');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  // Pre-fill template description if a SC is selected
+
+  // Pre-fill template description/condition
   useEffect(() => {
     if (prefillScId && !editingFinding) {
       // 1. Auto-fill URL and Page from current target if available
@@ -27,8 +29,12 @@ export function FindingForm({ prefillScId, editingFinding, onClose }) {
         if (!page) setPage(currentTarget.name);
       }
 
-      // 2. Auto-generate description from failed conditions
-      if (!description && currentTarget) {
+      // 2. Auto-generate description from condition if provided
+      if (prefillCondition && !description) {
+        setDescription(`Accessibility barrier identified: ${prefillCondition}`);
+      }
+      // 3. Fallback: Auto-generate description from failed conditions
+      else if (!description && currentTarget) {
         const currentAudit = audits[currentTarget.id];
         const checkState = currentAudit?.checks?.[prefillScId];
         const storedConditions = checkState?.checkedConditions || {};
@@ -56,7 +62,7 @@ export function FindingForm({ prefillScId, editingFinding, onClose }) {
         }
       }
     }
-  }, [prefillScId, editingFinding, description, currentTarget, audits, url, page]);
+  }, [prefillScId, editingFinding, description, currentTarget, audits, url, page, prefillCondition]);
   const isFormValid =
     selectedSCs.length > 0 &&
     !!severity &&
@@ -83,6 +89,7 @@ export function FindingForm({ prefillScId, editingFinding, onClose }) {
       domSnippet,
       cssSelector,
       notes,
+      condition,
       status: 'open',
     };
     if (editingFinding) {

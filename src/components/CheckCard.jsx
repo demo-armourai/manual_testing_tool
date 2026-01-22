@@ -166,7 +166,7 @@ export function CheckCard({ sc, onOpenFindingForm, onNext, onPrevious, onViewRep
                 rel="noopener noreferrer"
                 className="ml-2 text-slate-400 hover:text-indigo-600"
               >
-                <ExternalLink className="w-4 h-4" />
+                {/* <ExternalLink className="w-4 h-4" /> */}
               </a>
             </div>
             <h2 className="text-2xl font-bold text-slate-900 mb-2 leading-tight">
@@ -255,6 +255,27 @@ export function CheckCard({ sc, onOpenFindingForm, onNext, onPrevious, onViewRep
                   </div>
 
                   <div className="flex items-center gap-2 flex-shrink-0">
+                    {/* Finding Button for specific condition failure */}
+                    {status === 'fail' && (
+                      <button
+                        onClick={() => {
+                          const existingFinding = findings.find(f =>
+                            f.auditId === currentTarget?.id &&
+                            f.scIds?.includes(sc.id) &&
+                            f.condition === condition // Check if finding exists for this condition
+                          );
+                          onOpenFindingForm(sc.id, existingFinding, condition);
+                        }}
+                        title={findings.some(f => f.scIds?.includes(sc.id) && f.condition === condition) ? "Edit Finding" : "Add Finding"}
+                        className={`p-1.5 rounded-md border transition-all ${findings.some(f => f.scIds?.includes(sc.id) && f.condition === condition)
+                          ? 'bg-rose-100 border-rose-500 text-rose-700'
+                          : 'bg-white border-slate-200 text-slate-300 hover:border-rose-300 hover:text-rose-400'
+                          }`}
+                      >
+                        <FileBarChart className="w-5 h-5" />
+                      </button>
+                    )}
+
                     <button
                       onClick={() => handleConditionStatusChange(condition, 'pass')}
                       title="Pass"

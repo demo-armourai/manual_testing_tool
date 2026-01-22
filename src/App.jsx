@@ -60,6 +60,7 @@ export default function App() {
   const [selectedSCId, setSelectedSCId] = useState(null);
   const [showFindingForm, setShowFindingForm] = useState(false);
   const [findingFormScId, setFindingFormScId] = useState();
+  const [findingFormCondition, setFindingFormCondition] = useState();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [editingFinding, setEditingFinding] = useState();
   const [viewedReportOnce, setViewedReportOnce] = useState(false);
@@ -136,9 +137,10 @@ export default function App() {
     }
   };
 
-  const handleOpenFindingForm = (scId, finding = undefined) => {
+  const handleOpenFindingForm = (scId, finding = undefined, condition = undefined) => {
     setEditingFinding(finding);
     setFindingFormScId(scId);
+    setFindingFormCondition(condition);
     setShowFindingForm(true);
   };
 
@@ -160,7 +162,7 @@ export default function App() {
 
   // Determine findings to show in sidebar - only when a specific audit is selected
   let targetFindings = currentTarget
-    ? findings.filter(f => {
+    ? (findings || []).filter(f => {
       const fAuditId = (f.auditId || f.auditid || '').toString().toLowerCase();
       const tId = (currentTarget.id || '').toString().toLowerCase();
       return fAuditId === tId;
@@ -169,19 +171,19 @@ export default function App() {
 
   // Debug logging
   console.log('[App] Current target:', currentTarget?.id);
-  console.log('[App] Total findings in store:', findings.length);
-  console.log('[App] Findings for current target:', targetFindings.length);
-  if (findings.length > 0) {
+  console.log('[App] Total findings in store:', findings?.length || 0);
+  console.log('[App] Findings for current target:', targetFindings?.length || 0);
+  if (findings && findings.length > 0) {
     console.log('[App] Sample finding auditId:', findings[0]?.auditId);
-    console.log('[App] All finding auditIds:', findings.map(f => f.auditId));
+    console.log('[App] All finding auditIds:', findings.map(f => f?.auditId));
   }
 
   // Log when findings or currentTarget changes
   useEffect(() => {
-    console.log('[App useEffect] Findings changed. Total:', findings.length);
+    console.log('[App useEffect] Findings changed. Total:', findings?.length || 0);
     console.log('[App useEffect] Current target:', currentTarget?.id);
     if (currentTarget) {
-      const targetSpecificFindings = findings.filter(f => f.auditId === currentTarget.id);
+      const targetSpecificFindings = (findings || []).filter(f => f.auditId === currentTarget.id);
       console.log('[App useEffect] Findings for current target:', targetSpecificFindings.length);
     }
   }, [findings, currentTarget]);
@@ -203,7 +205,7 @@ export default function App() {
   const failedCount = complianceScore?.failed || 0;
   const naCount = complianceScore?.na || 0;
   const testedCount = complianceScore?.tested || 0;
-  const totalCount = aaChecklist.length;
+  const totalCount = aaChecklist?.length || 0;
 
   if (!currentUser) {
     return <Login />;
@@ -243,31 +245,24 @@ export default function App() {
                 </div>
               </button>
 
-              {complianceScore && (
-                <div className="hidden lg:flex items-center gap-3 px-4 py-1.5 bg-slate-50 rounded-full border border-slate-200 text-sm">
-                  <span>{testedCount}/{totalCount}</span>
-                  <span className="text-rose-600 font-semibold">{failedCount} Fail</span>
-                  <span className="text-slate-500">{naCount} N/A</span>
-                </div>
-              )}
             </div>
 
             {/* View mode tabs */}
             <div className="flex items-center gap-4">
               <div className="hidden xl:flex bg-slate-100 p-1 rounded-xl border border-slate-200">
-                {['home', 'audit', 'findings', 'report'].map(mode => (
+                {['home', 'audit', 'report'].map(mode => (
                   <button
                     key={mode}
                     onClick={() => setViewMode(mode)}
                     className={`px-5 mx-1 py-2 rounded-lg text-sm font-semibold transition flex items-center
                       ${viewMode === mode
-                        ? 'bg-white text-indigo-600 shadow ring-1 ring-black/5'
+                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-indigo-200 shadow-sm ring-1 ring-black/5'
                         : 'text-slate-600 hover:bg-slate-200'
                       }`}
                   >
                     {mode === 'home' && <HomeIcon className="inline w-4 h-4 mr-1" />}
                     {mode === 'audit' && <CheckSquare className="inline w-4 h-4 mr-1" />}
-                    {mode === 'findings' && <AlertCircle className="inline w-4 h-4 mr-1" />}
+                    {/* {mode === 'findings' && <AlertCircle className="inline w-4 h-4 mr-1" />} */}
                     {mode === 'report' && <FileBarChart className="inline w-4 h-4 mr-1" />}
                     {mode.charAt(0).toUpperCase() + mode.slice(1)}
                   </button>
@@ -470,11 +465,7 @@ export default function App() {
                       </button>
                     </div>
 
-                    <div className="mt-8 p-6 border border-slate-200 rounded-lg text-center">
-                      <p className="text-slate-600">
-                        Select a success criterion from the left panel to begin.
-                      </p>
-                    </div>
+
                   </>
                 )}
 
@@ -769,6 +760,7 @@ export default function App() {
       {showFindingForm && (
         <FindingForm
           prefillScId={findingFormScId}
+          prefillCondition={findingFormCondition}
           editingFinding={editingFinding}
           onClose={() => {
             setShowFindingForm(false);

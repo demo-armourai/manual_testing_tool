@@ -74,7 +74,7 @@ export function FindingsList({ findings, onEditFinding, onAddFinding }) {
     }
   };
 
-  if (findings.length === 0) {
+  if (!findings || findings.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 px-4 bg-slate-50/50 border-2 border-dashed border-slate-200 rounded-[32px] text-center max-w-4xl mx-auto">
         <div className="p-4 bg-white rounded-2xl shadow-sm mb-6">
@@ -140,7 +140,7 @@ export function FindingsList({ findings, onEditFinding, onAddFinding }) {
                   <div>
                     <h4 className="text-xl font-black text-slate-900">{domain}</h4>
                     <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
-                      {Object.keys(pages).length} pages • {Object.values(pages).flat().length} total findings
+                      {Object.keys(pages)?.length || 0} pages • {Object.values(pages)?.flat()?.length || 0} total findings
                     </div>
                   </div>
                 </div>

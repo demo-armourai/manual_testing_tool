@@ -32,7 +32,7 @@ export function ComplianceReport({ progress, findings, auditedEntity }) {
     URL.revokeObjectURL(url);
   };
 
-  console.log('[ComplianceReport] Findings received:', findings.length);
+  console.log('[ComplianceReport] Findings received:', findings?.length || 0);
   console.log('[ComplianceReport] Sample finding:', findings[0]);
 
   const radarData = principleScores.map(ps => ({
@@ -230,7 +230,7 @@ export function ComplianceReport({ progress, findings, auditedEntity }) {
         <h3 className="text-lg font-bold text-gray-900 mb-4">Findings Summary</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="p-4 border border-gray-200 rounded-lg bg-gray-50/50">
-            <div className="text-2xl font-bold text-gray-900 mb-1">{findings.length}</div>
+            <div className="text-2xl font-bold text-gray-900 mb-1">{findings?.length || 0}</div>
             <div className="text-sm text-gray-500 font-medium">Total Findings</div>
           </div>
           <div className="p-4 border border-rose-200 bg-rose-50 rounded-lg">

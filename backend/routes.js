@@ -867,10 +867,10 @@ router.post('/findings', asyncHandler(async (req, res) => {
 
     // Insert the finding
     const result = await db.query(
-        `INSERT INTO findings (result_id, severity, description, selector, html_snippet, notes)
-         VALUES ($1, $2, $3, $4, $5, $6) 
+        `INSERT INTO findings (result_id, severity, description, selector, html_snippet, notes, condition, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
          RETURNING *`,
-        [result_id, severity, description, selector, html_snippet, notes]
+        [result_id, severity, description, selector, htmlSnippet, notes, condition]
     );
 
     res.status(201).json(result.rows[0]);
@@ -1648,6 +1648,7 @@ router.get('/reports/audit/:page_audit_id/json', asyncHandler(async (req, res) =
         selector: f.selector,
         htmlSnippet: f.html_snippet,
         notes: f.notes,
+        condition: f.condition,
         createdAt: f.created_at,
         url: f.url,
         domain: f.domain,
@@ -1766,6 +1767,17 @@ router.get('/compliance-scores/page/:page_id', asyncHandler(async (req, res) => 
  */
 router.get('/compliance-scores/recent', asyncHandler(async (req, res) => {
     console.log('[DEBUG] HIT /compliance-scores/recent');
+
+    // Pagination parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 6;
+    const offset = (page - 1) * limit;
+
+    // Get total count
+    const countResult = await db.query('SELECT COUNT(*) FROM compliance_scores');
+    const total = parseInt(countResult.rows[0].count);
+    const totalPages = Math.ceil(total / limit);
+
     const result = await db.query(
         `SELECT 
             cs.*,
@@ -1787,10 +1799,19 @@ router.get('/compliance-scores/recent', asyncHandler(async (req, res) => {
          JOIN pages p ON cs.page_id = p.page_id
          LEFT JOIN users u ON cs.user_id::text = u.id::text
          ORDER BY cs.created_at DESC
-         LIMIT 6`
+         LIMIT $1 OFFSET $2`,
+        [limit, offset]
     );
 
-    res.json(result.rows);
+    res.json({
+        items: result.rows,
+        meta: {
+            total,
+            page,
+            limit,
+            totalPages
+        }
+    });
 }));
 
 /**
@@ -1850,6 +1871,21 @@ router.get('/users', asyncHandler(async (req, res) => {
  * @desc    Fetch audit statistics for each user.
  */
 router.get('/users/stats', asyncHandler(async (req, res) => {
+    // Pagination parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 6;
+    const offset = (page - 1) * limit;
+    const searchTerm = req.query.search || '';
+
+    // Base query for stats
+    // We strictly follow the request: "users should show based on their recent scan"
+    // So we ORDER BY MAX(cs.created_at) DESC
+
+    // Get total count first (approximate since we group by user)
+    const countResult = await db.query('SELECT COUNT(*) FROM users'); // Simple count of users
+    const total = parseInt(countResult.rows[0].count);
+    const totalPages = Math.ceil(total / limit);
+
     const result = await db.query(`
         SELECT 
             u.id, 
@@ -1859,14 +1895,25 @@ router.get('/users/stats', asyncHandler(async (req, res) => {
             COUNT(DISTINCT cs.id) as total_tests,
             COUNT(DISTINCT CASE WHEN pa.page_audit_id IS NULL AND cs.id IS NOT NULL THEN cs.id END) as not_started,
             COUNT(DISTINCT CASE WHEN pa.status = 'in_progress' THEN pa.page_audit_id END) as in_progress,
-            COUNT(DISTINCT CASE WHEN pa.status = 'completed' THEN pa.page_audit_id END) as finished
+            COUNT(DISTINCT CASE WHEN pa.status = 'completed' THEN pa.page_audit_id END) as finished,
+            MAX(cs.created_at) as last_active
         FROM users u
         LEFT JOIN compliance_scores cs ON u.id::text = cs.user_id::text
         LEFT JOIN page_audits pa ON cs.id = pa.compliance_score_id
         GROUP BY u.id, u.username, u.email, u.display_name
-        ORDER BY u.username ASC
-    `);
-    res.json(result.rows);
+        ORDER BY MAX(cs.created_at) DESC NULLS LAST, u.username ASC
+        LIMIT $1 OFFSET $2
+    `, [limit, offset]);
+
+    res.json({
+        items: result.rows,
+        meta: {
+            total,
+            page,
+            limit,
+            totalPages
+        }
+    });
 }));
 
 /**

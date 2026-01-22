@@ -19,7 +19,9 @@ export const useAuditStore = create()(persist((set, get) => ({
     audits: {}, // { [targetId]: AuditData }
     findings: [],
     recentComplianceChecks: [],
+    recentScansMeta: { page: 1, limit: 6, total: 0, totalPages: 0 },
     userStats: [],
+    userStatsMeta: { page: 1, limit: 6, total: 0, totalPages: 0 },
     currentUser: null,
     loading: false,
     error: null,
@@ -97,6 +99,7 @@ export const useAuditStore = create()(persist((set, get) => ({
                 selector: f.selector,
                 domSnippet: f.html_snippet || f.domSnippet || '',
                 notes: f.notes || '',
+                condition: f.condition || '',
                 scIds: Array.isArray(f.sc_id) ? f.sc_id : [f.sc_id],
                 auditId: f.auditId || f.auditid || f.page_audit_id,
                 createdAt: f.created_at,
@@ -118,7 +121,10 @@ export const useAuditStore = create()(persist((set, get) => ({
             }
 
             // Transform and load recent compliance checks
-            const recentComplianceChecks = recentChecksData.map(item => ({
+            const recentChecksItems = recentChecksData.items || recentChecksData || [];
+            const recentChecksMeta = recentChecksData.meta || { page: 1, limit: 6, total: recentChecksItems.length, totalPages: 1 };
+
+            const recentComplianceChecks = recentChecksItems.map(item => ({
                 id: item.id,
                 compliance_score_id: item.id,
                 page_id: item.page_id,
@@ -135,7 +141,20 @@ export const useAuditStore = create()(persist((set, get) => ({
                 audit_id: item.audit_id
             }));
 
-            set({ targets, audits, findings: allFindings, recentComplianceChecks, userStats: userStatsData, loading: false });
+            // Handle user stats pagination wrapper
+            const userStatsItems = userStatsData.items || userStatsData || [];
+            const userStatsMeta = userStatsData.meta || { page: 1, limit: 6, total: userStatsItems.length, totalPages: 1 };
+
+            set({
+                targets,
+                audits,
+                findings: allFindings,
+                recentComplianceChecks,
+                recentScansMeta: recentChecksMeta,
+                userStats: userStatsItems,
+                userStatsMeta: userStatsMeta,
+                loading: false
+            });
         } catch (error) {
             console.error('Failed to fetch initial data:', error);
             set({ error: error.message, loading: false });
@@ -238,10 +257,10 @@ export const useAuditStore = create()(persist((set, get) => ({
     loadAuditResults: async (targetId) => {
         set({ loading: true });
         try {
-            let results = await apiClient.get(API.RESULTS.BY_AUDIT(targetId));
+            let results = await apiClient.get(API.RESULTS.BY_AUDIT(targetId)) || [];
 
             // NEW: Auto-sync if results are empty and there is a scan to sync from
-            if (results.length === 0) {
+            if (results && results.length === 0) {
                 const target = get().targets.find(t => t.id === targetId);
                 const scoreId = target?.compliance_score_id || get().audits[targetId]?.compliance_score_id;
 
@@ -273,6 +292,7 @@ export const useAuditStore = create()(persist((set, get) => ({
                     selector: f.selector,
                     domSnippet: f.html_snippet || f.domSnippet || '',
                     notes: f.notes || '',
+                    condition: f.condition || '',
                     scIds: Array.isArray(f.sc_id) ? f.sc_id : [f.sc_id],
                     auditId: targetId, // CRITICAL: Use targetId to ensure correct audit association
                     createdAt: f.created_at,
@@ -602,7 +622,8 @@ export const useAuditStore = create()(persist((set, get) => ({
                 description: finding.description,
                 selector: finding.selector || finding.cssSelector || '',
                 html_snippet: finding.domSnippet || '',
-                notes: finding.notes || ''
+                notes: finding.notes || '',
+                condition: finding.condition || ''
             });
 
             const newFinding = {
@@ -640,7 +661,8 @@ export const useAuditStore = create()(persist((set, get) => ({
                 description: updates.description,
                 selector: updates.selector || updates.cssSelector || '',
                 html_snippet: updates.html_snippet || updates.domSnippet || '',
-                notes: updates.notes || ''
+                notes: updates.notes || '',
+                condition: updates.condition || ''
             });
 
             set((state) => ({
@@ -757,12 +779,61 @@ export const useAuditStore = create()(persist((set, get) => ({
         }
     },
 
-    fetchUserStats: async () => {
+    fetchUserStats: async (page = 1, limit = 6, search = '') => {
         try {
-            const userStatsData = await apiClient.get(API.USERS.STATS);
-            set({ userStats: userStatsData });
+            const queryParams = new URLSearchParams({
+                page: page.toString(),
+                limit: limit.toString(),
+                search
+            });
+            const userStatsData = await apiClient.get(`${API.USERS.STATS}?${queryParams}`);
+
+            const items = userStatsData.items || userStatsData || [];
+            const meta = userStatsData.meta || { page, limit, total: items.length, totalPages: 1 };
+
+            set({
+                userStats: items,
+                userStatsMeta: meta
+            });
         } catch (error) {
             console.error('Failed to fetch user stats:', error);
+        }
+    },
+
+    fetchRecentScans: async (page = 1, limit = 6) => {
+        try {
+            const queryParams = new URLSearchParams({
+                page: page.toString(),
+                limit: limit.toString()
+            });
+            const recentChecksData = await apiClient.get(`${API.COMPLIANCE_SCORES.RECENT}?${queryParams}`);
+
+            const items = recentChecksData.items || recentChecksData || [];
+            const meta = recentChecksData.meta || { page, limit, total: items.length, totalPages: 1 };
+
+            const recentComplianceChecks = items.map(item => ({
+                id: item.id,
+                compliance_score_id: item.id,
+                page_id: item.page_id,
+                url: item.page_url,
+                domain: item.domain,
+                page_name: item.page_name,
+                score: item.score,
+                user_id: item.user_id,
+                username: item.auditor_display_name || item.auditor_name || 'System',
+                auditor_name: item.auditor_name,
+                auditor_display_name: item.auditor_display_name,
+                created_at: item.created_at,
+                status: item.status,
+                audit_id: item.audit_id
+            }));
+
+            set({
+                recentComplianceChecks,
+                recentScansMeta: meta
+            });
+        } catch (error) {
+            console.error('Failed to fetch recent scans:', error);
         }
     },
 

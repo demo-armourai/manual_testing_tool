@@ -91,7 +91,7 @@ export function ChecklistSidebar({ selectedSC, onSelectSC, filters }) {
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="font-medium text-xs opacity-70 mb-0.5">
-                                                    {sc.id}
+                                                    {sc.id} ({sc.level})
                                                 </div>
                                                 <div className="truncate text-sm leading-tight">
                                                     {sc.title}

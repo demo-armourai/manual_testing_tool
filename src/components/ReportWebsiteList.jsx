@@ -59,6 +59,11 @@ export const ReportWebsiteList = ({ selectedUser, onBack, onSelectWebsite, selec
 
     const domainList = Object.values(groupedWebsites).sort((a, b) => b.lastScanned - a.lastScanned);
 
+    // Resolve the full domain group from the partial selectedDomain object
+    const activeDomainGroup = selectedDomain
+        ? Object.values(groupedWebsites).find(g => g.domain === (selectedDomain.domain || selectedDomain))
+        : null;
+
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center p-20 bg-white rounded-[40px] border border-slate-100">
@@ -124,19 +129,19 @@ export const ReportWebsiteList = ({ selectedUser, onBack, onSelectWebsite, selec
                     // Page List View for Selected Domain
                     <div className="bg-white border border-slate-200 rounded-[40px] p-8 shadow-sm">
                         <div className="flex flex-col">
-                            {selectedDomain.pages.length === 0 ? (
+                            {(!activeDomainGroup || activeDomainGroup.pages.length === 0) ? (
                                 <div className="text-center py-12">
                                     <p className="text-slate-400 font-bold">No reports found for this domain.</p>
                                 </div>
                             ) : (
-                                selectedDomain.pages.map((site, pIdx) => {
+                                activeDomainGroup.pages.map((site, pIdx) => {
                                     const dateStr = new Date(site.last_scanned_at || site.created_at).toLocaleDateString();
                                     const timeStr = new Date(site.last_scanned_at || site.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
                                     return (
                                         <div
                                             key={pIdx}
-                                            className={`flex items-center justify-between py-6 ${pIdx !== selectedDomain.pages.length - 1 ? 'border-b border-slate-100' : ''}`}
+                                            className={`flex items-center justify-between py-6 ${pIdx !== (activeDomainGroup.pages.length || 0) - 1 ? 'border-b border-slate-100' : ''}`}
                                         >
                                             <div className="flex items-center gap-6 flex-1 min-w-0">
                                                 <div className="w-6 h-6 rounded border border-slate-300 flex-shrink-0"></div>

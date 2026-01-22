@@ -51,10 +51,10 @@ export const UserWebsiteList = ({ selectedUser, onBack, onSelectWebsite, selecte
         // Determine status from backend API response
         let status = 'Not started';
         if (site.manual_audit_status) {
-            status = site.manual_audit_status === 'completed' ? 'Finished' : 'Resume';
+            status = site.manual_audit_status === 'completed' ? 'Finished' : 'Continue Audit';
         } else if (site.manual_audit_id) {
             // Fallback: if there's an audit ID but no status, default to Resume
-            status = 'Resume';
+            status = 'Continue Audit';
         }
 
         acc[rootDomain].pages.push({
@@ -105,21 +105,21 @@ export const UserWebsiteList = ({ selectedUser, onBack, onSelectWebsite, selecte
                         </span>
                     </div>
                 </div>
-                {!selectedDomain && websites.length > 0 && (
+                {!selectedDomain && (websites?.length || 0) > 0 && (
                     <div className="inline-flex self-start sm:self-auto px-4 py-2 bg-indigo-50 rounded-full text-indigo-600 text-xs sm:text-sm font-bold border border-indigo-100">
-                        {domainList.length} Domains • {websites.length} Pages
+                        {(domainList || []).length} Domains • {(websites || []).length} Pages
                     </div>
                 )}
 
                 {selectedDomain && (
                     <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0">
-                        {['all', 'Not started', 'Resume', 'Finished'].map((filter) => (
+                        {['all', 'Not started', 'In progress', 'Finished'].map((filter) => (
                             <button
                                 key={filter}
                                 onClick={() => setStatusFilter(filter)}
                                 className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap border
                                     ${statusFilter === filter
-                                        ? 'bg-cyan-400 text-white border-cyan-400 shadow-lg shadow-cyan-200'
+                                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-indigo-200 shadow-sm'
                                         : 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200 hover:border-slate-300'}`}
                             >
                                 {filter === 'all' ? 'All' : filter}
@@ -147,7 +147,7 @@ export const UserWebsiteList = ({ selectedUser, onBack, onSelectWebsite, selecte
                                         {group.domain}
                                     </h3>
                                     <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
-                                        {group.pages.length} Pages Scanned
+                                        {(group.pages || []).length} Pages Scanned
                                     </div>
                                 </div>
                                 <div className="p-2 bg-slate-100 text-slate-400 rounded-xl group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-all duration-300">
@@ -170,10 +170,11 @@ export const UserWebsiteList = ({ selectedUser, onBack, onSelectWebsite, selecte
                                     const dateStr = new Date(site.last_scanned_at || site.created_at).toLocaleDateString();
                                     const timeStr = new Date(site.last_scanned_at || site.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
+                                    const pageFindingsCount = site.manual_audits?.[0]?.findings?.length || 0;
                                     return (
                                         <div
                                             key={pIdx}
-                                            className={`flex items-center justify-between py-6 ${pIdx !== displayedPages.length - 1 ? 'border-b border-slate-100' : ''}`}
+                                            className={`flex items-center justify-between py-6 ${pIdx !== (displayedPages?.length || 0) - 1 ? 'border-b border-slate-100' : ''}`}
                                         >
                                             <div className="flex items-center gap-6 flex-1 min-w-0">
                                                 <div className="w-6 h-6 rounded border border-slate-300 flex-shrink-0"></div>
@@ -227,7 +228,7 @@ export const UserWebsiteList = ({ selectedUser, onBack, onSelectWebsite, selecte
             </div>
 
             {
-                websites.length === 0 && (
+                (websites || []).length === 0 && (
                     <div className="text-center py-16 sm:py-24 bg-slate-50 rounded-[40px] border border-dashed border-slate-200">
                         <Globe className="w-12 h-12 sm:w-16 sm:h-16 text-slate-200 mx-auto mb-4" />
                         <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">No scans found</h3>
