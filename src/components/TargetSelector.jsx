@@ -172,7 +172,13 @@ export function TargetSelector({ selectedDomain, onSelectDomain }) {
                   onClick={() => handleDomainClick(domain)}
                 >
                   {expandedDomains.has(domain) ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronRight className="w-4 h-4 text-gray-400" />}
-                  <Globe className={`w-4 h-4 ${isDomainSelected ? 'text-indigo-600' : 'text-indigo-500'}`} />
+                  <img
+                    src={`https://www.google.com/s2/favicons?domain=${domain}&sz=64`}
+                    alt=""
+                    className="w-4 h-4 object-contain opacity-80"
+                    onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }}
+                  />
+                  <Globe className="w-4 h-4 text-indigo-500 hidden" />
                   <h4 className={`flex-1 font-semibold text-sm ${isDomainSelected ? 'text-indigo-900' : 'text-gray-800'}`}>{domain}</h4>
                   <span className="text-xs font-medium text-gray-500 bg-white border border-gray-200 px-2 py-0.5 rounded-full">
                     {domainTargets.length} targets
@@ -199,8 +205,14 @@ export function TargetSelector({ selectedDomain, onSelectDomain }) {
                           <div className="flex items-start justify-between">
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2.5 mb-1.5">
-                                {/* Show selection indicator */}
+                                {/* Show selection indicator and Logo */}
                                 <div className={`w-2 h-2 rounded-full ${isSelected ? 'bg-blue-600' : 'bg-gray-200'}`} />
+                                <img
+                                  src={`https://www.google.com/s2/favicons?domain=${new URL(target.url).hostname}&sz=64`}
+                                  alt=""
+                                  className="w-4 h-4 object-contain opacity-80"
+                                  onError={(e) => { e.target.style.display = 'none'; }}
+                                />
                                 <h4 className={`font-medium ${isSelected ? 'text-blue-900' : 'text-gray-900'}`}>{target.name}</h4>
                                 <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-medium uppercase tracking-wide rounded border border-gray-200">
                                   {target.type}

@@ -15,7 +15,7 @@ export function FindingForm({ prefillScId, prefillCondition, editingFinding, onC
   const [viewport, setViewport] = useState(editingFinding?.viewport || '');
   const [device, setDevice] = useState(editingFinding?.device || '');
   const [role, setRole] = useState(editingFinding?.role || '');
-  const [domSnippet, setDomSnippet] = useState(editingFinding?.domSnippet || editingFinding?.htmlSnippet || editingFinding?.html_snippet || '');
+  const [snippets, setSnippets] = useState(editingFinding?.htmlSnippets || (editingFinding?.domSnippet || editingFinding?.htmlSnippet ? [editingFinding.domSnippet || editingFinding.htmlSnippet] : ['']));
   const [notes, setNotes] = useState(editingFinding?.notes || '');
   const [condition, setCondition] = useState(editingFinding?.condition || prefillCondition || '');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -79,6 +79,11 @@ export function FindingForm({ prefillScId, prefillCondition, editingFinding, onC
       const sc = getSCById(id);
       return sc ? `${sc.id} ${sc.title}` : id;
     });
+
+    // Filter out empty snippets
+    const cleanSnippets = snippets.filter(s => s.trim().length > 0);
+    const primarySnippet = cleanSnippets.length > 0 ? cleanSnippets.join('\n\n') : '';
+
     const findingData = {
       scIds: selectedSCs,
       scTitles,
@@ -86,7 +91,9 @@ export function FindingForm({ prefillScId, prefillCondition, editingFinding, onC
       description,
       url,
       page,
-      domSnippet,
+      domSnippet: primarySnippet,
+      htmlSnippet: primarySnippet,
+      htmlSnippets: cleanSnippets,
       cssSelector,
       notes,
       condition,
@@ -99,6 +106,21 @@ export function FindingForm({ prefillScId, prefillCondition, editingFinding, onC
       addFinding(findingData);
     }
     onClose();
+  };
+
+  const handleAddSnippet = () => {
+    setSnippets([...snippets, '']);
+  };
+
+  const handleRemoveSnippet = (index) => {
+    const newSnippets = snippets.filter((_, i) => i !== index);
+    setSnippets(newSnippets.length ? newSnippets : ['']);
+  };
+
+  const handleSnippetChange = (index, value) => {
+    const newSnippets = [...snippets];
+    newSnippets[index] = value;
+    setSnippets(newSnippets);
   };
   const toggleSC = (scId) => {
     setSelectedSCs(prev => prev.includes(scId)
@@ -287,14 +309,37 @@ export function FindingForm({ prefillScId, prefillCondition, editingFinding, onC
 
             {/* Evidence */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">DOM Snippet</label>
-              <textarea
-                value={domSnippet}
-                onChange={(e) => setDomSnippet(e.target.value)}
-                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono text-gray-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-gray-400 resize-none"
-                rows={3}
-                placeholder="<button class='btn'>Click me</button>"
-              />
+              <label className="block text-sm font-semibold text-gray-700 mb-2">DOM Snippets</label>
+              <div className="space-y-3">
+                {snippets.map((snippet, index) => (
+                  <div key={index} className="flex gap-2 items-start">
+                    <textarea
+                      value={snippet}
+                      onChange={(e) => handleSnippetChange(index, e.target.value)}
+                      className="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono text-gray-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-gray-400 resize-none"
+                      rows={3}
+                      placeholder="<button class='btn'>Click me</button>"
+                    />
+                    {snippets.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSnippet(index)}
+                        className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
+                        title="Remove snippet"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={handleAddSnippet}
+                  className="text-sm text-indigo-600 font-medium hover:text-indigo-800 flex items-center gap-1 mt-2"
+                >
+                  + Add another snippet
+                </button>
+              </div>
             </div>
 
             <div>

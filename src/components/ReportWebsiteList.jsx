@@ -104,23 +104,38 @@ export const ReportWebsiteList = ({ selectedUser, onBack, onSelectWebsite, selec
             <div className="flex flex-col gap-6">
                 {!selectedDomain ? (
                     // Domain List View
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {domainList.map((group, idx) => (
                             <div
                                 key={idx}
                                 onClick={() => setSelectedDomain(group)}
-                                className="group relative bg-white border border-slate-200 rounded-[32px] p-8 shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-200 transition-all cursor-pointer flex flex-col items-center text-center gap-4"
+                                className="group bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all cursor-pointer flex items-center justify-between gap-4"
                             >
-                                <div className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500">
-                                    <Globe className="w-8 h-8" />
-                                </div>
-                                <div>
-                                    <h3 className="text-xl font-black text-slate-900 group-hover:text-emerald-600 transition-colors mb-1">
-                                        {group.domain}
-                                    </h3>
-                                    <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                                        {group.pages.length} Reports Available
+                                <div className="flex items-center gap-4 min-w-0">
+                                    <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                        <img
+                                            src={`https://www.google.com/s2/favicons?domain=${group.domain}&sz=64`}
+                                            alt={`${group.domain} logo`}
+                                            className="w-6 h-6 object-contain opacity-90 mix-blend-multiply"
+                                            onError={(e) => {
+                                                e.target.onerror = null;
+                                                e.target.style.display = 'none';
+                                                e.target.parentElement.classList.add('fallback-icon');
+                                            }}
+                                        />
+                                        <Globe className="w-5 h-5 text-slate-300 hidden fallback-icon-target" />
                                     </div>
+                                    <div className="min-w-0">
+                                        <h3 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors truncate leading-tight">
+                                            {group.domain}
+                                        </h3>
+                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                                            {group.pages.length} REPORTS
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="w-10 h-10 flex items-center justify-center bg-slate-50 text-slate-400 rounded-lg border border-slate-100 group-hover:bg-indigo-50 group-hover:text-indigo-500 group-hover:border-indigo-100 transition-all">
+                                    <ExternalLink className="w-5 h-5" />
                                 </div>
                             </div>
                         ))}
@@ -144,7 +159,18 @@ export const ReportWebsiteList = ({ selectedUser, onBack, onSelectWebsite, selec
                                             className={`flex items-center justify-between py-6 ${pIdx !== (activeDomainGroup.pages.length || 0) - 1 ? 'border-b border-slate-100' : ''}`}
                                         >
                                             <div className="flex items-center gap-6 flex-1 min-w-0">
-                                                <div className="w-6 h-6 rounded border border-slate-300 flex-shrink-0"></div>
+                                                <div className="w-6 h-6 bg-slate-50 border border-slate-200 rounded flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                                    <img
+                                                        src={`https://www.google.com/s2/favicons?domain=${new URL(site.page_url).hostname}&sz=64`}
+                                                        alt=""
+                                                        className="w-4 h-4 object-contain opacity-80"
+                                                        onError={(e) => {
+                                                            e.target.style.display = 'none';
+                                                            e.target.nextSibling.style.display = 'block';
+                                                        }}
+                                                    />
+                                                    <Globe className="w-3 h-3 text-slate-300 hidden" />
+                                                </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="font-bold text-slate-700 text-sm truncate mb-0.5">
                                                         {site.page_url}

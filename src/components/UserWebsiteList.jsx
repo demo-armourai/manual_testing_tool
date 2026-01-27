@@ -137,20 +137,32 @@ export const UserWebsiteList = ({ selectedUser, onBack, onSelectWebsite, selecte
                             <div
                                 key={idx}
                                 onClick={() => setSelectedDomain(group)}
-                                className="group bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-200 transition-all cursor-pointer flex items-center gap-5"
+                                className="group bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all cursor-pointer flex items-center justify-between gap-4"
                             >
-                                <div className="w-10 h-10 bg-slate-100 border border-slate-200 rounded flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-50 group-hover:border-indigo-100 transition-colors">
-                                    <div className="w-5 h-5 border-2 border-slate-300 rounded group-hover:border-indigo-400"></div>
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                    <h3 className="text-lg font-black text-slate-900 group-hover:text-indigo-600 transition-colors truncate">
-                                        {group.domain}
-                                    </h3>
-                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
-                                        {(group.pages || []).length} Pages Scanned
+                                <div className="flex items-center gap-4 min-w-0">
+                                    <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                        <img
+                                            src={`https://www.google.com/s2/favicons?domain=${group.domain}&sz=64`}
+                                            alt={`${group.domain} logo`}
+                                            className="w-6 h-6 object-contain opacity-90 mix-blend-multiply"
+                                            onError={(e) => {
+                                                e.target.onerror = null;
+                                                e.target.style.display = 'none';
+                                                e.target.parentElement.classList.add('fallback-icon');
+                                            }}
+                                        />
+                                        <Globe className="w-5 h-5 text-slate-300 hidden fallback-icon-target" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <h3 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors truncate leading-tight">
+                                            {group.domain}
+                                        </h3>
+                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                                            {(group.pages || []).length} PAGES SCANNED
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="p-2 bg-slate-100 text-slate-400 rounded-xl group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-all duration-300">
+                                <div className="w-10 h-10 flex items-center justify-center bg-slate-50 text-slate-400 rounded-lg border border-slate-100 group-hover:bg-indigo-50 group-hover:text-indigo-500 group-hover:border-indigo-100 transition-all">
                                     <ExternalLink className="w-5 h-5" />
                                 </div>
                             </div>
@@ -177,7 +189,18 @@ export const UserWebsiteList = ({ selectedUser, onBack, onSelectWebsite, selecte
                                             className={`flex items-center justify-between py-6 ${pIdx !== (displayedPages?.length || 0) - 1 ? 'border-b border-slate-100' : ''}`}
                                         >
                                             <div className="flex items-center gap-6 flex-1 min-w-0">
-                                                <div className="w-6 h-6 rounded border border-slate-300 flex-shrink-0"></div>
+                                                <div className="w-6 h-6 bg-slate-50 border border-slate-200 rounded flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                                    <img
+                                                        src={`https://www.google.com/s2/favicons?domain=${new URL(site.page_url).hostname}&sz=64`}
+                                                        alt=""
+                                                        className="w-4 h-4 object-contain opacity-80"
+                                                        onError={(e) => {
+                                                            e.target.style.display = 'none';
+                                                            e.target.nextSibling.style.display = 'block';
+                                                        }}
+                                                    />
+                                                    <Globe className="w-3 h-3 text-slate-300 hidden" />
+                                                </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="font-bold text-slate-700 text-sm truncate mb-0.5">
                                                         {site.page_url}

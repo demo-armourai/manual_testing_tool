@@ -68,12 +68,26 @@ export default function App() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedDomain, setSelectedDomain] = useState(null);
 
-  // Constants derived from checklist - Move these up to avoid TDZ in useEffect
-  const aaChecklist = getChecklistByLevel('AA');
+  const [filters, setFilters] = useState({
+    principles: [],
+    levels: ['A', 'AA'],
+    types: []
+  });
+
+  // Dynamic checklist based on filters
+  // Default to A/AA if no filters active, matching the initial state
+  const activeLevels = filters.levels.length > 0 ? filters.levels : ['A', 'AA'];
+
+  const filteredChecklist = wcagChecklist.filter(sc =>
+    activeLevels.includes(sc.level)
+  );
+
+  // Use filteredChecklist for navigation and completion checks instead of hardcoded aaChecklist
 
   // Logic to determine if all A/AA checks are filled (non-pending)
   // AAA is optional and should NOT block report generation
-  const isAuditComplete = aaChecklist.every(sc => {
+  // Logic to determine if all checks in the CURRENT FILTERED VIEW are filled
+  const isAuditComplete = filteredChecklist.every(sc => {
     // Only check A and AA levels explicitly
     if (sc.level !== 'A' && sc.level !== 'AA') {
       return true; // Skip AAA criteria
@@ -94,7 +108,7 @@ export default function App() {
     : null;
 
   const currentIndex = selectedSCId
-    ? aaChecklist.findIndex(sc => sc.id === selectedSCId)
+    ? filteredChecklist.findIndex(sc => sc.id === selectedSCId)
     : -1;
 
   // Resume progress when target changes
@@ -105,12 +119,12 @@ export default function App() {
         setSelectedSCId(auditProgress.lastActiveScId);
       } else {
         // Smart Resume: Start from first SC (1.1.1) if no history
-        setSelectedSCId(aaChecklist[0]?.id);
+        setSelectedSCId(filteredChecklist[0]?.id);
       }
     } else {
       setSelectedSCId(null);
     }
-  }, [currentTarget?.id, audits, aaChecklist]);
+  }, [currentTarget?.id, audits, filteredChecklist]);
 
   // Save progress when SC changes
   useEffect(() => {
@@ -119,21 +133,17 @@ export default function App() {
     }
   }, [selectedSCId, currentTarget, setLastActiveScId]);
 
-  const [filters, setFilters] = useState({
-    principles: [],
-    levels: ['A', 'AA'],
-    types: []
-  });
+
 
   const handleNext = () => {
-    if (currentIndex < aaChecklist.length - 1) {
-      setSelectedSCId(aaChecklist[currentIndex + 1].id);
+    if (currentIndex < filteredChecklist.length - 1) {
+      setSelectedSCId(filteredChecklist[currentIndex + 1].id);
     }
   };
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
-      setSelectedSCId(aaChecklist[currentIndex - 1].id);
+      setSelectedSCId(filteredChecklist[currentIndex - 1].id);
     }
   };
 
@@ -205,7 +215,7 @@ export default function App() {
   const failedCount = complianceScore?.failed || 0;
   const naCount = complianceScore?.na || 0;
   const testedCount = complianceScore?.tested || 0;
-  const totalCount = aaChecklist?.length || 0;
+  const totalCount = filteredChecklist?.length || 0;
 
   if (!currentUser) {
     return <Login />;
@@ -548,7 +558,7 @@ export default function App() {
                       onNext={handleNext}
                       onPrevious={handlePrevious}
                       onViewReport={() => setViewMode('report')}
-                      hasNext={currentIndex < aaChecklist.length - 1}
+                      hasNext={currentIndex < filteredChecklist.length - 1}
                       hasPrevious={currentIndex > 0}
                     />
                   </>
@@ -622,6 +632,7 @@ export default function App() {
                       progress={progress || {}}
                       findings={targetFindings}
                       auditedEntity={selectedUser?.display_name || selectedUser?.username || 'Client'}
+                      filters={filters}
                     />
                   </>
                 )}

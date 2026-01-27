@@ -834,7 +834,7 @@ router.get('/findings', asyncHandler(async (req, res) => {
 }));
 
 router.post('/findings', asyncHandler(async (req, res) => {
-    const { result_id, severity, description, selector, html_snippet, notes } = req.body;
+    const { result_id, severity, description, selector, htmlSnippet, notes, condition } = req.body;
     console.log('--- POST /findings ---');
     console.log('Body:', JSON.stringify(req.body, null, 2));
 
@@ -1161,14 +1161,13 @@ router.post('/reports/generate', asyncHandler(async (req, res) => {
             page_url,
             audit_status,
             audit_score,
-            last_saved_at,
             pass_count,
             fail_count,
             na_count,
             pending_count,
             compliance_percentage,
             generated_at
-         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, now())
+         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, now())
          ON CONFLICT (page_audit_id)
          DO UPDATE SET
             domain = EXCLUDED.domain,
@@ -1176,7 +1175,6 @@ router.post('/reports/generate', asyncHandler(async (req, res) => {
             page_url = EXCLUDED.page_url,
             audit_status = EXCLUDED.audit_status,
             audit_score = EXCLUDED.audit_score,
-            last_saved_at = EXCLUDED.last_saved_at,
             pass_count = EXCLUDED.pass_count,
             fail_count = EXCLUDED.fail_count,
             na_count = EXCLUDED.na_count,
@@ -1191,7 +1189,6 @@ router.post('/reports/generate', asyncHandler(async (req, res) => {
             audit.page_url,
             audit.status,
             audit.score,
-            audit.last_saved_at,
             pass_count,
             fail_count,
             na_count,

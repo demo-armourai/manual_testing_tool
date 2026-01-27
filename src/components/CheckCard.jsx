@@ -43,15 +43,6 @@ export function CheckCard({ sc, onOpenFindingForm, onNext, onPrevious, onViewRep
 
   const handleStatusChange = (newStatus) => {
     updateCheckStatus(sc.id, newStatus);
-    if (newStatus === 'fail') {
-      const existingFinding = findings.find(f =>
-        f.auditId === currentTarget?.id &&
-        f.scIds?.includes(sc.id)
-      );
-      setTimeout(() => {
-        onOpenFindingForm(sc.id, existingFinding);
-      }, 100);
-    }
   };
 
   const handleNoteBlur = () => {
@@ -107,11 +98,33 @@ export function CheckCard({ sc, onOpenFindingForm, onNext, onPrevious, onViewRep
   const handleConditionStatusChange = async (condition, newStatus) => {
     const currentStatus = getConditionStatus(condition);
     // Toggle off if clicking same status
-    if (currentStatus === newStatus) {
-      await updateConditionStatus(sc.id, condition, null);
+    const nextStatus = (currentStatus === newStatus) ? null : newStatus;
+
+    // Auto-update SC Status Logic
+    // Check if ANY condition will be 'fail' after this change
+    const willHaveFail = conditions.some(c => {
+      if (c === condition) return nextStatus === 'fail';
+      return getConditionStatus(c) === 'fail';
+    });
+
+    if (willHaveFail) {
+      updateCheckStatus(sc.id, 'fail');
+
+      // Auto-open findings form if newly failed
+      if (nextStatus === 'fail' && currentStatus !== 'fail') {
+        const existingFinding = findings.find(f =>
+          f.auditId === currentTarget?.id &&
+          f.scIds?.includes(sc.id) &&
+          f.condition === condition
+        );
+        onOpenFindingForm(sc.id, existingFinding, condition);
+      }
     } else {
-      await updateConditionStatus(sc.id, condition, newStatus);
+      // If there is no failed condition, make Success Criteria pass automatically
+      updateCheckStatus(sc.id, 'pass');
     }
+
+    await updateConditionStatus(sc.id, condition, nextStatus);
   };
 
   const hasFailedCondition = conditions.some(c => getConditionStatus(c) === 'fail');
@@ -357,23 +370,7 @@ export function CheckCard({ sc, onOpenFindingForm, onNext, onPrevious, onViewRep
           Previous
         </button>
 
-        {status === 'fail' && (
-          <button
-            onClick={() => {
-              const existingFinding = findings.find(f =>
-                f.auditId === currentTarget?.id &&
-                f.scIds?.includes(sc.id)
-              );
-              onOpenFindingForm(sc.id, existingFinding);
-            }}
-            className="px-6 py-2.5 bg-rose-600 text-white rounded-lg hover:bg-rose-700 font-medium shadow-sm shadow-rose-200 transition-all flex items-center gap-2"
-          >
-            <XCircle className="w-4 h-4" />
-            {findings.some(f => f.auditId === currentTarget?.id && f.scIds?.includes(sc.id))
-              ? 'Edit Detailed Finding'
-              : 'Add Detailed Finding'}
-          </button>
-        )}
+
 
         {/* Check if all conditions have been verified */}
         {(() => {

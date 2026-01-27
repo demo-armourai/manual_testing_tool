@@ -64,13 +64,14 @@ const PDFReport = ({ data }) => {
             detailedFindings: data.detailedFindings || [],
             compliance: null,
             summary: null,
-            preparedFor: 'User',
+            preparedFor: data.preparedFor || 'User',
             preparedBy: {
                 organization: 'Professional Accessibility Testing Team',
                 email: 'accessibility@wcag-audit.com',
                 role: 'Certified WCAG Auditor'
             },
-            wcagVersion: 'WCAG 2.2 Level A',
+            wcagVersion: data.complianceStandard ? `WCAG 2.2 (${data.complianceStandard})` : 'WCAG 2.2 Level A & AA',
+            complianceLevels: data.complianceStandard || 'A & AA',
             testingTechnology: 'axe-core v4.10.3',
             reportVersion: '1.0'
         };
@@ -78,7 +79,7 @@ const PDFReport = ({ data }) => {
         return <div className="p-8 text-center text-gray-500">No report data available. Please Start an audit first.</div>;
     }
 
-    const { targetUrl, projectName, date, tests, detailedFindings, compliance, summary, preparedFor, preparedBy, wcagVersion, testingTechnology, reportVersion } = reportData;
+    const { targetUrl, projectName, date, tests, detailedFindings, compliance, summary, preparedFor, preparedBy, wcagVersion, testingTechnology, reportVersion, complianceLevels } = reportData;
 
     // Debug: Log findings data
     console.log('PDFReport - Total tests:', tests.length);
@@ -110,7 +111,7 @@ const PDFReport = ({ data }) => {
                     </div>
 
                     <h1 className="text-4xl font-bold text-center mb-2">Web Content Accessibility Guidelines</h1>
-                    <h2 className="text-3xl font-bold text-center mb-4">(WCAG) A & AA</h2>
+                    <h2 className="text-3xl font-bold text-center mb-4">(WCAG) {complianceLevels || 'A & AA'}</h2>
                     <p className="text-blue-100 text-lg">Comprehensive Compliance Testing Report</p>
 
                     <div className="w-12 h-1 bg-blue-300 rounded mt-8"></div>
@@ -127,7 +128,7 @@ const PDFReport = ({ data }) => {
                                 { label: 'Assessment Date', value: date },
                                 { label: 'Report Version', value: reportVersion },
                                 { label: 'Testing Technology', value: testingTechnology },
-                                { label: 'Compliance Standard', value: 'A & AA' },
+                                { label: 'Compliance Standard', value: complianceLevels || 'A & AA' },
                             ].map((item, i) => (
                                 <div key={i} className="flex border-b border-gray-100 last:border-0 pb-3 last:pb-0">
                                     <span className="w-1/3 text-sm font-bold text-gray-500 uppercase tracking-wide">{item.label}</span>
@@ -234,124 +235,169 @@ const PDFReport = ({ data }) => {
                 </div>
             )}
 
-            {detailedFindings && detailedFindings.map((finding, idx) => {
-                const severityColor =
-                    (finding.severity || '').toLowerCase() === 'critical' ? 'red' :
-                        (finding.severity || '').toLowerCase() === 'serious' ? 'orange' :
-                            (finding.severity || '').toLowerCase() === 'moderate' ? 'amber' :
-                                'blue';
+            {/* Detailed Findings - Grouped by SC */}
+            {(() => {
+                if (!detailedFindings || detailedFindings.length === 0) return null;
 
-                return (
-                    <div key={`detail-${idx}`} className="p-12 bg-white min-h-[1100px] border-t-4 border-gray-100 flex flex-col relative text-gray-800 page-break">
-                        {/* Header Section from Image */}
-                        <div className="flex justify-between items-center border-b-2 border-blue-600 pb-2 mb-6">
-                            <span className="text-blue-600 font-semibold">{wcagVersion} Assessment Report</span>
-                            <span className="text-gray-500">Detailed Findings {idx + 1} of {detailedFindings.length}</span>
-                        </div>
-                        {idx === 0 && (
-                            <>
-                                <h2 className="text-3xl font-bold text-gray-900 mb-2">Detailed Findings</h2>
-                                <p className="text-gray-600 mb-6">Each issue includes WCAG guideline reference, impact assessment, and AI-generated remediation guidance:</p>
-                            </>
-                        )}
+                // Group findings by SC ID
+                const groupedFindings = detailedFindings.reduce((acc, finding) => {
+                    const scId = finding.scIds && finding.scIds.length > 0 ? finding.scIds[0] : (finding.scId || '').split(' ')[0];
+                    if (!acc[scId]) {
+                        acc[scId] = [];
+                    }
+                    acc[scId].push(finding);
+                    return acc;
+                }, {});
 
-                        <div className="border-t-4 border-orange-500 bg-orange-50/30 rounded-lg p-6 flex-1 flex flex-col border-x border-b border-gray-200">
-                            {/* Issue Header */}
-                            <div className="flex justify-between items-start mb-6">
-                                <h3 className="text-xl font-bold text-red-800 flex-1 pr-4">
-                                    Issue #{idx + 1}: {finding.description}
-                                </h3>
-                                <span className={`px-4 py-1 rounded-full text-xs font-bold uppercase text-white tracking-wide ${severityColor === 'red' ? 'bg-red-600' :
-                                    severityColor === 'orange' ? 'bg-orange-500' :
-                                        severityColor === 'amber' ? 'bg-amber-500' :
-                                            'bg-blue-500'
-                                    }`}>
-                                    {finding.severity || 'Issue'}
-                                </span>
+                return Object.entries(groupedFindings).map(([scId, findings], groupIdx) => {
+                    const scDetails = getSCById(scId);
+                    const title = scDetails ? scDetails.title : (findings[0].scTitles && findings[0].scTitles[0]) || 'Unknown Criteria';
+                    const level = scDetails ? scDetails.level : 'A';
+                    const principle = scDetails ? scDetails.principle : 'Unknown Principle'; // Need to ensure principle is available in getSCById result or handle fallback
+                    const guidelineId = scDetails ? scDetails.id : scId;
+
+                    // Determine max severity for the group
+                    const severityOrder = { 'critical': 4, 'serious': 3, 'moderate': 2, 'minor': 1 };
+                    const maxSeverity = findings.reduce((max, f) => {
+                        const currentSev = (f.severity || 'minor').toLowerCase();
+                        const maxSev = (max || 'minor').toLowerCase();
+                        return (severityOrder[currentSev] || 0) > (severityOrder[maxSev] || 0) ? f.severity : max;
+                    }, 'Minor');
+
+                    const severityColor =
+                        (maxSeverity || '').toLowerCase() === 'critical' ? 'red' :
+                            (maxSeverity || '').toLowerCase() === 'serious' ? 'orange' :
+                                (maxSeverity || '').toLowerCase() === 'moderate' ? 'amber' :
+                                    'blue';
+
+                    // Use the first finding for common metadata like URL if they share it, otherwise might need to be generic
+                    const primaryUrl = findings[0].url || targetUrl;
+
+                    return (
+                        <div key={`sc-group-${scId}`} className="p-12 bg-white min-h-[1100px] border-t-4 border-gray-100 flex flex-col relative text-gray-800 page-break">
+                            {/* Header Section */}
+                            <div className="flex justify-between items-center border-b-2 border-blue-600 pb-2 mb-6">
+                                <span className="text-blue-600 font-semibold">{wcagVersion} Assessment Report</span>
+                                <span className="text-gray-500">Detailed Findings {groupIdx + 1} of {Object.keys(groupedFindings).length}</span>
                             </div>
 
-                            {/* Meta Data Grid */}
-                            <div className="grid grid-cols-[max-content_1fr] gap-x-8 gap-y-2 mb-6 text-sm">
-                                <span className="font-bold text-red-800">Page/Component:</span>
-                                <span className="font-medium text-gray-900 break-all">{finding.url}</span>
-
-                                <span className="font-bold text-red-800">WCAG Guideline:</span>
-                                <span className="font-medium text-gray-900">
-                                    {(() => {
-                                        const scId = finding.scIds && finding.scIds.length > 0 ? finding.scIds[0] : (finding.scId || '').split(' ')[0];
-                                        const scDetails = getSCById(scId);
-                                        return scDetails && scDetails.id ? scDetails.id : (scId || finding.wcagCriteria || 'N/A');
-                                    })()}
-                                </span>
-
-                                <span className="font-bold text-red-800">Impact:</span>
-                                <span className="font-medium text-red-800">
-                                    {finding.impactDescription || "Users with assistive technologies may face difficulties accessing this content properly."}
-                                </span>
-                            </div>
-
-                            {/* Location */}
-                            <div className="mb-6">
-                                <h4 className="font-bold text-red-800 mb-2">Location:</h4>
-                                <div className="bg-gray-100 p-3 rounded font-mono text-xs text-gray-800">
-                                    {finding.selector || finding.element || 'N/A'}
-                                </div>
-                            </div>
-
-                            {/* HTML Element */}
-                            {finding.htmlSnippet && (
-                                <div className="mb-6">
-                                    <h4 className="font-bold text-red-800 mb-2">HTML Element:</h4>
-                                    <div className="bg-slate-800 text-white p-3 rounded font-mono text-xs overflow-x-auto">
-                                        {finding.htmlSnippet}
-                                    </div>
-                                </div>
+                            {groupIdx === 0 && (
+                                <>
+                                    <h2 className="text-3xl font-bold text-gray-900 mb-2">Detailed Findings</h2>
+                                    <p className="text-gray-600 mb-8">Each issue includes WCAG guideline reference, impact assessment, and remediation guidance.</p>
+                                </>
                             )}
 
-                            {/* Issue Details */}
-                            <div className="mb-6">
-                                <h4 className="font-bold text-red-800 mb-2">Issue Details:</h4>
-                                <ul className="list-disc pl-5 text-gray-800 text-sm">
-                                    <li>{finding.description}</li>
-                                    {finding.notes && <li>{finding.notes}</li>}
-                                </ul>
+                            {/* Dynamic Heading */}
+                            <div className="mb-8">
+                                <h3 className="text-2xl text-gray-900 font-normal mb-1">
+                                    <span className="font-bold">{level}</span> {principle}
+                                </h3>
+                                <h4 className="text-3xl text-gray-900 font-normal">
+                                    {guidelineId}: {title}
+                                </h4>
                             </div>
 
-                            {/* Website URL */}
-                            <div className="mb-6">
-                                <h4 className="font-bold text-red-800 mb-2">Website URL:</h4>
-                                <div className="bg-blue-50 p-2 rounded border border-blue-100">
-                                    <a href={finding.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-xs break-all">
-                                        {finding.url}
+                            {/* Impact/Metadata Summary Block */}
+                            <div className="flex flex-col gap-2 mb-8 text-sm">
+                                <div className="grid grid-cols-[150px_1fr] items-baseline">
+                                    <span className="font-bold text-red-800">Page/Component:</span>
+                                    <a href={primaryUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline break-all">{primaryUrl}</a>
+                                </div>
+                                <div className="grid grid-cols-[150px_1fr] items-baseline">
+                                    <span className="font-bold text-red-800">WCAG Guideline:</span>
+                                    <span className="font-medium text-gray-900">{guidelineId}</span>
+                                </div>
+                                <div className="grid grid-cols-[150px_1fr] items-baseline">
+                                    <span className="font-bold text-red-800">Impact:</span>
+                                    <span className="font-bold text-red-800">
+                                        {findings[0].impactDescription || "Users with assistive technologies may face difficulties accessing this content properly."}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* List of Instances - Grouped by Description/Condition */}
+                            <div className="space-y-8">
+                                {(() => {
+                                    // Group findings by description (Condition)
+                                    const findingsByCondition = findings.reduce((acc, finding) => {
+                                        const desc = finding.description || "Unspecified Issue";
+                                        if (!acc[desc]) {
+                                            acc[desc] = [];
+                                        }
+                                        acc[desc].push(finding);
+                                        return acc;
+                                    }, {});
+
+                                    return Object.entries(findingsByCondition).map(([description, conditionFindings], idx) => (
+                                        <div key={idx} className="relative pl-6">
+                                            {/* Numbered Condition Description */}
+                                            <div className="absolute -left-0 top-1 text-lg font-normal text-gray-900">
+                                                {idx + 1}.
+                                            </div>
+
+                                            <div className="mb-6 pl-2">
+                                                <p className="text-lg text-gray-900 leading-relaxed">
+                                                    {description}
+                                                </p>
+                                            </div>
+
+                                            {/* List of HTML Elements for this Condition */}
+                                            <div className="pl-2 space-y-6">
+                                                {conditionFindings.map((finding, fIdx) => (
+                                                    <div key={fIdx}>
+                                                        {((finding.htmlSnippets && finding.htmlSnippets.length > 0) || finding.htmlSnippet) && (
+                                                            <div className="mb-4">
+                                                                <h5 className="font-bold text-red-800 text-sm mb-1 uppercase tracking-wide">HTML Element:</h5>
+                                                                <div className="space-y-2">
+                                                                    {(finding.htmlSnippets || [finding.htmlSnippet]).map((snippet, sIdx) => (
+                                                                        snippet && (
+                                                                            <div key={`snip-${fIdx}-${sIdx}`} className="bg-blue-50/30 p-4 rounded border border-blue-100 font-mono text-xs text-slate-600 overflow-x-auto">
+                                                                                {snippet}
+                                                                            </div>
+                                                                        )
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {finding.notes && (
+                                                            <div className="mb-2">
+                                                                <span className="font-bold text-gray-700 text-sm">Notes: </span>
+                                                                <span className="text-gray-600 text-sm italic">{finding.notes}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ));
+                                })()}
+                            </div>
+
+                            {/* Website URL Footer for the group */}
+                            <div className="mt-8 pt-4 border-t border-gray-100">
+                                <h4 className="font-bold text-red-800 text-sm mb-2">Website URL:</h4>
+                                <div className="bg-blue-50 p-3 rounded border border-blue-100 text-sm">
+                                    <a href={primaryUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline break-all">
+                                        {primaryUrl}
                                     </a>
                                 </div>
                             </div>
 
-                            {/* Remediation */}
-                            <div className="mt-auto">
-                                <h4 className="font-bold text-red-800 mb-2">AI-Generated Remediation Solution:</h4>
-                                <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-sm">
-                                    <span className="font-bold text-green-800 block mb-1">Recommended Fixes:</span>
-                                    <div className="text-gray-800 whitespace-pre-wrap">
-                                        {finding.remediation || "Ensure that the content is implemented according to the WCAG guidelines."}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="text-right mt-4">
-                                <a href="https://dequeuniversity.com/rules/axe/4.10/" target="_blank" rel="noreferrer" className="text-blue-500 italic text-xs hover:underline">
-                                    For more information, see: Deque University Rules
+                            <div className="text-right mt-auto pt-8">
+                                <a href={`https://www.w3.org/WAI/WCAG22/Understanding/${(scDetails?.id || '').replace(/\./g, '')}`} target="_blank" rel="noreferrer" className="text-blue-500 italic text-xs hover:underline">
+                                    Understanding SC {scDetails?.id}
                                 </a>
                             </div>
-                        </div>
 
-                        {/* Footer for Finding Page */}
-                        <div className="border-t border-gray-200 pt-4 mt-8 text-center text-gray-400 text-xs">
-                            Generated: {date} | WCAG Compliance Assessment | Page {5 + idx}
+                            <div className="border-t border-gray-200 pt-4 mt-4 text-center text-gray-400 text-xs">
+                                Generated: {date} | WCAG Compliance Assessment | Issue Group {groupIdx + 1}
+                            </div>
                         </div>
-                    </div>
-                );
-            })}
+                    );
+                });
+            })()}
 
             {/* All Tests Table */}
             <div className="p-12 bg-white min-h-[1100px] border-t-4 border-gray-100 page-break">
