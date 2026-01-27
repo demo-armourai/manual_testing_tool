@@ -225,30 +225,31 @@ export function CheckCard({ sc, onOpenFindingForm, onNext, onPrevious, onViewRep
 
           <div className="divide-y divide-slate-100">
             {conditions.map((condition, index) => {
-              const isAuto = autoChecks.includes(condition);
-              const status = getConditionStatus(condition); // 'pass', 'fail', 'na', or null
+              const conditionTag = getConditionTag(condition);
+              const isAuto = conditionTag === 'axe-core';
+              const s = getConditionStatus(condition); // 'pass', 'fail', 'na', or null
 
               return (
                 <div
                   key={index}
                   className={`flex flex-col sm:flex-row sm:items-center gap-3 p-4 transition-colors group
-                                    ${status
+                                    ${s
                       ? 'bg-white'
                       : 'bg-slate-50 hover:bg-white'
                     }`}
                 >
                   <div className="flex-1">
-                    <p className={`text-sm leading-relaxed transition-colors ${status ? 'text-slate-900' : 'text-slate-600'}`}>
+                    <p className={`text-sm leading-relaxed transition-colors ${s ? 'text-slate-900' : 'text-slate-600'}`}>
                       {condition}
                     </p>
-                    {getConditionTag(condition) && (
+                    {conditionTag && (
                       <span className={`mt-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border
-                        ${getConditionTag(condition) === 'manual'
+                        ${conditionTag === 'manual'
                           ? 'bg-slate-100 text-slate-600 border-slate-200'
                           : 'bg-emerald-50 text-emerald-700 border-emerald-100'
                         }`}>
-                        {getConditionTag(condition) === 'manual' ? 'Manual Verification' :
-                          getConditionTag(condition) === 'axe-core' ? 'Automated (axe-core)' :
+                        {conditionTag === 'manual' ? 'Manual Verification' :
+                          conditionTag === 'axe-core' ? 'Automated Check' :
                             'Automated Check'}
                       </span>
                     )}
@@ -256,11 +257,11 @@ export function CheckCard({ sc, onOpenFindingForm, onNext, onPrevious, onViewRep
 
                   <div className="flex items-center gap-2 flex-shrink-0">
                     {/* Finding Button for specific condition failure */}
-                    {status === 'fail' && (
+                    {s === 'fail' && (
                       <button
                         onClick={() => {
                           const existingFinding = findings.find(f =>
-                            f.auditId === currentTarget?.id &&
+                            (f.auditId || f.auditid)?.toString().toLowerCase() === currentTarget?.id?.toString().toLowerCase() &&
                             f.scIds?.includes(sc.id) &&
                             f.condition === condition // Check if finding exists for this condition
                           );
@@ -277,31 +278,56 @@ export function CheckCard({ sc, onOpenFindingForm, onNext, onPrevious, onViewRep
                     )}
 
                     <button
-                      onClick={() => handleConditionStatusChange(condition, 'pass')}
-                      title="Pass"
-                      className={`p-1.5 rounded-md border transition-all ${status === 'pass'
+                      onClick={() => !isAuto && handleConditionStatusChange(condition, 'pass')}
+                      disabled={isAuto}
+                      title={isAuto ? "Automated check (fixed)" : "Pass"}
+                      className={`p-1.5 rounded-md border transition-all ${s === 'pass'
                         ? 'bg-emerald-100 border-emerald-500 text-emerald-700'
-                        : 'bg-white border-slate-200 text-slate-300 hover:border-emerald-300 hover:text-emerald-400'
+                        : isAuto ? 'bg-slate-50 border-slate-100 text-slate-200 cursor-not-allowed opacity-50' : 'bg-white border-slate-200 text-slate-300 hover:border-emerald-300 hover:text-emerald-400'
                         }`}
                     >
                       <CheckCircle2 className="w-5 h-5" />
                     </button>
                     <button
-                      onClick={() => handleConditionStatusChange(condition, 'fail')}
-                      title="Fail"
-                      className={`p-1.5 rounded-md border transition-all ${status === 'fail'
+                      onClick={() => {
+                        if (isAuto) {
+                          // For automated ones, just open the finding form if already failed
+                          if (s === 'fail') {
+                            const existing = findings.find(f =>
+                              (f.auditId || f.auditid)?.toString().toLowerCase() === currentTarget?.id?.toString().toLowerCase() &&
+                              f.scIds?.includes(sc.id) &&
+                              f.condition === condition
+                            );
+                            onOpenFindingForm(sc.id, existing, condition);
+                          }
+                        } else {
+                          handleConditionStatusChange(condition, 'fail');
+                          // Trigger form opening after status update for manual Fail
+                          setTimeout(() => {
+                            const existing = findings.find(f =>
+                              (f.auditId || f.auditid)?.toString().toLowerCase() === currentTarget?.id?.toString().toLowerCase() &&
+                              f.scIds?.includes(sc.id) &&
+                              f.condition === condition
+                            );
+                            onOpenFindingForm(sc.id, existing, condition);
+                          }, 100);
+                        }
+                      }}
+                      title={isAuto ? "Automated failure (click to document)" : "Fail"}
+                      className={`p-1.5 rounded-md border transition-all ${s === 'fail'
                         ? 'bg-rose-100 border-rose-500 text-rose-700'
-                        : 'bg-white border-slate-200 text-slate-300 hover:border-rose-300 hover:text-rose-400'
+                        : isAuto ? 'bg-slate-50 border-slate-100 text-slate-200 cursor-not-allowed opacity-50' : 'bg-white border-slate-200 text-slate-300 hover:border-rose-300 hover:text-rose-400'
                         }`}
                     >
                       <XCircle className="w-5 h-5" />
                     </button>
                     <button
-                      onClick={() => handleConditionStatusChange(condition, 'na')}
-                      title="Not Applicable"
-                      className={`p-1.5 rounded-md border transition-all ${status === 'na'
+                      onClick={() => !isAuto && handleConditionStatusChange(condition, 'na')}
+                      disabled={isAuto}
+                      title={isAuto ? "Automated check (fixed)" : "Not Applicable"}
+                      className={`p-1.5 rounded-md border transition-all ${s === 'na'
                         ? 'bg-slate-200 border-slate-400 text-slate-700'
-                        : 'bg-white border-slate-200 text-slate-300 hover:border-slate-300 hover:text-slate-400'
+                        : isAuto ? 'bg-slate-50 border-slate-100 text-slate-200 cursor-not-allowed opacity-50' : 'bg-white border-slate-200 text-slate-300 hover:border-slate-300 hover:text-slate-400'
                         }`}
                     >
                       <MinusCircle className="w-5 h-5" />
@@ -357,23 +383,6 @@ export function CheckCard({ sc, onOpenFindingForm, onNext, onPrevious, onViewRep
           Previous
         </button>
 
-        {status === 'fail' && (
-          <button
-            onClick={() => {
-              const existingFinding = findings.find(f =>
-                f.auditId === currentTarget?.id &&
-                f.scIds?.includes(sc.id)
-              );
-              onOpenFindingForm(sc.id, existingFinding);
-            }}
-            className="px-6 py-2.5 bg-rose-600 text-white rounded-lg hover:bg-rose-700 font-medium shadow-sm shadow-rose-200 transition-all flex items-center gap-2"
-          >
-            <XCircle className="w-4 h-4" />
-            {findings.some(f => f.auditId === currentTarget?.id && f.scIds?.includes(sc.id))
-              ? 'Edit Detailed Finding'
-              : 'Add Detailed Finding'}
-          </button>
-        )}
 
         {/* Check if all conditions have been verified */}
         {(() => {

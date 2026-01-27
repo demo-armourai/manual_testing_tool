@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FileBarChart, CheckSquare, AlertCircle, Menu, X, BarChart, Globe, LogOut, User as UserIcon, ShieldCheck, Home as HomeIcon, CheckCircle2 } from 'lucide-react';
 import { wcagChecklist, getChecklistByLevel } from './utils/wcag-loader';
 import { useAuditStore } from './hooks/useAuditStore';
@@ -67,6 +67,53 @@ export default function App() {
 
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedDomain, setSelectedDomain] = useState(null);
+
+  // Layout resizing logic
+  const [leftSidebarWidth, setLeftSidebarWidth] = useState(320);
+  const [rightSidebarWidth, setRightSidebarWidth] = useState(300);
+  const isResizingLeft = useRef(false);
+  const isResizingRight = useRef(false);
+
+  const startResizingLeft = (e) => {
+    e.preventDefault();
+    isResizingLeft.current = true;
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', stopResizing);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
+
+  const startResizingRight = (e) => {
+    e.preventDefault();
+    isResizingRight.current = true;
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', stopResizing);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
+
+  const stopResizing = () => {
+    isResizingLeft.current = false;
+    isResizingRight.current = false;
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', stopResizing);
+    document.body.style.cursor = 'default';
+    document.body.style.userSelect = 'auto';
+  };
+
+  const handleMouseMove = (e) => {
+    if (isResizingLeft.current) {
+      const newWidth = e.clientX;
+      if (newWidth > 240 && newWidth < 600) {
+        setLeftSidebarWidth(newWidth);
+      }
+    } else if (isResizingRight.current) {
+      const newWidth = window.innerWidth - e.clientX;
+      if (newWidth > 240 && newWidth < 600) {
+        setRightSidebarWidth(newWidth);
+      }
+    }
+  };
 
   // Constants derived from checklist - Move these up to avoid TDZ in useEffect
   const aaChecklist = getChecklistByLevel('AA');
@@ -295,19 +342,29 @@ export default function App() {
 
         {/* ---------- LEFT SIDEBAR ---------- */}
         {viewMode === 'audit' && (
-          <aside className="hidden xl:flex w-80 flex-col bg-white border-r border-slate-200">
-            <FilterPanel filters={filters} onFilterChange={setFilters} />
+          <>
+            <aside
+              style={{ width: `${leftSidebarWidth}px` }}
+              className="hidden xl:flex flex-none flex-col bg-white border-r border-slate-200 h-full"
+            >
+              <FilterPanel filters={filters} onFilterChange={setFilters} />
 
-            <div className="flex-1 overflow-y-auto">
-              <div className="pb-6">
-                <ChecklistSidebar
-                  selectedSC={selectedSCId}
-                  onSelectSC={setSelectedSCId}
-                  filters={filters}
-                />
+              <div className="flex-1 overflow-y-auto">
+                <div className="pb-6">
+                  <ChecklistSidebar
+                    selectedSC={selectedSCId}
+                    onSelectSC={setSelectedSCId}
+                    filters={filters}
+                  />
+                </div>
               </div>
-            </div>
-          </aside>
+            </aside>
+            <div
+              onMouseDown={startResizingLeft}
+              className="hidden xl:block w-1 hover:w-1.5 bg-slate-200 hover:bg-indigo-400 cursor-col-resize transition-all h-full z-10 flex-none"
+              title="Drag to resize sidebar"
+            />
+          </>
         )}
 
         {/* ---------- CENTER CONTENT ---------- */}
@@ -560,7 +617,6 @@ export default function App() {
               <FindingsList
                 findings={findings}
                 onEditFinding={(f) => handleOpenFindingForm(undefined, f)}
-                onAddFinding={() => handleOpenFindingForm()}
               />
             )}
 
@@ -631,59 +687,79 @@ export default function App() {
         </main>
 
         {/* ---------- RIGHT SIDEBAR ---------- */}
+        {/* ---------- RIGHT SIDEBAR ---------- */}
         {viewMode === 'audit' && (
-          <aside className="hidden xl:flex w-[300px] flex-col bg-white border-l border-slate-200">
-            <div className="px-4 py-3 border-b border-slate-200 bg-slate-50">
-              <h3 className="text-sm font-semibold">{sidebarTitle}</h3>
-            </div>
+          <>
+            <div
+              onMouseDown={startResizingRight}
+              className="hidden xl:block w-1 hover:w-1.5 bg-slate-200 hover:bg-indigo-400 cursor-col-resize transition-all h-full z-10 flex-none"
+              title="Drag to resize sidebar"
+            />
+            <aside
+              style={{ width: `${rightSidebarWidth}px` }}
+              className="hidden xl:flex flex-none flex-col bg-white border-l border-slate-200 h-full"
+            >
+              <div className="px-4 py-3 border-b border-slate-200 bg-slate-50">
+                <h3 className="text-sm font-semibold">{sidebarTitle}</h3>
+              </div>
 
-            <div className="flex-1 overflow-y-auto p-4 pb-6 space-y-3">
-              {targetFindings.length === 0 ? (
-                <p className="text-sm text-slate-500 italic">
-                  No findings recorded yet.
-                </p>
-              ) : (
-                targetFindings.map(finding => (
-                  <div
-                    key={finding.id}
-                    onClick={() => handleOpenFindingForm(undefined, finding)}
-                    className="p-3 border border-slate-200 rounded-lg cursor-pointer hover:border-indigo-300 hover:shadow-sm transition group"
-                  >
-                    <div className="flex justify-between items-start mb-1">
-                      <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded ${finding.severity === 'Critical' ? 'bg-rose-100 text-rose-800' :
-                        finding.severity === 'Serious' ? 'bg-orange-100 text-orange-800' :
-                          finding.severity === 'Moderate' ? 'bg-amber-100 text-amber-800' :
-                            'bg-slate-100 text-slate-800'
-                        }`}>
-                        {finding.severity}
-                      </span>
-                      <div className="text-[10px] text-slate-400 font-mono">
-                        {finding.scIds && finding.scIds[0]}
+              <div className="flex-1 overflow-y-auto p-4 pb-6 space-y-3">
+                {targetFindings.length === 0 ? (
+                  <p className="text-sm text-slate-500 italic">
+                    No findings recorded yet.
+                  </p>
+                ) : (
+                  targetFindings.map(finding => (
+                    <div
+                      key={finding.id}
+                      onClick={() => handleOpenFindingForm(undefined, finding)}
+                      className="p-3 border border-slate-200 rounded-lg cursor-pointer hover:border-indigo-300 hover:shadow-sm transition group"
+                    >
+                      <div className="flex justify-between items-start mb-1">
+                        <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded ${finding.severity === 'Critical' ? 'bg-rose-100 text-rose-800' :
+                          finding.severity === 'Serious' ? 'bg-orange-100 text-orange-800' :
+                            finding.severity === 'Moderate' ? 'bg-amber-100 text-amber-800' :
+                              'bg-slate-100 text-slate-800'
+                          }`}>
+                          {finding.severity}
+                        </span>
+                        <div className="text-[10px] text-slate-400 font-mono">
+                          {finding.scIds && finding.scIds[0]}
+                        </div>
                       </div>
-                    </div>
-                    <p className="text-sm text-slate-800 line-clamp-2 group-hover:text-indigo-900">
-                      {finding.description}
-                    </p>
-                    {finding.domSnippet && (
-                      <div className="mt-2 p-1.5 bg-slate-900 text-slate-100 rounded text-[9px] font-mono whitespace-pre-wrap overflow-x-auto max-h-32">
-                        {finding.domSnippet}
-                      </div>
-                    )}
-                    {finding.selector && (
-                      <div className="mt-1 text-[9px] text-indigo-600 font-mono break-all">
-                        SEL: {finding.selector}
-                      </div>
-                    )}
-                    {finding.notes && (
-                      <p className="mt-1 text-[10px] text-slate-500 italic">
-                        Note: {finding.notes}
+                      <p className="text-sm text-slate-800 line-clamp-2 group-hover:text-indigo-900">
+                        {finding.description}
                       </p>
-                    )}
-                  </div>
-                ))
-              )}
-            </div>
-          </aside>
+                      <p className="text-sm text-slate-800 line-clamp-2 group-hover:text-indigo-900">
+                        <b>Code Snippet</b>
+                      </p>
+                      {finding.domSnippet && (
+                        <div className="mt-2 p-2 bg-slate-950 text-slate-100 rounded-md text-[9px] font-mono whitespace-pre-wrap overflow-y-auto max-h-32 border border-slate-800 shadow-inner leading-relaxed">
+                          {finding.domSnippet}
+                        </div>
+                      )}
+                      <p className="text-sm text-slate-800 line-clamp-2 group-hover:text-indigo-900">
+                        <b>CSS Selectors</b>
+                      </p>
+                      {finding.selector && (
+                        <div className="mt-2 p-2 bg-indigo-50/50 text-indigo-700 rounded-md text-[9px] font-mono whitespace-pre-wrap overflow-y-auto max-h-24 border border-indigo-100/50 shadow-inner group-hover:bg-indigo-50 transition-colors leading-relaxed">
+                          <div className="flex items-center gap-1.5 mb-1 opacity-70">
+                            {/* </div>span className="font-black uppercase tracking-widest text-[8px]">CSS Selectors</span> */}
+                          </div>
+                          {finding.selector}
+                        </div>
+                      )}
+                      {finding.notes && (
+                        <p className="mt-1 text-[10px] text-slate-500 italic whitespace-pre-wrap">
+                          Note: {finding.notes}
+                        </p>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </aside>
+          </>
         )}
       </div>
 

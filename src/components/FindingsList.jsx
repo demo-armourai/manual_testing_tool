@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Edit2, Trash2, ExternalLink, Code, ChevronRight, ChevronDown, Globe, ShieldCheck, AlertCircle } from 'lucide-react';
 import { useAuditStore } from '../hooks/useAuditStore';
 
-export function FindingsList({ findings, onEditFinding, onAddFinding }) {
+export function FindingsList({ findings, onEditFinding }) {
   const deleteFinding = useAuditStore(state => state.deleteFinding);
   const [expandedFindings, setExpandedFindings] = useState(new Set());
   const [expandedDomains, setExpandedDomains] = useState(new Set());
@@ -50,12 +50,25 @@ export function FindingsList({ findings, onEditFinding, onAddFinding }) {
     return acc;
   }, {});
 
-  const SEVERITY_ORDER = { 'Critical': 4, 'Serious': 3, 'Moderate': 2, 'Minor': 1 };
+  // Sort findings within each group by WCAG Success Criterion (numerical order)
+  const compareSC = (a, b) => {
+    const scA = (a.scIds || [])[0] || "";
+    const scB = (b.scIds || [])[0] || "";
 
-  // Sort findings within each group
+    const partsA = scA.split('.').map(p => parseInt(p) || 0);
+    const partsB = scB.split('.').map(p => parseInt(p) || 0);
+
+    for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+      const pA = partsA[i] || 0;
+      const pB = partsB[i] || 0;
+      if (pA !== pB) return pA - pB;
+    }
+    return 0;
+  };
+
   Object.values(groupedFindings).forEach(pages => {
     Object.values(pages).forEach(pageFindings => {
-      pageFindings.sort((a, b) => (SEVERITY_ORDER[b.severity] || 0) - (SEVERITY_ORDER[a.severity] || 0));
+      pageFindings.sort(compareSC);
     });
   });
 
@@ -82,15 +95,8 @@ export function FindingsList({ findings, onEditFinding, onAddFinding }) {
         </div>
         <h3 className="text-xl font-black text-slate-900 mb-2">No findings yet</h3>
         <p className="text-slate-500 text-base max-w-sm mx-auto">
-          Findings will appear here as you mark success criteria as "Fail" during your audits.
+          Findings appear here automatically when you mark success criteria as "Fail" during your audits.
         </p>
-        <button
-          onClick={onAddFinding}
-          className="mt-8 flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 transition-all font-bold shadow-lg shadow-indigo-200"
-        >
-          <Edit2 className="w-4 h-4" />
-          Create First Finding
-        </button>
       </div>
     );
   }
@@ -111,13 +117,6 @@ export function FindingsList({ findings, onEditFinding, onAddFinding }) {
             Manage and track all accessibility issues across your scanned domains.
           </p>
         </div>
-        <button
-          onClick={onAddFinding}
-          className="inline-flex self-start sm:self-auto px-6 py-3 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 transition-all font-bold shadow-lg shadow-indigo-200 text-sm"
-        >
-          <Edit2 className="w-4 h-4 mr-2" />
-          Add Finding
-        </button>
       </div>
 
       <div className="flex flex-col gap-6">
@@ -249,7 +248,7 @@ export function FindingsList({ findings, onEditFinding, onAddFinding }) {
                                             {finding.notes && (
                                               <div>
                                                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Auditor Notes</span>
-                                                <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 text-sm text-slate-700 italic">
+                                                <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 text-sm text-slate-700 italic whitespace-pre-wrap">
                                                   {finding.notes}
                                                 </div>
                                               </div>
@@ -264,6 +263,15 @@ export function FindingsList({ findings, onEditFinding, onAddFinding }) {
                                                 <ExternalLink className="w-3.5 h-3.5 flex-shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                                               </a>
                                             </div>
+
+                                            {finding.selector && (
+                                              <div>
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2 font-bold flex items-center gap-1.5">CSS Selectors</span>
+                                                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 text-[11px] font-mono text-indigo-600 whitespace-pre-wrap break-words italic leading-relaxed max-h-60 overflow-y-auto shadow-inner">
+                                                  {finding.selector}
+                                                </div>
+                                              </div>
+                                            )}
 
                                             {finding.domSnippet && (
                                               <div>

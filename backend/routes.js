@@ -20,6 +20,114 @@ const asyncHandler = fn => (req, res, next) =>
     });
 
 /**
+ * Maps axe-core impact levels to Auditor severity levels.
+ * @param {string} impact - The impact level from axe-core
+ * @returns {string} The matched severity level
+ */
+function mapAxeImpactToSeverity(impact) {
+    switch (impact?.toLowerCase()) {
+        case 'critical': return 'Critical';
+        case 'serious': return 'Serious';
+        case 'moderate': return 'Moderate';
+        case 'minor': return 'Minor';
+        default: return 'Minor';
+    }
+}
+
+/**
+ * Groups and aggregates automated violations into findings records.
+ * @param {string} result_id - The ID of the parent SC result
+ * @param {string} sc_id - The WCAG Success Criterion ID
+ * @param {object} scanData - The raw axe output scan data
+ * @param {array} conditions - Reference conditions for this SC
+ */
+async function processAutomatedFindings(result_id, sc_id, scanData, conditions) {
+    const summaryTables = scanData.summaryTables || {};
+    const violations = summaryTables.violations?.rows || [];
+
+    // Group fail nodes by Auditor check (condition_text)
+    const checkMaps = new Map();
+
+    conditions.forEach(cond => {
+        if (cond.condition_type === 'axe-core' && cond.axe_rule_id) {
+            const ruleIds = cond.axe_rule_id.split(',').map(r => r.trim());
+
+            ruleIds.forEach(ruleId => {
+                const violation = violations.find(v => v.ruleId === ruleId);
+                if (violation && violation.nodes && violation.nodes.length > 0) {
+                    if (!checkMaps.has(cond.condition_text)) {
+                        checkMaps.set(cond.condition_text, {
+                            nodes: [],
+                            severity: violation.impact, // Use impact from first rule
+                            condition_id: cond.condition_id,
+                            condition_text: cond.condition_text
+                        });
+                    }
+                    // Aggregate nodes from multiple rules if they map to the same check
+                    const checkData = checkMaps.get(cond.condition_text);
+                    violation.nodes.forEach(node => {
+                        checkData.nodes.push({
+                            ...node,
+                            ruleId: violation.ruleId // Tag node with its originating rule
+                        });
+                    });
+                }
+            });
+        }
+    });
+
+    // Create findings for each Auditor check that has failure nodes
+    for (const [checkText, data] of checkMaps.entries()) {
+        const nodes = data.nodes;
+
+        // Join raw code snippets and selectors for database storage
+        // [NUMBERING] prefix added for both snippets and selectors as requested
+        const aggregatedHtml = nodes.map((n, i) => `[${i + 1}] ${n.html}`).join('\n\n');
+        const aggregatedSelector = nodes.map((n, i) => `[${i + 1}] ${n.target?.join(', ') || ''}`).join('\n\n');
+
+        // Deduplicate failure details for the notes section
+        const ruleGroups = new Map();
+        nodes.forEach(n => {
+            if (!ruleGroups.has(n.ruleId)) {
+                ruleGroups.set(n.ruleId, {
+                    summaries: new Set(),
+                    count: 0
+                });
+            }
+            const group = ruleGroups.get(n.ruleId);
+            group.count++;
+            // Split by newline and deduplicate bullet points
+            n.failureSummary.split('\n')
+                .map(s => s.trim())
+                .filter(s => s.length > 0)
+                .forEach(s => group.summaries.add(s));
+        });
+
+        let notes = `Aggregated from ${nodes.length} automated failure(s).\n\n`;
+        for (const [ruleId, group] of ruleGroups.entries()) {
+            notes += `Rule: ${ruleId} (${group.count} instances affected)\n`;
+            notes += `Failures:\n${Array.from(group.summaries).join('\n')}\n\n`;
+        }
+
+        const description = checkText;
+
+        await db.query(
+            `INSERT INTO findings (result_id, severity, description, selector, html_snippet, condition, notes)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+            [
+                result_id,
+                mapAxeImpactToSeverity(data.severity),
+                description,
+                aggregatedSelector,
+                aggregatedHtml,
+                checkText,
+                notes.trim()
+            ]
+        );
+    }
+}
+
+/**
  * Recalculate and update the compliance score for an audit.
  * @param {string} page_audit_id - The ID of the audit to update
  */
@@ -223,7 +331,7 @@ async function syncAuditAutomatedResults(page_audit_id) {
 
         // 6. Upsert results, but ONLY if they don't exist OR are currently 'pending'
         // This prevents overwriting manual auditor work.
-        await db.query(
+        const resQuery = await db.query(
             `INSERT INTO page_sc_results (page_audit_id, sc_id, result, checked_conditions, reviewed_at)
              VALUES ($1, $2, $3, $4, now())
              ON CONFLICT (page_audit_id, sc_id) 
@@ -240,9 +348,19 @@ async function syncAuditAutomatedResults(page_audit_id) {
                                 WHEN page_sc_results.result = 'pending' THEN now() 
                                 ELSE page_sc_results.reviewed_at 
                               END
-             WHERE page_sc_results.result = 'pending' OR NOT EXISTS (SELECT 1 FROM page_sc_results WHERE page_audit_id = $1 AND sc_id = $2)`,
+             WHERE page_sc_results.result = 'pending' OR NOT EXISTS (SELECT 1 FROM page_sc_results WHERE page_audit_id = $1 AND sc_id = $2)
+             RETURNING result_id`,
             [page_audit_id, sc_id, sc_status, JSON.stringify(checked_conditions)]
         );
+
+        const result_id = resQuery.rows[0]?.result_id;
+
+        // If we updated (or inserted) and the status is Fail, sync findings
+        if (result_id && sc_status === 'fail') {
+            // Clear existing automated findings first to avoid duplicates
+            await db.query(`DELETE FROM findings WHERE result_id = $1`, [result_id]);
+            await processAutomatedFindings(result_id, sc_id, scanData, conditions);
+        }
 
         syncResults.push({ sc_id, status: sc_status });
     }
@@ -463,11 +581,18 @@ router.post('/audits/:page_audit_id/sync-automated/:scId', asyncHandler(async (r
     }
 
     // 5. Insert new automated result
-    await db.query(
+    const result_id_query = await db.query(
         `INSERT INTO page_sc_results (page_audit_id, sc_id, result, checked_conditions, reviewed_at)
-         VALUES ($1, $2, $3, $4, now())`,
+         VALUES ($1, $2, $3, $4, now())
+         RETURNING result_id`,
         [page_audit_id, scId, sc_status, JSON.stringify(checked_conditions)]
     );
+    const result_id = result_id_query.rows.length > 0 ? result_id_query.rows[0].result_id : null;
+
+    // 6. If result is 'fail', create automated findings
+    if (result_id && sc_status === 'fail') {
+        await processAutomatedFindings(result_id, scId, scanData, conditions);
+    }
 
     // 6. Update audit score
     await updateAuditScore(page_audit_id);
@@ -819,6 +944,7 @@ router.get('/findings', asyncHandler(async (req, res) => {
             f.html_snippet,
             f.created_at,
             f.notes,
+            f.condition,
             r.sc_id,
             pa.page_audit_id as auditId,
             p.domain,
@@ -834,7 +960,7 @@ router.get('/findings', asyncHandler(async (req, res) => {
 }));
 
 router.post('/findings', asyncHandler(async (req, res) => {
-    const { result_id, severity, description, selector, html_snippet, notes } = req.body;
+    const { result_id, severity, description, selector, html_snippet, notes, condition } = req.body;
     console.log('--- POST /findings ---');
     console.log('Body:', JSON.stringify(req.body, null, 2));
 
@@ -870,7 +996,7 @@ router.post('/findings', asyncHandler(async (req, res) => {
         `INSERT INTO findings (result_id, severity, description, selector, html_snippet, notes, condition, created_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
          RETURNING *`,
-        [result_id, severity, description, selector, htmlSnippet, notes, condition]
+        [result_id, severity, description, selector, html_snippet, notes, condition]
     );
 
     res.status(201).json(result.rows[0]);
@@ -897,6 +1023,7 @@ router.get('/findings/audit/:page_audit_id', asyncHandler(async (req, res) => {
             f.html_snippet,
             f.created_at,
             f.notes,
+            f.condition,
             r.sc_id,
             r.page_audit_id as auditId,
             p.domain,

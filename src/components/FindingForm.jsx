@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react';
-import { X, ChevronDown } from 'lucide-react';
+import { X, ChevronDown, Trash2 } from 'lucide-react';
 import { wcagChecklist, getSCById } from '../utils/wcag-loader';
 import { useAuditStore } from '../hooks/useAuditStore';
+
 export function FindingForm({ prefillScId, prefillCondition, editingFinding, onClose }) {
-  const { addFinding, updateFinding, progress, audits, currentTarget, error, loading } = useAuditStore();
+  const { addFinding, updateFinding, deleteFinding, progress, audits, findings, currentTarget, error, loading } = useAuditStore();
+
+  // Helper to strip [N] numbering from incoming data for the editable textareas
+  const cleanInput = (val) => val?.replace(/^\[\d+\]\s*/, '') || '';
+
   const [selectedSCs, setSelectedSCs] = useState(editingFinding?.scIds || (prefillScId ? [prefillScId] : []));
   const [severity, setSeverity] = useState(editingFinding?.severity ||
     (prefillScId ? getSCById(prefillScId)?.defaultSeverity || '' : ''));
@@ -11,58 +16,108 @@ export function FindingForm({ prefillScId, prefillCondition, editingFinding, onC
   const [url, setUrl] = useState(editingFinding?.url || progress?.targetUrl || '');
   const [page, setPage] = useState(editingFinding?.page || progress?.targetName || '');
   const [component, setComponent] = useState(editingFinding?.component || '');
-  const [cssSelector, setCssSelector] = useState(editingFinding?.cssSelector || editingFinding?.selector || '');
+  const [selectors, setSelectors] = useState(
+    editingFinding?.cssSelectors
+      ? editingFinding.cssSelectors.map(cleanInput)
+      : (editingFinding?.cssSelector || editingFinding?.selector
+        ? (editingFinding.cssSelector || editingFinding.selector).split('\n\n').map(cleanInput)
+        : [''])
+  );
   const [viewport, setViewport] = useState(editingFinding?.viewport || '');
   const [device, setDevice] = useState(editingFinding?.device || '');
   const [role, setRole] = useState(editingFinding?.role || '');
-  const [domSnippet, setDomSnippet] = useState(editingFinding?.domSnippet || editingFinding?.htmlSnippet || editingFinding?.html_snippet || '');
+
+
+  const [snippets, setSnippets] = useState(
+    editingFinding?.htmlSnippets
+      ? editingFinding.htmlSnippets.map(cleanInput)
+      : (editingFinding?.domSnippet || editingFinding?.htmlSnippet
+        ? (editingFinding.domSnippet || editingFinding.htmlSnippet).split('\n\n').map(cleanInput)
+        : [''])
+  );
   const [notes, setNotes] = useState(editingFinding?.notes || '');
   const [condition, setCondition] = useState(editingFinding?.condition || prefillCondition || '');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // Pre-fill template description/condition
+  // Pre-fill template description/condition or fetch existing automated data
   useEffect(() => {
-    if (prefillScId && !editingFinding) {
-      // 1. Auto-fill URL and Page from current target if available
+    // Logic for EXISTING findings or AUTO-FETCHING from store
+    if (!editingFinding && (prefillScId || prefillCondition)) {
+      // 1. Proactively search for an existing finding in the store that matches this condition
+      // This handles "fetching data which comes from wcag-compliance"
+      const autoMatch = findings.find(f =>
+        (f.auditId || f.auditid)?.toString().toLowerCase() === currentTarget?.id?.toString().toLowerCase() &&
+        f.scIds?.includes(prefillScId) &&
+        f.condition === prefillCondition
+      );
+
+      if (autoMatch) {
+        // If we found a data match in the store, use it as the source of truth
+        if (!url) setUrl(autoMatch.url || currentTarget?.url || '');
+        if (!page) setPage(autoMatch.page || currentTarget?.name || '');
+        if (!description) setDescription(autoMatch.description || prefillCondition || '');
+
+        // Split joined snippets back into array for UI
+        if (snippets.length === 1 && snippets[0] === '') {
+          let matchedSnippets = [];
+          if (autoMatch.htmlSnippets && Array.isArray(autoMatch.htmlSnippets)) {
+            matchedSnippets = autoMatch.htmlSnippets;
+          } else {
+            const snippetStr = autoMatch.domSnippet || autoMatch.htmlSnippet || '';
+            // Split by double newline if present (our standard delimiter)
+            matchedSnippets = snippetStr.includes('\n\n') ? snippetStr.split('\n\n') : [snippetStr];
+          }
+          const cleanedSnippets = matchedSnippets.map(cleanInput);
+          setSnippets(cleanedSnippets.filter(s => s.trim().length > 0).length ? cleanedSnippets : ['']);
+        }
+
+        if (selectors.length === 1 && selectors[0] === '') {
+          let matchedSelectors = [];
+          if (autoMatch.cssSelectors && Array.isArray(autoMatch.cssSelectors)) {
+            matchedSelectors = autoMatch.cssSelectors;
+          } else {
+            const selectorStr = autoMatch.cssSelector || autoMatch.selector || '';
+            matchedSelectors = selectorStr.includes('\n\n') ? selectorStr.split('\n\n') : [selectorStr];
+          }
+          const cleanedSelectors = matchedSelectors.map(cleanInput);
+          setSelectors(cleanedSelectors.filter(s => s.trim().length > 0).length ? cleanedSelectors : ['']);
+        }
+
+        if (!notes) setNotes(autoMatch.notes || '');
+        return; // Skip other pre-fill logic if matched
+      }
+
+      // 2. Fallback: Auto-fill URL and Page from current target if available
       if (currentTarget) {
         if (!url) setUrl(currentTarget.url);
         if (!page) setPage(currentTarget.name);
       }
 
-      // 2. Auto-generate description from condition if provided
+      // 3. Auto-generate description from condition if provided
       if (prefillCondition && !description) {
-        setDescription(`Accessibility barrier identified: ${prefillCondition}`);
+        setDescription(prefillCondition);
       }
-      // 3. Fallback: Auto-generate description from failed conditions
+      // 4. Traceback: Auto-generate description from failed conditions if sc-level
       else if (!description && currentTarget) {
         const currentAudit = audits[currentTarget.id];
         const checkState = currentAudit?.checks?.[prefillScId];
         const storedConditions = checkState?.checkedConditions || {};
 
-        // Find failed conditions
         const failedConditions = Object.entries(storedConditions)
           .filter(([_, status]) => (status === 'fail' || (typeof status === 'object' && status.status === 'fail')))
-          .map(([condition]) => `[${prefillScId}] ${condition}`);
+          .map(([condition]) => condition);
 
         if (failedConditions.length > 0) {
-          const generatedDesc = `The following accessibility barriers were identified:\n\n${failedConditions.map(c => `- ${c}`).join('\n')}`;
+          const generatedDesc = prefillCondition || failedConditions.join('\n');
           setDescription(generatedDesc);
         } else {
-          // Fallback to template if no specific conditions failed
           const sc = getSCById(prefillScId);
-          if (sc?.templateDescription) {
-            setDescription(sc.templateDescription);
-          }
-        }
-      } else if (!description) {
-        // Fallback if no target/audit data (e.g. initial load without audit)
-        const sc = getSCById(prefillScId);
-        if (sc?.templateDescription) {
-          setDescription(sc.templateDescription);
+          if (sc?.templateDescription) setDescription(sc.templateDescription);
         }
       }
     }
-  }, [prefillScId, editingFinding, description, currentTarget, audits, url, page, prefillCondition]);
+  }, [prefillScId, prefillCondition, editingFinding, findings, currentTarget, audits]);
+
   const isFormValid =
     selectedSCs.length > 0 &&
     !!severity &&
@@ -79,6 +134,17 @@ export function FindingForm({ prefillScId, prefillCondition, editingFinding, onC
       const sc = getSCById(id);
       return sc ? `${sc.id} ${sc.title}` : id;
     });
+
+    // Filter out empty snippets and re-apply sequence numbering
+    const cleanSnippetsArray = snippets.filter(s => s.trim().length > 0).map(cleanInput);
+    const numberedSnippets = cleanSnippetsArray.map((s, i) => `[${i + 1}] ${s}`);
+    const primarySnippet = numberedSnippets.join('\n\n');
+
+    // Filter out empty selectors and re-apply sequence numbering
+    const cleanSelectorsArray = selectors.filter(s => s.trim().length > 0).map(cleanInput);
+    const numberedSelectors = cleanSelectorsArray.map((s, i) => `[${i + 1}] ${s}`);
+    const primarySelector = numberedSelectors.join('\n\n');
+
     const findingData = {
       scIds: selectedSCs,
       scTitles,
@@ -86,8 +152,12 @@ export function FindingForm({ prefillScId, prefillCondition, editingFinding, onC
       description,
       url,
       page,
-      domSnippet,
-      cssSelector,
+      domSnippet: primarySnippet,
+      htmlSnippet: primarySnippet,
+      htmlSnippets: cleanSnippetsArray,
+      cssSelector: primarySelector,
+      selector: primarySelector,
+      cssSelectors: cleanSelectorsArray,
       notes,
       condition,
       status: 'open',
@@ -100,11 +170,43 @@ export function FindingForm({ prefillScId, prefillCondition, editingFinding, onC
     }
     onClose();
   };
+
+  const handleAddSnippet = () => {
+    setSnippets([...snippets, '']);
+  };
+
+  const handleRemoveSnippet = (index) => {
+    const newSnippets = snippets.filter((_, i) => i !== index);
+    setSnippets(newSnippets.length ? newSnippets : ['']);
+  };
+
+  const handleSnippetChange = (index, value) => {
+    const newSnippets = [...snippets];
+    newSnippets[index] = value;
+    setSnippets(newSnippets);
+  };
+
+  const handleAddSelector = () => {
+    setSelectors([...selectors, '']);
+  };
+
+  const handleRemoveSelector = (index) => {
+    const newSelectors = selectors.filter((_, i) => i !== index);
+    setSelectors(newSelectors.length ? newSelectors : ['']);
+  };
+
+  const handleSelectorChange = (index, value) => {
+    const newSelectors = [...selectors];
+    newSelectors[index] = value;
+    setSelectors(newSelectors);
+  };
+
   const toggleSC = (scId) => {
     setSelectedSCs(prev => prev.includes(scId)
       ? prev.filter(id => id !== scId)
       : [...prev, scId]);
   };
+
   return (
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-all duration-300">
       <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
@@ -195,15 +297,15 @@ export function FindingForm({ prefillScId, prefillCondition, editingFinding, onC
                     type="button"
                     onClick={() => setSeverity(sev)}
                     className={`
-                                            px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 border
-                                            ${severity === sev
+                      px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 border
+                      ${severity === sev
                         ? sev === 'Critical' ? 'bg-rose-50 border-rose-200 text-rose-700 ring-2 ring-rose-500 ring-offset-1'
                           : sev === 'Serious' ? 'bg-orange-50 border-orange-200 text-orange-700 ring-2 ring-orange-500 ring-offset-1'
                             : sev === 'Moderate' ? 'bg-amber-50 border-amber-200 text-amber-700 ring-2 ring-amber-400 ring-offset-1'
                               : 'bg-slate-100 border-slate-200 text-slate-700 ring-2 ring-slate-400 ring-offset-1'
                         : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
                       }
-                                        `}
+                    `}
                   >
                     {sev}
                   </button>
@@ -222,20 +324,18 @@ export function FindingForm({ prefillScId, prefillCondition, editingFinding, onC
                   onClick={() => {
                     if (selectedSCs.length > 0 && currentTarget) {
                       const currentAudit = audits[currentTarget.id];
-                      // Pull failed conditions from all selected SCs
                       const allFailedConditions = [];
                       selectedSCs.forEach(scId => {
                         const checkState = currentAudit?.checks?.[scId];
                         const storedConditions = checkState?.checkedConditions || {};
                         const failed = Object.entries(storedConditions)
                           .filter(([_, status]) => (status === 'fail' || (typeof status === 'object' && status.status === 'fail')))
-                          .map(([condition]) => `[${scId}] ${condition}`);
+                          .map(([condition]) => condition);
                         allFailedConditions.push(...failed);
                       });
 
                       if (allFailedConditions.length > 0) {
-                        const generatedDesc = `The following accessibility barriers were identified:\n\n${allFailedConditions.map(c => `- ${c}`).join('\n')}`;
-                        setDescription(generatedDesc);
+                        setDescription(allFailedConditions.join('\n'));
                       } else {
                         alert("No failed conditions found for the selected criteria.");
                       }
@@ -285,16 +385,80 @@ export function FindingForm({ prefillScId, prefillCondition, editingFinding, onC
               </div>
             </div>
 
+            {/* Selectors Area */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">CSS Selectors</label>
+              <div className="space-y-3">
+                {selectors.map((sel, index) => (
+                  <div key={index} className="flex gap-2 items-start">
+                    <div className="flex-none p-2 bg-slate-100 rounded text-[10px] font-bold text-slate-500 w-8 text-center mt-1">
+                      #{index + 1}
+                    </div>
+                    <input
+                      type="text"
+                      value={sel}
+                      onChange={(e) => handleSelectorChange(index, e.target.value)}
+                      className="flex-1 p-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-gray-400"
+                      placeholder=".my-button[id='submit']"
+                    />
+                    {selectors.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSelector(index)}
+                        className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors mt-0.5"
+                        title="Remove selector"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={handleAddSelector}
+                  className="text-sm text-indigo-600 font-medium hover:text-indigo-800 flex items-center gap-1 mt-2"
+                >
+                  + Add another selector
+                </button>
+              </div>
+            </div>
+
             {/* Evidence */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">DOM Snippet</label>
-              <textarea
-                value={domSnippet}
-                onChange={(e) => setDomSnippet(e.target.value)}
-                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono text-gray-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-gray-400 resize-none"
-                rows={3}
-                placeholder="<button class='btn'>Click me</button>"
-              />
+              <label className="block text-sm font-semibold text-gray-700 mb-2">DOM Snippets</label>
+              <div className="space-y-3">
+                {snippets.map((snippet, index) => (
+                  <div key={index} className="flex gap-2 items-start">
+                    <div className="flex-none p-2 bg-slate-100 rounded text-[10px] font-bold text-slate-500">
+                      #{index + 1}
+                    </div>
+                    <textarea
+                      value={snippet}
+                      onChange={(e) => handleSnippetChange(index, e.target.value)}
+                      className="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono text-gray-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-gray-400 resize-none"
+                      rows={3}
+                      placeholder="<button class='btn'>Click me</button>"
+                    />
+                    {snippets.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSnippet(index)}
+                        className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
+                        title="Remove snippet"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={handleAddSnippet}
+                  className="text-sm text-indigo-600 font-medium hover:text-indigo-800 flex items-center gap-1 mt-2"
+                >
+                  + Add another snippet
+                </button>
+              </div>
             </div>
 
             <div>
@@ -311,22 +475,41 @@ export function FindingForm({ prefillScId, prefillCondition, editingFinding, onC
         </div>
 
         {/* Footer (Actions) */}
-        <div className="flex-none px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-3 rounded-b-xl">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-5 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-white border border-transparent hover:border-gray-200 rounded-lg transition-all"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            form="finding-form"
-            disabled={!isFormValid || loading}
-            className="px-5 py-2.5 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-lg shadow-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            {loading ? 'Saving...' : editingFinding ? 'Update Finding' : 'Add Finding'}
-          </button>
+        <div className="flex-none px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between gap-3 rounded-b-xl">
+          <div>
+            {editingFinding && (
+              <button
+                type="button"
+                onClick={async () => {
+                  if (window.confirm('Are you sure you want to delete this finding?')) {
+                    await deleteFinding(editingFinding.id);
+                    onClose();
+                  }
+                }}
+                className="px-5 py-2.5 text-sm font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 border border-transparent hover:border-rose-200 rounded-lg transition-all flex items-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                Delete Finding
+              </button>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-5 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-white border border-transparent hover:border-gray-200 rounded-lg transition-all"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              form="finding-form"
+              disabled={!isFormValid || loading}
+              className="px-5 py-2.5 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-lg shadow-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              {loading ? 'Saving...' : editingFinding ? 'Update Finding' : 'Add Finding'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
