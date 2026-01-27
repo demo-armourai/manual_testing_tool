@@ -64,7 +64,7 @@ export function FilterPanel({ filters, onFilterChange }) {
         <div>
           <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Conformance Level</div>
           <div className="flex gap-2">
-            {['A', 'AA'].map(level => (
+            {['A', 'AA', 'AAA'].map(level => (
               <button
                 key={level}
                 onClick={() => toggleLevel(level)}

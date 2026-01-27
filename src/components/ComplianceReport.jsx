@@ -8,9 +8,17 @@ import DownloadReportButton from './Report/DownloadReportButton';
 import PDFReport from './Report/PDFReport';
 import { wcagChecklist } from '../utils/wcag-loader';
 
-export function ComplianceReport({ progress, findings, auditedEntity }) {
+export function ComplianceReport({ progress, findings, auditedEntity, filters }) {
   const { generateReport } = useAuditStore();
   const [showFullReport, setShowFullReport] = useState(false);
+
+  // Filter the checklist based on selected levels
+  // Default to A/AA if no filters provided, but respect the passed filters
+  const activeLevels = filters?.levels?.length > 0 ? filters.levels : ['A', 'AA'];
+
+  const filteredChecklist = wcagChecklist.filter(sc =>
+    activeLevels.includes(sc.level)
+  );
 
   useEffect(() => {
     if (progress?.page_audit_id) {
@@ -18,8 +26,8 @@ export function ComplianceReport({ progress, findings, auditedEntity }) {
     }
   }, [progress?.page_audit_id, generateReport]);
 
-  const overallScore = calculateComplianceScore(progress);
-  const principleScores = calculatePrincipleScores(progress);
+  const overallScore = calculateComplianceScore(progress, filteredChecklist);
+  const principleScores = calculatePrincipleScores(progress, filteredChecklist);
 
   const handleExportJSON = () => {
     const data = exportToJSON(progress, findings);
@@ -57,7 +65,7 @@ export function ComplianceReport({ progress, findings, auditedEntity }) {
     targetUrl: progress.targetUrl,
     projectName: progress.targetName,
     date: progress.startedAt ? new Date(progress.startedAt).toLocaleString() : new Date().toLocaleString(),
-    tests: wcagChecklist.map(sc => {
+    tests: filteredChecklist.map(sc => {
       const check = progress.checks && progress.checks[sc.id];
       const status = check ? check.status : 'untested';
       let result = 'Untested';
@@ -95,14 +103,20 @@ export function ComplianceReport({ progress, findings, auditedEntity }) {
         ...f,
         scId: scId,
         scIds: [scId], // Ensure scIds is always an array
-        scTitles: sc ? [sc.title] : [],
+        scTitles: sc ? [sc.title] : ['Unknown Criterion'],
         htmlSnippet: f.htmlSnippet || f.domSnippet || f.html_snippet || '',
         notes: f.notes || '',
         wcagCriteria: scId,
         url: f.url || progress.targetUrl
       };
+    }).filter(f => {
+      // Only include findings that belong to the filtered SCs
+      // Also ensure we have a valid scId
+      if (!f.scIds || f.scIds.length === 0 || !f.scIds[0]) return false;
+      return f.scIds.some(id => filteredChecklist.some(sc => sc.id === id));
     }),
-    preparedFor: auditedEntity
+    preparedFor: auditedEntity,
+    complianceStandard: activeLevels.join(' & ')
   };
 
   if (showFullReport) {

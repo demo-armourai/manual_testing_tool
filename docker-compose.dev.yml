@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   auditor-backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: auditor-backend

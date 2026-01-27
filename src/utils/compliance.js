@@ -1,9 +1,10 @@
 import { wcagChecklist } from '../utils/wcag-loader';
 
-export const calculateComplianceScore = (progress) => {
+export const calculateComplianceScore = (progress, checklist = wcagChecklist) => {
     const checks = progress?.checks || {};
-    const scIds = Object.keys(checks);
-    const tested = scIds.length;
+    // Only count SCs that are in the provided checklist
+    const scIds = checklist.map(sc => sc.id);
+    const tested = scIds.filter(id => checks[id]?.status).length; // Only count if status exists
 
     // Helper to get status safely
     const getStatus = (id) => checks[id]?.status || 'untested';
@@ -12,7 +13,7 @@ export const calculateComplianceScore = (progress) => {
     const failed = scIds.filter(id => getStatus(id) === 'fail').length;
     const na = scIds.filter(id => getStatus(id) === 'na').length;
 
-    const total = wcagChecklist.length;
+    const total = checklist.length;
     const untested = total - tested;
 
     // Calculate score as percentage of applicable (passed / (total - na))
@@ -30,13 +31,13 @@ export const calculateComplianceScore = (progress) => {
     };
 };
 
-export const calculatePrincipleScores = (progress) => {
+export const calculatePrincipleScores = (progress, checklist = wcagChecklist) => {
     const principles = ['Perceivable', 'Operable', 'Understandable', 'Robust'];
     const checks = progress?.checks || {};
     const getStatus = (id) => checks[id]?.status || 'untested';
 
     return principles.map(principle => {
-        const principleSCs = wcagChecklist.filter(sc => sc.principle === principle);
+        const principleSCs = checklist.filter(sc => sc.principle === principle);
 
         const total = principleSCs.length;
         // Count scs that have an entry in checks
