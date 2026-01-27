@@ -245,7 +245,24 @@ export default function App() {
     }
   }, [findings, currentTarget]);
 
+  const compareSC = (a, b) => {
+    const scA = (a.scIds || [])[0] || "";
+    const scB = (b.scIds || [])[0] || "";
+
+    const partsA = scA.split('.').map(p => parseInt(p) || 0);
+    const partsB = scB.split('.').map(p => parseInt(p) || 0);
+
+    for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+      const pA = partsA[i] || 0;
+      const pB = partsB[i] || 0;
+      if (pA !== pB) return pA - pB;
+    }
+    return 0;
+  };
+
   targetFindings = targetFindings.sort((a, b) => {
+    const scCompare = compareSC(a, b);
+    if (scCompare !== 0) return scCompare;
     return (SEVERITY_ORDER[b.severity] || 0) - (SEVERITY_ORDER[a.severity] || 0);
   });
 
@@ -264,9 +281,7 @@ export default function App() {
   const testedCount = complianceScore?.tested || 0;
   const totalCount = filteredChecklist?.length || 0;
 
-  if (!currentUser) {
-    return <Login />;
-  }
+  // Removed login gatekeeper for Demo Mode
 
   return (
     <div className="min-h-screen text-gray-900 font-sans bg-slate-50/50">
@@ -331,13 +346,6 @@ export default function App() {
                   <span className="text-sm font-bold text-slate-900">{currentUser?.username}</span>
                   <span className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">Tester</span>
                 </div>
-                <button
-                  onClick={logout}
-                  className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors group"
-                  title="Sign Out"
-                >
-                  <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                </button>
               </div>
             </div>
           </div>

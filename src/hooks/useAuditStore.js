@@ -22,7 +22,7 @@ export const useAuditStore = create()(persist((set, get) => ({
     recentScansMeta: { page: 1, limit: 6, total: 0, totalPages: 0 },
     userStats: [],
     userStatsMeta: { page: 1, limit: 6, total: 0, totalPages: 0 },
-    currentUser: null,
+    currentUser: { id: 'demo-001', username: 'Demo Tester', role: 'tester' },
     loading: false,
     error: null,
 
@@ -511,8 +511,7 @@ export const useAuditStore = create()(persist((set, get) => ({
                 ...audit?.checks,
                 [scId]: {
                     ...existingCheck,
-                    // Reset status to pending whenever conditions change to force re-verification
-                    status: 'pending',
+                    // Note: Status is now managed by aggregation logic in components/store
                     checkedConditions: updatedConditions
                 }
             },

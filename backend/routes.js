@@ -960,7 +960,7 @@ router.get('/findings', asyncHandler(async (req, res) => {
 }));
 
 router.post('/findings', asyncHandler(async (req, res) => {
-    const { result_id, severity, description, selector, htmlSnippet, notes, condition } = req.body;
+    const { result_id, severity, description, selector, html_snippet, notes, condition } = req.body;
     console.log('--- POST /findings ---');
     console.log('Body:', JSON.stringify(req.body, null, 2));
 

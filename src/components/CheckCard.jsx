@@ -100,60 +100,62 @@ export function CheckCard({ sc, onOpenFindingForm, onNext, onPrevious, onViewRep
     // Toggle off if clicking same status
     const nextStatus = (currentStatus === newStatus) ? null : newStatus;
 
-    // Auto-update SC Status Logic
-    // Check if ANY condition will be 'fail' after this change
-    const willHaveFail = conditions.some(c => {
-      if (c === condition) return nextStatus === 'fail';
-      return getConditionStatus(c) === 'fail';
+    // Aggregation Logic for overall Success Criteria status
+    const updatedStatuses = conditions.map(c => {
+      if (c === condition) return nextStatus;
+      return getConditionStatus(c);
     });
 
-    if (willHaveFail) {
-      updateCheckStatus(sc.id, 'fail');
+    const hasFail = updatedStatuses.some(s => s === 'fail');
+    const allNA = updatedStatuses.every(s => s === 'na');
+    const allCompleted = updatedStatuses.every(s => s !== null);
+    const anyPass = updatedStatuses.some(s => s === 'pass');
 
-      // Auto-open findings form if newly failed
-      if (nextStatus === 'fail' && currentStatus !== 'fail') {
-        const existingFinding = findings.find(f =>
-          f.auditId === currentTarget?.id &&
-          f.scIds?.includes(sc.id) &&
-          f.condition === condition
-        );
-        onOpenFindingForm(sc.id, existingFinding, condition);
-      }
-    } else {
-      // If there is no failed condition, make Success Criteria pass automatically
-      updateCheckStatus(sc.id, 'pass');
+    // Apply User Priority Rules
+    let finalSCStatus = 'pending';
+    if (hasFail) {
+      finalSCStatus = 'fail';
+    } else if (allNA) {
+      finalSCStatus = 'na';
+    } else if (allCompleted && anyPass) {
+      finalSCStatus = 'pass';
     }
 
+    // 1. Update the condition first
     await updateConditionStatus(sc.id, condition, nextStatus);
-  };
 
-  const hasFailedCondition = conditions.some(c => getConditionStatus(c) === 'fail');
+    // 2. Mark overall SC status automatically
+    updateCheckStatus(sc.id, finalSCStatus);
+
+    // 3. Auto-open findings form if newly failed
+    if (nextStatus === 'fail' && currentStatus !== 'fail') {
+      const existingFinding = findings.find(f =>
+        (f.auditId || f.auditid)?.toString().toLowerCase() === currentTarget?.id?.toString().toLowerCase() &&
+        f.scIds?.includes(sc.id) &&
+        f.condition === condition
+      );
+      onOpenFindingForm(sc.id, existingFinding, condition);
+    }
+  };
 
   const getStatusButton = (buttonStatus, label, Icon) => {
     const isSelected = status === buttonStatus;
-
-    // Check if all conditions have been attempted (are strictly not undefined/null)
-    const allConditionsVerified = conditions.every(c => {
-      const s = getConditionStatus(c);
-      return s !== null && s !== undefined;
-    });
-
-    const isDisabled = !allConditionsVerified;
+    const isDisabled = syncing; // Only disable during sync
 
     return (
       <button
         onClick={() => !isDisabled && handleStatusChange(buttonStatus)}
         disabled={isDisabled}
-        title={isDisabled ? "Verify all conditions first" : label}
+        title={label}
         className={`flex flex-col items-center gap-2 px-12 py-4 rounded-lg border transition-all duration-200
-          ${isDisabled ? 'opacity-50 cursor-not-allowed grayscale bg-slate-50 border-slate-100' : ''}
+          ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}
           ${isSelected
             ? buttonStatus === 'pass'
               ? 'border-emerald-500 bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500 shadow-sm'
               : buttonStatus === 'fail'
                 ? 'border-rose-500 bg-rose-50 text-rose-700 ring-1 ring-rose-500 shadow-sm'
                 : 'border-slate-400 bg-slate-100 text-slate-700 ring-1 ring-slate-400 shadow-sm'
-            : !isDisabled && 'border-slate-200 bg-white text-slate-600 hover:border-indigo-300 hover:text-indigo-600 hover:bg-slate-50'}`}
+            : 'border-slate-200 bg-white text-slate-600 hover:border-indigo-300 hover:text-indigo-600 hover:bg-slate-50'}`}
       >
         <Icon className={`w-7 h-7 ${isSelected ? 'fill-current opacity-20' : ''}`} />
         <span className="text-sm font-medium">{label}</span>

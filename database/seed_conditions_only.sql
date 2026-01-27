@@ -14,7 +14,7 @@ INSERT INTO reference_sc_conditions (sc_id, condition_text, condition_type, axe_
   ('1.1.1', 'Inputs have appropriate accessible names.', 'axe-core', 'aria-meter-name, aria-progressbar-name, input-image-alt, role-img-alt, svg-img-alt'),
   ('1.1.1', 'Embedded multimedia is identified using accessible text alternatives.', 'axe-core', 'input-image-alt, object-alt, role-img-alt, svg-img-alt'),
   ('1.1.1', 'Frames and iframes have appropriate and descriptive titles.', 'manual', NULL),
-  ('1.2.1', 'Audio-only media elements include a mechanism (such as a track or accessible reference) indicating the presence of a transcript or caption alternative.', 'axe-core', 'audio-caption  (Deprecated)'),
+   ('1.2.1', 'Audio-only media elements include a mechanism (such as a track or accessible reference) indicating the presence of a transcript or caption alternative.', 'manual', NULL),
   ('1.2.1', 'A complete and accurate transcript is provided for all non-live audio-only content.', 'manual', NULL),
   ('1.2.1', 'The transcript includes all relevant spoken dialogue and meaningful sounds.', 'manual', NULL),
   ('1.2.1', 'For non-live video-only content, a descriptive transcript or audio description is provided.', 'manual', NULL),
